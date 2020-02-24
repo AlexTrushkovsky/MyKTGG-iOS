@@ -152,7 +152,6 @@ extension AuthViewController: GIDSignInDelegate{
             }
             
             print("Successfully logged into Firebase with Google")
-            print("again check... 😱")
             self.dismiss(animated: true, completion: nil)
         }
     }
