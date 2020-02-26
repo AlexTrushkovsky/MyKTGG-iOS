@@ -36,7 +36,8 @@ class AuthViewController: UIViewController {
         nameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self
-        
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     func showNoAppleAlert(){
         let alert = UIAlertController(title: "Помилка", message: "Вхід з Apple тимчасово недоступний", preferredStyle: .alert)
@@ -76,7 +77,10 @@ class AuthViewController: UIViewController {
             }
         }
     }
-    @IBAction func signInWithGoogle(_ sender: UIButton) {
+    @IBAction func signInWithGoogle(_ sender: GIDSignInButton) {
+        GIDSignIn.sharedInstance().delegate=self
+        GIDSignIn.sharedInstance()?.presentingViewController = self
+        GIDSignIn.sharedInstance().signIn()
     }
     @IBAction func regOrLogButton(_ sender: UIButton) {
     }
