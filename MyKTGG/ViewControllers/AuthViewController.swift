@@ -135,7 +135,7 @@ class AuthViewController: UIViewController {
                     if (emailTextField.text!.contains("@")){
                         email=emailTextField.text!
                     }else{
-                        showAlert(title: "Помилка", message: "Ви ввели не дійсний email")
+                        showAlert(title: "Помилка", message: "Ви ввели недійсний email")
                     }
                 }else{
                    showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
@@ -149,7 +149,7 @@ class AuthViewController: UIViewController {
                     Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                         if error == nil{
                             self.dismiss(animated: true, completion: nil)
-                        }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль не вірний")}
+                        }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль невірний")}
                     }
                 }
             }
