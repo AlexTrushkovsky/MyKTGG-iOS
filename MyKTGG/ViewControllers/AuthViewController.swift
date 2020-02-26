@@ -79,7 +79,7 @@ class AuthViewController: UIViewController {
         }
     }
     @IBAction func signInWithGoogle(_ sender: GIDSignInButton) {
-        GIDSignIn.sharedInstance().delegate=self
+        GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
     }
