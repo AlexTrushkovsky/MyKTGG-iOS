@@ -18,7 +18,7 @@
         <!--KTGG-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="authKTGG" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="MyKTGG" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -51,7 +51,7 @@
         <!--Auth View Controller-->
         <scene sceneID="F33-o8-NF7">
             <objects>
-                <viewController storyboardIdentifier="RegViewController" id="jDS-EW-EeY" customClass="AuthViewController" customModule="authKTGG" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="RegViewController" id="jDS-EW-EeY" customClass="AuthViewController" customModule="MyKTGG" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="oSS-eU-jGX">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -196,7 +196,7 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
                         <outlet property="AuthLabel" destination="7ec-UT-m4V" id="ZWZ-Jc-3v4"/>
-                        <outlet property="LoginSubButton" destination="I7m-CZ-rmN" id="HrD-AO-73K"/>
+                        <outlet property="LoginSubButton" destination="I7m-CZ-rmN" id="99w-F5-9Ij"/>
                         <outlet property="RegisterButton" destination="2yh-iq-MU6" id="TpE-Mp-ffX"/>
                         <outlet property="emailTextField" destination="GNT-a7-gya" id="4Wy-v9-thS"/>
                         <outlet property="emailTextFieldView" destination="dE0-Ha-e6n" id="zwE-90-YH5"/>
@@ -235,7 +235,7 @@
         <!--Forgot Pass View Controller-->
         <scene sceneID="1x3-jy-KPM">
             <objects>
-                <viewController storyboardIdentifier="ForgotPassViewController" id="24V-pT-goR" customClass="ForgotPassViewController" customModule="authKTGG" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ForgotPassViewController" id="24V-pT-goR" customClass="ForgotPassViewController" customModule="MyKTGG" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3Fm-PV-fDh">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="300"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
