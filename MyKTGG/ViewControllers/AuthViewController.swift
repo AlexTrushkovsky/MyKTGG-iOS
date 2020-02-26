@@ -1,6 +1,7 @@
 import UIKit
 import Firebase
 import FBSDKLoginKit
+import GoogleSignIn
 class AuthViewController: UIViewController {
     var signup:Bool = true{
         willSet{
