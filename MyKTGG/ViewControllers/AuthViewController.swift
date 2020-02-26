@@ -27,7 +27,7 @@ class AuthViewController: UIViewController {
     @IBOutlet weak var forgotPasswordButton: UIButton!
     @IBOutlet weak var signInWithAppleButton: UIButton!
     @IBOutlet weak var signInWithFacebookButton: UIButton!
-    @IBOutlet weak var signInWithGoogleButton: UIButton!
+    @IBOutlet weak var signInWithGoogleButton: GIDSignInButton!
     @IBOutlet weak var RegisterButton: UIButton!
     @IBOutlet weak var LoginSubButton: UIButton!
     
@@ -79,7 +79,7 @@ class AuthViewController: UIViewController {
         }
     }
     @IBAction func signInWithGoogle(_ sender: GIDSignInButton) {
-        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().delegate=self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
     }
@@ -138,3 +138,24 @@ class AuthViewController: UIViewController {
             return true
         }
     }
+//  Google SDK
+extension AuthViewController: GIDSignInDelegate{
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error {
+            print("Failed to log into Google: ", error)
+            return
+        }
+        print("Succesfuly logged into Google")
+        guard let authentication = user.authentication else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
+        Auth.auth().signIn(with: credential) { (user, error) in
+            if let error = error {
+                print("Something went wrong with out google user: ", error)
+                return
+            }
+            
+            print("Successfully logged into Firebase with Google")
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+}
