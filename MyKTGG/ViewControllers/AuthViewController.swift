@@ -33,18 +33,14 @@ class AuthViewController: UIViewController {
         }
     }
     @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         isModalInPresentation = true
         nameTextField.delegate = self
-        nameTextField.tag = 0
         emailTextField.delegate = self
-        emailTextField.tag = 1
         passwordTextField.delegate = self
-        passwordTextField.tag = 2
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
@@ -150,6 +146,8 @@ extension AuthViewController:UITextFieldDelegate{
             if !emailTextField.text!.isEmpty{
                 if (emailTextField.text!.contains("@")){
                     email=emailTextField.text!
+                    textField.resignFirstResponder()
+                    passwordTextField.becomeFirstResponder()
                 }else{
                     showAlert(title: "Помилка", message: "Ви ввели недійсний email")
                 }

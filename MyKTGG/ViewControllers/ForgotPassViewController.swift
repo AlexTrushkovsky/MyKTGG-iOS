@@ -27,9 +27,15 @@ class ForgotPassViewController: UIViewController {
         super.viewDidLoad()
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        emailTextField.delegate = self
     }
     
     @IBAction func restoreButton(_ sender: UIButton) {
+        _ = textFieldShouldReturn(emailTextField)
+    }
+}
+extension ForgotPassViewController:UITextFieldDelegate{
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         var email = ""
         if !emailTextField.text!.isEmpty{
             if (emailTextField.text!.contains("@")){
@@ -51,5 +57,6 @@ class ForgotPassViewController: UIViewController {
         }else{
             showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
         }
+        return true
     }
 }
