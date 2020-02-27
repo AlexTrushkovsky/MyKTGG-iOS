@@ -16,7 +16,7 @@ class AuthViewController: UIViewController {
     @IBOutlet weak var signInWithGoogleButton: GIDSignInButton!
     @IBOutlet weak var RegisterButton: UIButton!
     @IBOutlet weak var LoginSubButton: UIButton!
-// Sign/Log in Switch
+    // Sign/Log in Switch
     var signup:Bool = true{
         willSet{
             if newValue{
@@ -32,14 +32,23 @@ class AuthViewController: UIViewController {
             }
         }
     }
+    @objc func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         isModalInPresentation = true
         nameTextField.delegate = self
+        nameTextField.tag = 0
         emailTextField.delegate = self
+        emailTextField.tag = 1
         passwordTextField.delegate = self
+        passwordTextField.tag = 2
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
     }
     func showAlert(title: String, message: String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -49,11 +58,11 @@ class AuthViewController: UIViewController {
     
     @IBAction func forgonPasswordAction(_ sender: UIButton) {
     }
-//  Apple SignIn
+    //  Apple SignIn
     @IBAction func signInWithAppleAction(_ sender: UIButton) {
         showAlert(title: "Помилка", message: "Авторизація за допомогою Apple на даний час недоступна")
     }
-//  Facebook SignIn
+    //  Facebook SignIn
     @IBAction func signInWithFaceBookAction(_ sender: UIButton) {
         let login = LoginManager()
         login.logIn(permissions: ["email","public_profile"], from: self) {(result, error) in
@@ -86,76 +95,81 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance().signIn()
     }
     @IBAction func regOrLogButton(_ sender: UIButton) {
+        _ = textFieldShouldReturn(passwordTextField)
     }
     @IBAction func logSingSwitch(_ sender: UIButton) {
         signup = !signup
     }
 }
 //  Email SignIn
-    extension AuthViewController:UITextFieldDelegate{
-        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            var name = ""
-            var email = ""
-            var password = ""
-            
-            if (signup){
-                if !nameTextField.text!.isEmpty{
-                    name=nameTextField.text!
+extension AuthViewController:UITextFieldDelegate{
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        var name = ""
+        var email = ""
+        var password = ""
+        
+        if (signup){
+            if !nameTextField.text!.isEmpty{
+                name=nameTextField.text!
+                textField.resignFirstResponder()
+                emailTextField.becomeFirstResponder()
+            }else{
+               showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup name check")
+            }
+            if !emailTextField.text!.isEmpty{
+                if (emailTextField.text!.contains("@")){
+                    email=emailTextField.text!
+                    textField.resignFirstResponder()
+                    passwordTextField.becomeFirstResponder()
                 }else{
-                   showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                }
-                if !emailTextField.text!.isEmpty{
-                    if (emailTextField.text!.contains("@")){
-                        email=emailTextField.text!
-                    }else{
-                        showAlert(title: "Помилка", message: "Ви ввели не дійсний email")
-                    }
-                }else{
-                   showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                }
-                if !passwordTextField.text!.isEmpty{
-                    password=passwordTextField.text!
-                }else{
-                   showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                }
-                if(!name.isEmpty && !email.isEmpty && !password.isEmpty){
-                    Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
-                        if error == nil{
-                            if let result = result{
-                                print(result.user.uid)
-                                let ref = Database.database().reference().child("users")
-                                ref.child(result.user.uid).updateChildValues(["name":name,"email":email])
-                                self.dismiss(animated: true, completion: nil)
-                            }
-                        }else{self.showAlert(title: "Помилка", message: "Не вдалося зареєструвати користувача, перевірте дані!")}
-                    }
+                   showAlert(title: "Помилка", message: "Ви ввели недійсний email")
+                    print ("Error on signup email check (bad email)")
                 }
             }else{
-                if !emailTextField.text!.isEmpty{
-                    if (emailTextField.text!.contains("@")){
-                        email=emailTextField.text!
-                    }else{
-                        showAlert(title: "Помилка", message: "Ви ввели недійсний email")
-                    }
-                }else{
-                   showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                }
-                if !passwordTextField.text!.isEmpty{
-                    password=passwordTextField.text!
-                }else{
-                   showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                }
-                if (!email.isEmpty && !password.isEmpty){
-                    Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
-                        if error == nil{
-                            self.dismiss(animated: true, completion: nil)
-                        }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль невірний")}
-                    }
-                }
+               showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup email check")
             }
-            return true
+            if !passwordTextField.text!.isEmpty{
+                password=passwordTextField.text!
+            }else{
+              showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup pass check")
+            }
+            Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
+                if error == nil{
+                    if let result = result{
+                        print(result.user.uid)
+                        let ref = Database.database().reference().child("users")
+                        ref.child(result.user.uid).updateChildValues(["name":name,"email":email])
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }else{self.showAlert(title: "Помилка", message: "Не вдалося зареєструвати користувача, перевірте дані!")}
+            }
+        }else{
+            if !emailTextField.text!.isEmpty{
+                if (emailTextField.text!.contains("@")){
+                    email=emailTextField.text!
+                }else{
+                    showAlert(title: "Помилка", message: "Ви ввели недійсний email")
+                }
+            }else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+            }
+            if !passwordTextField.text!.isEmpty{
+                password=passwordTextField.text!
+            }else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+            }
+            Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
+                if error == nil{
+                    self.dismiss(animated: true, completion: nil)
+                }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль невірний")}
+            }
         }
+        return true
     }
+}
 //  Google SignIn
 extension AuthViewController: GIDSignInDelegate{
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
