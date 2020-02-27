@@ -32,6 +32,10 @@ class AuthViewController: UIViewController {
             }
         }
     }
+    var name = ""
+    var email = ""
+    var password = ""
+    
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
@@ -91,73 +95,45 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance().signIn()
     }
     @IBAction func regOrLogButton(_ sender: UIButton) {
-        _ = textFieldShouldReturn(passwordTextField)
-    }
-    @IBAction func logSingSwitch(_ sender: UIButton) {
-        signup = !signup
-    }
-}
-//  Email SignIn
-extension AuthViewController:UITextFieldDelegate{
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        var name = ""
-        var email = ""
-        var password = ""
-        
         if (signup){
             guard !nameTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup name check")
-                return true
+                return
             }
             guard nameTextField.text!.count<30 else {
                 showAlert(title: "Помилка", message: "Ім'я користувача повинно містити не більше 30 символів")
                 print ("GG")
-                return true
+                return
             }
-            name=nameTextField.text!
-            textField.resignFirstResponder()
-            emailTextField.becomeFirstResponder()
-            
             guard !emailTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup name check")
-                return true
+                return
             }
             guard emailTextField.text!.contains("@") else{
                 showAlert(title: "Помилка", message: "Ви ввели недійсний email")
                 print ("Error on signup email check (bad email)")
-                return true
+                return
             }
-            email=emailTextField.text!
-            textField.resignFirstResponder()
-            passwordTextField.becomeFirstResponder()
-            
             guard !passwordTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup pass check")
-                return true
+                return
             }
             guard passwordTextField.text!.count>6 else{
                 showAlert(title: "Помилка", message: "Пароль повинен містити не менше 6 символів")
-                return true
+                return
             }
-            password=passwordTextField.text!
-            
             Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
                 if error == nil{
                     if let result = result{
                         print(result.user.uid)
                         let ref = Database.database().reference().child("users")
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
-                        changeRequest?.displayName = name
-                        changeRequest?.commitChanges { (error) in
-                            print("DisplayName push error")
-                        }
-                        ref.child(result.user.uid).updateChildValues(["name":name,"email":email])
-                    }
-                    Auth.auth().currentUser?.sendEmailVerification { (error) in
-                        self.showAlert(title: "Успіх", message: "На вашу поштову скриньку було надіслано повідомлення з підтвердженням електронної адреси")
+                        changeRequest?.displayName = self.name
+                        changeRequest?.commitChanges { (error) in }
+                        ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email])
                         self.dismiss(animated: true, completion: nil)
                     }
                 }else{self.showAlert(title: "Помилка", message: "Не вдалося зареєструвати користувача, перевірте дані!")}
@@ -165,26 +141,59 @@ extension AuthViewController:UITextFieldDelegate{
         }else{
             guard !emailTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                return true
+                return
             }
             guard emailTextField.text!.contains("@") else{
                 showAlert(title: "Помилка", message: "Ви ввели недійсний email")
-                return true
+                return
             }
-            email=emailTextField.text!
-            textField.resignFirstResponder()
-            passwordTextField.becomeFirstResponder()
-            
             guard !passwordTextField.text!.isEmpty else{
-                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                return true
-            }
-            password=passwordTextField.text!
+                           showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                           return
+                       }
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                 if error == nil{
+                    let user = Auth.auth().currentUser
+                    self.name = user?.displayName ?? "Невідомий"
+                    self.email = user?.email ?? "no email"
                     self.dismiss(animated: true, completion: nil)
                 }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль невірний")}
             }
+        }
+    }
+    @IBAction func logSingSwitch(_ sender: UIButton) {
+        signup = !signup
+    }
+}
+//  Email SignIn
+extension AuthViewController:UITextFieldDelegate{
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if (signup){
+            if textField == nameTextField {
+                textField.resignFirstResponder()
+                emailTextField.becomeFirstResponder()
+             } else if textField == emailTextField {
+                textField.resignFirstResponder()
+                passwordTextField.becomeFirstResponder()
+             } else if textField == passwordTextField {
+                textField.resignFirstResponder()
+             }
+            
+            name=nameTextField.text!
+            email=emailTextField.text!
+            password=passwordTextField.text!
+        }else{
+            
+           
+            if textField == emailTextField {
+                textField.resignFirstResponder()
+                passwordTextField.becomeFirstResponder()
+            } else if textField == passwordTextField {
+                textField.resignFirstResponder()
+            }
+            email=emailTextField.text!
+            password=passwordTextField.text!
         }
         return true
     }
