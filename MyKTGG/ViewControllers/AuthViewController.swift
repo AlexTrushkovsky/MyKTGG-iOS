@@ -104,7 +104,6 @@ class AuthViewController: UIViewController {
             }
             guard nameTextField.text!.count<30 else {
                 showAlert(title: "Помилка", message: "Ім'я користувача повинно містити не більше 30 символів")
-                print ("GG")
                 return
             }
             guard !emailTextField.text!.isEmpty else{
@@ -112,20 +111,14 @@ class AuthViewController: UIViewController {
                 print ("Error on signup name check")
                 return
             }
-            guard emailTextField.text!.contains("@") else{
-                showAlert(title: "Помилка", message: "Ви ввели недійсний email")
-                print ("Error on signup email check (bad email)")
-                return
-            }
             guard !passwordTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup pass check")
                 return
             }
-            guard passwordTextField.text!.count>6 else{
-                showAlert(title: "Помилка", message: "Пароль повинен містити не менше 6 символів")
-                return
-            }
+            name=nameTextField.text!
+            email=emailTextField.text!
+            password=passwordTextField.text!
             Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
                 if error == nil{
                     if let result = result{
@@ -138,7 +131,8 @@ class AuthViewController: UIViewController {
                         self.dismiss(animated: true, completion: nil)
                     }
                 }else{
-                    self.showAlert(title: "Помилка", message: "Не вдалося зареєструвати користувача, перевірте дані!")
+                    print(error!._code)
+                    self.handleError(error!)
                 }
             }
         }else{
@@ -146,21 +140,24 @@ class AuthViewController: UIViewController {
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 return
             }
-            guard emailTextField.text!.contains("@") else{
-                showAlert(title: "Помилка", message: "Ви ввели недійсний email")
+            guard !passwordTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 return
             }
-            guard !passwordTextField.text!.isEmpty else{
-                           showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
-                           return
-                       }
+            
+            email=emailTextField.text!
+            password=passwordTextField.text!
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                 if error == nil{
+                    
                     let user = Auth.auth().currentUser
                     self.name = user?.displayName ?? "Невідомий"
                     self.email = user?.email ?? "no email"
                     self.dismiss(animated: true, completion: nil)
-                }else{self.showAlert(title: "Помилка", message: "Користувача не існує або пароль невірний")}
+                }else{
+                    print(error!._code)
+                    self.handleError(error!)
+                }
             }
         }
     }
@@ -170,7 +167,6 @@ class AuthViewController: UIViewController {
 }
 //  Email SignIn
 extension AuthViewController:UITextFieldDelegate{
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if (signup){
             if textField == nameTextField {
@@ -182,21 +178,13 @@ extension AuthViewController:UITextFieldDelegate{
              } else if textField == passwordTextField {
                 textField.resignFirstResponder()
              }
-            
-            name=nameTextField.text!
-            email=emailTextField.text!
-            password=passwordTextField.text!
         }else{
-            
-           
             if textField == emailTextField {
                 textField.resignFirstResponder()
                 passwordTextField.becomeFirstResponder()
             } else if textField == passwordTextField {
                 textField.resignFirstResponder()
             }
-            email=emailTextField.text!
-            password=passwordTextField.text!
         }
         return true
     }
@@ -226,21 +214,21 @@ extension AuthErrorCode {
     var errorMessage: String {
         switch self {
         case .emailAlreadyInUse:
-            return "The email is already in use with another account"
+            return "Електронна пошта вже зареєстрована"
         case .userNotFound:
-            return "Account not found for the specified user. Please check and try again"
+            return "Аккаунту не знайдено. \nПеревірте правильність вводу і спробуйте ще раз!"
         case .userDisabled:
-            return "Your account has been disabled. Please contact support."
+            return "Ваш обліковий запис було заблоковано. \nЗверніться до техпідтримки в \nTelegram: @esen1n25"
         case .invalidEmail, .invalidSender, .invalidRecipientEmail:
-            return "Please enter a valid email"
+            return "Будь-ласка, введіть правильну електронну адресу!"
         case .networkError:
-            return "Network error. Please try again."
+            return "Немає зв'язку з сервером. \nСпробуйте будь-ласка пізніше."
         case .weakPassword:
-            return "Your password is too weak. The password must be 6 characters long or more."
+            return "Ваш пароль закороткий. \nВкажіть пароль, що містить більше 6 символів."
         case .wrongPassword:
-            return "Your password is incorrect. Please try again or use 'Forgot password' to reset your password"
+            return "Пароль невірний. \nСпробуйте ще раз, або натисніть 'Забули пароль', щоб відновити доступ."
         default:
-            return "Unknown error occurred"
+            return "Сталася невідома помилка"
         }
     }
 }
@@ -248,9 +236,9 @@ extension UIViewController{
     func handleError(_ error: Error) {
         if let errorCode = AuthErrorCode(rawValue: error._code) {
             print(errorCode.errorMessage)
-            let alert = UIAlertController(title: "Error", message: errorCode.errorMessage, preferredStyle: .alert)
+            let alert = UIAlertController(title: "Помилка", message: errorCode.errorMessage, preferredStyle: .alert)
 
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            let okAction = UIAlertAction(title: "ОК", style: .default, handler: nil)
 
             alert.addAction(okAction)
 
