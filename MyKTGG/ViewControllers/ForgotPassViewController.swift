@@ -28,6 +28,7 @@ class ForgotPassViewController: UIViewController {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         emailTextField.delegate = self
+        emailTextField.becomeFirstResponder()
     }
     
     @IBAction func restoreButton(_ sender: UIButton) {
