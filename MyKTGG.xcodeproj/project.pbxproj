@@ -19,6 +19,7 @@
 		6E76258C2403F87F00C68C7F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625852403F87F00C68C7F /* GoogleService-Info.plist */; };
 		6E76258D2403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625862403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf */; };
 		6E76258E2403F87F00C68C7F /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7625872403F87F00C68C7F /* AuthViewController.swift */; };
+		6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */; };
 		97CAC5A91E75E7784EA8A58A /* Pods_MyKTGG.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 218BA11BD462F34C6A02B9F9 /* Pods_MyKTGG.framework */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +41,7 @@
 		6E7625852403F87F00C68C7F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6E7625862403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AcuminProSemiCondensed-Bold.otf"; sourceTree = "<group>"; };
 		6E7625872403F87F00C68C7F /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupChooseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 				6E7625712403F6C100C68C7F /* ViewController.swift */,
 				6E7625872403F87F00C68C7F /* AuthViewController.swift */,
 				6E7625822403F87F00C68C7F /* ForgotPassViewController.swift */,
+				6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6E7625892403F87F00C68C7F /* ForgotPassViewController.swift in Sources */,
+				6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */,
 				6E7625722403F6C100C68C7F /* ViewController.swift in Sources */,
 				6E76258E2403F87F00C68C7F /* AuthViewController.swift in Sources */,
 				6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */,

@@ -16,6 +16,8 @@ class AuthViewController: UIViewController {
     @IBOutlet weak var signInWithGoogleButton: GIDSignInButton!
     @IBOutlet weak var RegisterButton: UIButton!
     @IBOutlet weak var LoginSubButton: UIButton!
+    @IBOutlet weak var ActivityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var darkView: UIView!
     
     // Sign/Log in Switch
     var signup:Bool = true{
@@ -50,14 +52,27 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance()?.presentingViewController = self
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        darkView.isHidden=true
+        ActivityIndicator.isHidden=true
     }
     func showAlert(title: String, message: String){
+        stopWaitingAnimation()
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "ОК",style: .default))
         present(alert, animated: true, completion: nil)
     }
+    func startWaitingAnimation(){
+        darkView.isHidden=false
+        ActivityIndicator.startAnimating()
+        ActivityIndicator.isHidden = false
+    }
+    func stopWaitingAnimation(){
+        darkView.isHidden=true
+        ActivityIndicator.stopAnimating()
+        ActivityIndicator.isHidden = true
+       }
     
-    @IBAction func forgonPasswordAction(_ sender: UIButton) {
+    @IBAction func forgotPasswordAction(_ sender: UIButton) {
     }
     //  Apple SignIn
     @IBAction func signInWithAppleAction(_ sender: UIButton) {
@@ -71,6 +86,7 @@ class AuthViewController: UIViewController {
                 print("isCanceled")
             }else{
                 if error == nil{
+                    self.startWaitingAnimation()
                     GraphRequest(graphPath: "me", parameters: ["fields":"email,name"], tokenString: AccessToken.current?.tokenString, version: nil, httpMethod: HTTPMethod(rawValue: "GET")).start(completionHandler: {
                         (nil, result, error) in
                         if error == nil{
@@ -79,6 +95,7 @@ class AuthViewController: UIViewController {
                             Auth.auth().signIn(with: credential, completion: {(result, error) in
                                 if error == nil{
                                     print(result?.user.uid as Any)
+                                    self.stopWaitingAnimation()
                                     self.dismiss(animated: true, completion: nil)
                                 }else{
                                     print(error as Any)
@@ -96,6 +113,7 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance().signIn()
     }
     @IBAction func regOrLogButton(_ sender: UIButton) {
+        startWaitingAnimation()
         if (signup){
             guard !nameTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
@@ -128,11 +146,13 @@ class AuthViewController: UIViewController {
                         changeRequest?.displayName = self.name
                         changeRequest?.commitChanges { (error) in }
                         ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email])
+                        self.stopWaitingAnimation()
                         self.dismiss(animated: true, completion: nil)
                     }
                 }else{
                     print(error!._code)
                     self.handleError(error!)
+                    self.stopWaitingAnimation()
                 }
             }
         }else{
@@ -147,16 +167,20 @@ class AuthViewController: UIViewController {
             
             email=emailTextField.text!
             password=passwordTextField.text!
+//
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                 if error == nil{
                     
                     let user = Auth.auth().currentUser
                     self.name = user?.displayName ?? "Невідомий"
                     self.email = user?.email ?? "no email"
+                    self.stopWaitingAnimation()
                     self.dismiss(animated: true, completion: nil)
                 }else{
+                    self.stopWaitingAnimation()
                     print(error!._code)
                     self.handleError(error!)
+                    
                 }
             }
         }
@@ -165,8 +189,9 @@ class AuthViewController: UIViewController {
         signup = !signup
     }
 }
-//  Email SignIn
+//  Email SignIn Delegate
 extension AuthViewController:UITextFieldDelegate{
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if (signup){
             if textField == nameTextField {
@@ -192,8 +217,10 @@ extension AuthViewController:UITextFieldDelegate{
 //  Google SignIn
 extension AuthViewController: GIDSignInDelegate{
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        startWaitingAnimation()
         if let error = error {
             print("Failed to log into Google: ", error)
+            stopWaitingAnimation()
             return
         }
         print("Succesfuly logged into Google")
@@ -206,8 +233,10 @@ extension AuthViewController: GIDSignInDelegate{
             }
             
             print("Successfully logged into Firebase with Google")
+            self.stopWaitingAnimation()
             self.dismiss(animated: true, completion: nil)
         }
+        
     }
 }
 extension AuthErrorCode {

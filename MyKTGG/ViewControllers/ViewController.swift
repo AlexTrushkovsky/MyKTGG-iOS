@@ -8,8 +8,9 @@
 
 import UIKit
 import Firebase
+var groupname = ""
+
 class ViewController: UIViewController {
-    
     @IBAction func logOutAction(_ sender: UIBarButtonItem) {
         do{
             try Auth.auth().signOut()
@@ -17,11 +18,10 @@ class ViewController: UIViewController {
             print(error)
         }
     }
+    
     @IBOutlet weak var WelcomeLabel: UILabel!
-    @IBAction func restart(_ sender: Any) {
-        let user = Auth.auth().currentUser
-        let username = user?.displayName ?? "Невідомий"
-        WelcomeLabel.text = "Welcome, \(username)"
+    @IBOutlet weak var GroupLabel: UILabel!
+    @IBAction func restart(_ sender: Any){
     }
     
     override func viewDidLoad() {
@@ -29,7 +29,5 @@ class ViewController: UIViewController {
         let user = Auth.auth().currentUser
         _ = user?.displayName ?? "Невідомий"
     }
-    
-    
 }
 
