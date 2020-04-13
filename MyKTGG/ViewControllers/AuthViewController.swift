@@ -3,20 +3,6 @@ import Firebase
 import FBSDKLoginKit
 import GoogleSignIn
 class AuthViewController: UIViewController {
-    var signup:Bool = true{
-        willSet{
-            if newValue{
-                AuthLabel.image = UIImage(named: "createAccountTitle")
-                RegisterButton.setImage(UIImage(named: "registerButton"), for: .normal)
-                nameTextFieldView.isHidden=false
-            }else{
-                AuthLabel.image = UIImage(named: "logInTitle")
-                nameTextFieldView.isHidden=true
-                RegisterButton.setImage(UIImage(named: "loginButton"), for: .normal)
-            }
-        }
-    }
-    
     @IBOutlet weak var AuthLabel: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var nameTextFieldView: UIView!
@@ -30,28 +16,74 @@ class AuthViewController: UIViewController {
     @IBOutlet weak var signInWithGoogleButton: GIDSignInButton!
     @IBOutlet weak var RegisterButton: UIButton!
     @IBOutlet weak var LoginSubButton: UIButton!
+    @IBOutlet weak var ActivityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var darkView: UIView!
+    
+    // Sign/Log in Switch
+    var signup:Bool = true{
+        willSet{
+            if newValue{
+                AuthLabel.image = UIImage(named: "createAccountTitle")
+                RegisterButton.setImage(UIImage(named: "registerButton"), for: .normal)
+                nameTextFieldView.isHidden=false
+                LoginSubButton.setTitle("Увійти", for: .normal)
+            }else{
+                AuthLabel.image = UIImage(named: "logInTitle")
+                nameTextFieldView.isHidden=true
+                RegisterButton.setImage(UIImage(named: "loginButton"), for: .normal)
+                LoginSubButton.setTitle("Зареєструватися", for: .normal)
+            }
+        }
+    }
+    var name = ""
+    var email = ""
+    var password = ""
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        isModalInPresentation = true
+        if #available(iOS 13.0, *) {
+            isModalInPresentation = true
+        } else {
+            // Fallback on earlier versions
+        }
         nameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
+        darkView.isHidden=true
+        ActivityIndicator.isHidden=true
     }
-    func showNoAppleAlert(){
-        let alert = UIAlertController(title: "Помилка", message: "Вхід з Apple тимчасово недоступний", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: nil))
+    func showAlert(title: String, message: String){
+        stopWaitingAnimation()
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК",style: .default))
         present(alert, animated: true, completion: nil)
     }
+    func startWaitingAnimation(){
+        darkView.isHidden=false
+        ActivityIndicator.startAnimating()
+        ActivityIndicator.isHidden = false
+    }
+    func stopWaitingAnimation(){
+        darkView.isHidden=true
+        ActivityIndicator.stopAnimating()
+        ActivityIndicator.isHidden = true
+       }
     
-    @IBAction func forgonPasswordAction(_ sender: UIButton) {
+    @IBAction func forgotPasswordAction(_ sender: UIButton) {
     }
+    //  Apple SignIn
     @IBAction func signInWithAppleAction(_ sender: UIButton) {
-        
-        self.showNoAppleAlert()
+        showAlert(title: "Помилка", message: "Авторизація за допомогою Apple на даний час недоступна")
     }
+    //  Facebook SignIn
     @IBAction func signInWithFaceBookAction(_ sender: UIButton) {
         let login = LoginManager()
         login.logIn(permissions: ["email","public_profile"], from: self) {(result, error) in
@@ -59,6 +91,7 @@ class AuthViewController: UIViewController {
                 print("isCanceled")
             }else{
                 if error == nil{
+                    self.startWaitingAnimation()
                     GraphRequest(graphPath: "me", parameters: ["fields":"email,name"], tokenString: AccessToken.current?.tokenString, version: nil, httpMethod: HTTPMethod(rawValue: "GET")).start(completionHandler: {
                         (nil, result, error) in
                         if error == nil{
@@ -67,6 +100,7 @@ class AuthViewController: UIViewController {
                             Auth.auth().signIn(with: credential, completion: {(result, error) in
                                 if error == nil{
                                     print(result?.user.uid as Any)
+                                    self.stopWaitingAnimation()
                                     self.dismiss(animated: true, completion: nil)
                                 }else{
                                     print(error as Any)
@@ -84,65 +118,114 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance().signIn()
     }
     @IBAction func regOrLogButton(_ sender: UIButton) {
+        startWaitingAnimation()
+        if (signup){
+            guard !nameTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup name check")
+                return
+            }
+            guard nameTextField.text!.count<30 else {
+                showAlert(title: "Помилка", message: "Ім'я користувача повинно містити не більше 30 символів")
+                return
+            }
+            guard !emailTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup name check")
+                return
+            }
+            guard !passwordTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                print ("Error on signup pass check")
+                return
+            }
+            name=nameTextField.text!
+            email=emailTextField.text!
+            password=passwordTextField.text!
+            Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
+                if error == nil{
+                    if let result = result{
+                        print(result.user.uid)
+                        let ref = Database.database().reference().child("users")
+                        let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                        changeRequest?.displayName = self.name
+                        changeRequest?.commitChanges { (error) in }
+                        ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email])
+                        self.stopWaitingAnimation()
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }else{
+                    print(error!._code)
+                    self.handleError(error!)
+                    self.stopWaitingAnimation()
+                }
+            }
+        }else{
+            guard !emailTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                return
+            }
+            guard !passwordTextField.text!.isEmpty else{
+                showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
+                return
+            }
+            
+            email=emailTextField.text!
+            password=passwordTextField.text!
+//
+            Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
+                if error == nil{
+                    
+                    let user = Auth.auth().currentUser
+                    self.name = user?.displayName ?? "Невідомий"
+                    self.email = user?.email ?? "no email"
+                    self.stopWaitingAnimation()
+                    self.dismiss(animated: true, completion: nil)
+                }else{
+                    self.stopWaitingAnimation()
+                    print(error!._code)
+                    self.handleError(error!)
+                    
+                }
+            }
+        }
     }
     @IBAction func logSingSwitch(_ sender: UIButton) {
         signup = !signup
     }
-    func showAlert(){
-        let alert = UIAlertController(title: "Помилка", message: "Всі поля обов'язкові до заповнення", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
-    }
-    func showAlertNotEmail(){
-        let alert = UIAlertController(title: "Помилка", message: "Ви ввели не дійсний email", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+}
+//  Email SignIn Delegate
+extension AuthViewController:UITextFieldDelegate{
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if (signup){
+            if textField == nameTextField {
+                textField.resignFirstResponder()
+                emailTextField.becomeFirstResponder()
+             } else if textField == emailTextField {
+                textField.resignFirstResponder()
+                passwordTextField.becomeFirstResponder()
+             } else if textField == passwordTextField {
+                textField.resignFirstResponder()
+             }
+        }else{
+            if textField == emailTextField {
+                textField.resignFirstResponder()
+                passwordTextField.becomeFirstResponder()
+            } else if textField == passwordTextField {
+                textField.resignFirstResponder()
+            }
+        }
+        return true
     }
 }
-    extension AuthViewController:UITextFieldDelegate{
-        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            let name = nameTextField.text!
-            let email = emailTextField.text!
-            let password = passwordTextField.text!
-            
-            if (signup){
-                if(!name.isEmpty && !email.isEmpty && !password.isEmpty){
-                    Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
-                        if error == nil{
-                            if let result = result{
-                                print(result.user.uid)
-                                let ref = Database.database().reference().child("users")
-                                ref.child(result.user.uid).updateChildValues(["name":name,"email":email])
-                                self.dismiss(animated: true, completion: nil)
-                            }
-                        }
-                    }
-                }else if (!email.contains("@")){
-                        showAlertNotEmail()
-                    }else{
-                        showAlert()
-                }
-            }else{
-                if (!email.isEmpty && !password.isEmpty){
-                    Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
-                        if error == nil{
-                            self.dismiss(animated: true, completion: nil)
-                        }
-                    }
-                }else if (!email.contains("@")){
-                    showAlertNotEmail()
-                }else{
-                    showAlert()
-                }
-            }
-            return true
-        }
-    }
-//  Google SDK
+//  Google SignIn
 extension AuthViewController: GIDSignInDelegate{
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        startWaitingAnimation()
         if let error = error {
             print("Failed to log into Google: ", error)
+            stopWaitingAnimation()
             return
         }
         print("Succesfuly logged into Google")
@@ -155,7 +238,47 @@ extension AuthViewController: GIDSignInDelegate{
             }
             
             print("Successfully logged into Firebase with Google")
+            self.stopWaitingAnimation()
             self.dismiss(animated: true, completion: nil)
         }
+        
     }
+}
+extension AuthErrorCode {
+    var errorMessage: String {
+        switch self {
+        case .emailAlreadyInUse:
+            return "Електронна пошта вже зареєстрована"
+        case .userNotFound:
+            return "Аккаунту не знайдено. \nПеревірте правильність вводу і спробуйте ще раз!"
+        case .userDisabled:
+            return "Ваш обліковий запис було заблоковано. \nЗверніться до техпідтримки в \nTelegram: @esen1n25"
+        case .invalidEmail, .invalidSender, .invalidRecipientEmail:
+            return "Будь-ласка, введіть правильну електронну адресу!"
+        case .networkError:
+            return "Немає зв'язку з сервером. \nСпробуйте будь-ласка пізніше."
+        case .weakPassword:
+            return "Ваш пароль закороткий. \nВкажіть пароль, що містить більше 6 символів."
+        case .wrongPassword:
+            return "Пароль невірний. \nСпробуйте ще раз, або натисніть 'Забули пароль', щоб відновити доступ."
+        default:
+            return "Сталася невідома помилка"
+        }
+    }
+}
+extension UIViewController{
+    func handleError(_ error: Error) {
+        if let errorCode = AuthErrorCode(rawValue: error._code) {
+            print(errorCode.errorMessage)
+            let alert = UIAlertController(title: "Помилка", message: errorCode.errorMessage, preferredStyle: .alert)
+
+            let okAction = UIAlertAction(title: "ОК", style: .default, handler: nil)
+
+            alert.addAction(okAction)
+
+            self.present(alert, animated: true, completion: nil)
+
+        }
+    }
+
 }
