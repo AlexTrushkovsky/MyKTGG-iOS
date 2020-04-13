@@ -42,9 +42,14 @@ class AuthViewController: UIViewController {
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        isModalInPresentation = true
+        if #available(iOS 13.0, *) {
+            isModalInPresentation = true
+        } else {
+            // Fallback on earlier versions
+        }
         nameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self

@@ -1,17 +1,16 @@
 {
   "images" : [
     {
-      "filename" : "gg.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "gg-1.png",
+      "filename" : "male-placeholder-1.jpg",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "gg-2.png",
+      "filename" : "male-placeholder.jpg",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -8,9 +8,22 @@
 
 import UIKit
 import Firebase
-var groupname = ""
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    var newsCount = 5
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 5
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+        cell?.textLabel?.text = "Hello KTGG"
+        return cell!
+    }
+    
+    @IBOutlet var mainTableView: UITableView!
     @IBAction func logOutAction(_ sender: UIBarButtonItem) {
         do{
             try Auth.auth().signOut()
@@ -28,6 +41,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         let user = Auth.auth().currentUser
         _ = user?.displayName ?? "Невідомий"
+        mainTableView.layer.cornerRadius = 40
+        
     }
 }
 
