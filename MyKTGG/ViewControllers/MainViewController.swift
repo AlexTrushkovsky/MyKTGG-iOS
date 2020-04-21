@@ -11,20 +11,6 @@ import Firebase
 import SOPullUpView
 
 class MainViewController: UIViewController {
-
-    
-    @IBAction func logOutAction(_ sender: UIBarButtonItem) {
-        do{
-            try Auth.auth().signOut()
-        }catch{
-            print(error)
-        }
-    }
-    
-    @IBOutlet weak var WelcomeLabel: UILabel!
-    @IBOutlet weak var GroupLabel: UILabel!
-    @IBAction func restart(_ sender: Any){
-    }
     
     let pullUpController = SOPullUpControl()
     
@@ -35,8 +21,6 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let user = Auth.auth().currentUser
-        _ = user?.displayName ?? "Невідомий"
         pullUpController.dataSource = self
         pullUpController.setupCard(from: view)
     }
@@ -44,17 +28,17 @@ class MainViewController: UIViewController {
 
 extension MainViewController: SOPullUpViewDataSource {
 
-    
+
     func pullUpViewCollapsedViewHeight() -> CGFloat {
         return bottomPadding + 480
     }
-    
+
     func pullUpViewController() -> UIViewController {
         guard let vc = UIStoryboard(name: "PickedPull", bundle: nil).instantiateInitialViewController() as? PickedPullUpViewController else {return UIViewController()}
         //vc.pullUpControl = self.pullUpController
         return vc
     }
-    
+
     func pullUpViewExpandedViewHeight() -> CGFloat {
         return 500
     }

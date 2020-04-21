@@ -5,11 +5,14 @@ target 'MyKTGG' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for authKTGG
+  # Pods for auth
 pod 'Firebase/Analytics'
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'Firebase/Database'
+pod 'Firebase/Storage'
 pod 'FBSDKLoginKit'
 pod 'GoogleSignIn'
+pod 'SOPullUpView'
+pod 'PullUpController'
 end

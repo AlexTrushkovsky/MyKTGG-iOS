@@ -61,80 +61,6 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="125" id="MJy-Qp-suj">
-                                        <rect key="frame" x="0.0" y="153" width="414" height="125"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="MJy-Qp-suj" id="kdP-Cj-62E">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="125"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="second" translatesAutoresizingMaskIntoConstraints="NO" id="ZPM-2h-OmC">
-                                                    <rect key="frame" x="16" y="12.5" width="100" height="100"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="100" id="3ix-Xx-3ag"/>
-                                                        <constraint firstAttribute="height" constant="100" id="uhi-Rk-Bpd"/>
-                                                    </constraints>
-                                                </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.89999997615814209" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Financial Freedom" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2si-pS-ZNi">
-                                                    <rect key="frame" x="132" y="16" width="195" height="29"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="24"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@Ahmad Sofi" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nZn-Z6-14h">
-                                                    <rect key="frame" x="132" y="53" width="108" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="18"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="nZn-Z6-14h" firstAttribute="top" secondItem="2si-pS-ZNi" secondAttribute="bottom" constant="8" id="24V-fm-gq5"/>
-                                                <constraint firstItem="ZPM-2h-OmC" firstAttribute="centerY" secondItem="kdP-Cj-62E" secondAttribute="centerY" id="DU8-1w-q3y"/>
-                                                <constraint firstItem="2si-pS-ZNi" firstAttribute="leading" secondItem="ZPM-2h-OmC" secondAttribute="trailing" constant="16" id="Myw-gr-KPW"/>
-                                                <constraint firstItem="nZn-Z6-14h" firstAttribute="leading" secondItem="ZPM-2h-OmC" secondAttribute="trailing" constant="16" id="c1K-YY-uyu"/>
-                                                <constraint firstItem="2si-pS-ZNi" firstAttribute="top" secondItem="kdP-Cj-62E" secondAttribute="top" constant="16" id="gCh-6n-w5b"/>
-                                                <constraint firstItem="ZPM-2h-OmC" firstAttribute="leading" secondItem="kdP-Cj-62E" secondAttribute="leading" constant="16" id="gXB-5e-bb6"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="125" id="3U9-RU-3gk">
-                                        <rect key="frame" x="0.0" y="278" width="414" height="125"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="3U9-RU-3gk" id="5Vb-Zc-Vbh">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="125"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="third" translatesAutoresizingMaskIntoConstraints="NO" id="cr2-Nv-diH">
-                                                    <rect key="frame" x="16" y="12.5" width="100" height="100"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="100" id="YMT-90-dbd"/>
-                                                        <constraint firstAttribute="width" constant="100" id="oFO-Z6-nPI"/>
-                                                    </constraints>
-                                                </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.89999997615814209" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Financial Freedom" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YDt-J7-1wJ">
-                                                    <rect key="frame" x="132" y="16" width="195" height="29"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="24"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@Ahmad Sofi" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="neb-GA-QzM">
-                                                    <rect key="frame" x="132" y="53" width="108" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="18"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="cr2-Nv-diH" firstAttribute="centerY" secondItem="5Vb-Zc-Vbh" secondAttribute="centerY" id="2pi-5d-ZRm"/>
-                                                <constraint firstItem="YDt-J7-1wJ" firstAttribute="top" secondItem="5Vb-Zc-Vbh" secondAttribute="top" constant="16" id="2za-Fo-fDh"/>
-                                                <constraint firstItem="cr2-Nv-diH" firstAttribute="leading" secondItem="5Vb-Zc-Vbh" secondAttribute="leading" constant="16" id="3ZK-YE-zU9"/>
-                                                <constraint firstItem="YDt-J7-1wJ" firstAttribute="leading" secondItem="cr2-Nv-diH" secondAttribute="trailing" constant="16" id="5KU-KI-WVl"/>
-                                                <constraint firstItem="neb-GA-QzM" firstAttribute="leading" secondItem="cr2-Nv-diH" secondAttribute="trailing" constant="16" id="BMk-SF-V2k"/>
-                                                <constraint firstItem="neb-GA-QzM" firstAttribute="top" secondItem="YDt-J7-1wJ" secondAttribute="bottom" constant="8" id="tQS-VY-1cg"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                 </prototypes>
                                 <sections/>
                                 <connections>
@@ -225,7 +151,6 @@
     </scenes>
     <resources>
         <image name="first" width="104" height="104"/>
-        <image name="second" width="106" height="106"/>
         <image name="third" width="106" height="106"/>
     </resources>
 </document>

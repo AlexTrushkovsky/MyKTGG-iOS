@@ -51,8 +51,19 @@ class AuthViewController: UIViewController {
             // Fallback on earlier versions
         }
         nameTextField.delegate = self
+        nameTextFieldView.layer.cornerRadius = 15
         emailTextField.delegate = self
+        emailTextFieldView.layer.cornerRadius = 15
         passwordTextField.delegate = self
+        passwordTextFieldView.layer.cornerRadius = 15
+        
+        nameTextField.attributedPlaceholder = NSAttributedString(string: "ім'я та призвіще",
+        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+        emailTextField.attributedPlaceholder = NSAttributedString(string: "email",
+        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+        passwordTextField.attributedPlaceholder = NSAttributedString(string: "пароль",
+        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+        
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))

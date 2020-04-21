@@ -29,6 +29,9 @@ class ForgotPassViewController: UIViewController {
         view.addGestureRecognizer(tap)
         emailTextField.delegate = self
         emailTextField.becomeFirstResponder()
+        emailFieldView.layer.cornerRadius = 15
+        emailTextField.attributedPlaceholder = NSAttributedString(string: "email",
+                                                                  attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
     }
     
     @IBAction func restoreButton(_ sender: UIButton) {

@@ -116,7 +116,7 @@ namespace mat {
             storage_ = std::shared_ptr<void>(MAllocateMemory(nbytes), MCheckPtr);
         }
 
-        int64_t size(int dim) {
+        int64_t size(int dim) const {
             return sizes_[dim];
         }
 
@@ -129,7 +129,7 @@ namespace mat {
         }
 
         template <typename T>
-        T* data() {
+        T* data() const {
             return static_cast<T*>(storage_.get());
         }
 
@@ -144,7 +144,7 @@ namespace mat {
         std::shared_ptr<void> storage_;
     };
 
-    static MTensor mempty(const std::vector<int64_t>& sizes) {
+    static inline MTensor mempty(const std::vector<int64_t>& sizes) {
         return MTensor(sizes);
     }
 } // namespace mat

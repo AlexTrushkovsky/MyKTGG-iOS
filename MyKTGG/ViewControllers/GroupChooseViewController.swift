@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 
 class GroupChooseViewController: UIViewController {
+    @IBOutlet weak var bachelorSwitch: UISwitch!
     @IBOutlet weak var GroupPicker: UIPickerView!
     @IBOutlet weak var chooseButtonView: UIButton!
     @IBOutlet weak var darkView: UIView!
@@ -20,6 +21,7 @@ class GroupChooseViewController: UIViewController {
         GroupPicker.delegate = self
         darkView.isHidden=true
         ActivityIndicator.isHidden=true
+        bachelorSwitch.isOn=false
     }
     
     func showAlert(title: String, message: String){
@@ -33,18 +35,22 @@ class GroupChooseViewController: UIViewController {
         "21","22","23","24","25",
         "31","32","33","34","35",
         "41","42","43","44","45"]
-    var groupSpec = ["ІПЗ","КІ","ОО","ПТБД","ФБС","ПВ","ГРС(РО)","ГРС(ГО)","ХТ","Т"]
+    var groupSpec = ["ІПЗ","КІ","ОО","ПТБД","ФБС","ПВ","ГРС(РО)","ГРС(ГО)","ХТ","Т","ФО"]
     var groupChoosen = ""
     let ref = Database.database().reference().child("users")
     let user = Auth.auth().currentUser
     lazy var groupNumChoosen = groupNum[0]
     lazy var groupSpecChoosen = groupSpec[0]
     @IBAction func chooseButtonAction(_ sender: UIButton) {
+        var bachelor = ""
+        if bachelorSwitch.isOn{
+            bachelor = "б"
+        }
         darkView.isHidden=false
         ActivityIndicator.startAnimating()
         ActivityIndicator.isHidden = false
         if !groupNumChoosen.isEmpty || !groupSpecChoosen.isEmpty{
-            ref.child(user!.uid).updateChildValues(["group":"\(groupNumChoosen)-\(groupSpecChoosen)"]) {
+            ref.child(user!.uid).updateChildValues(["group":"\(groupNumChoosen)-\(groupSpecChoosen)\(bachelor)"]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
                     print("Data could not be saved: \(error).")
