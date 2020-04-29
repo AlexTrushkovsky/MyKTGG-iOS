@@ -15,4 +15,6 @@ pod 'FBSDKLoginKit'
 pod 'GoogleSignIn'
 pod 'SOPullUpView'
 pod 'PullUpController'
+pod 'Alamofire'
+pod 'AlamofireImage'
 end

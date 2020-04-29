@@ -521,7 +521,7 @@
                                             <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="14"/>
                                             <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                         </textView>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="newPlaceholder копия" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-IT-4Ed">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-IT-4Ed">
                                             <rect key="frame" x="15" y="18" width="258" height="200"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="200" id="1Dd-y9-9Ek"/>
@@ -555,7 +555,6 @@
                                     <outlet property="heading" destination="otd-ec-15p" id="d4q-vu-zhK"/>
                                     <outlet property="newsText" destination="jsH-21-tLH" id="nBw-3k-Cfl"/>
                                     <outlet property="rubric" destination="Gki-0d-o5e" id="lrN-uf-3lT"/>
-                                    <segue destination="bL6-VQ-2Yd" kind="show" id="UnH-62-2Nx"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -660,7 +659,7 @@
         <!--News Web View-->
         <scene sceneID="88J-Qp-3nL">
             <objects>
-                <viewController id="bL6-VQ-2Yd" customClass="NewsWebView" customModule="MyKTGG" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NewsWebView" id="bL6-VQ-2Yd" customClass="NewsWebView" customModule="MyKTGG" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="Vs7-FX-CcR"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0HY-uL-mqk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1311,7 +1310,6 @@
         <image name="icon-padlock" width="21" height="23.5"/>
         <image name="link" catalog="system" width="128" height="116"/>
         <image name="lock" catalog="system" width="128" height="128"/>
-        <image name="newPlaceholder копия" width="334" height="200"/>
         <image name="registerButton" width="315" height="60"/>
         <image name="resetPasswordLabel" width="209" height="82.5"/>
         <image name="restorePasswordButton" width="315" height="60"/>
