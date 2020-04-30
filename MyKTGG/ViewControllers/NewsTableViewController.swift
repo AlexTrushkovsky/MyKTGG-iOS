@@ -16,34 +16,46 @@ class NewsTableViewController: UITableViewController {
     private var new = Items()
     private var imageCache = AutoPurgingImageCache()
     let refControl = UIRefreshControl()
+    var limit = 15
+    var isLoading: Bool = false
+    var countOfNews = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.refreshControl = refControl
         refControl.addTarget(self, action: #selector(refreshNews(_:)), for: .valueChanged)
         refControl.attributedTitle = NSAttributedString(string: "Потягніть для оновлення")
-        fetchData()
+        let spinner = UIActivityIndicatorView(style: .white)
+        spinner.startAnimating()
+        spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+        tableView.tableFooterView = spinner
+        tableView.tableFooterView?.isHidden = false
+        fetchData(limit: limit)
     }
     
     @objc private func refreshNews(_ sender: Any) {
-        fetchData()
+        limit = 15
+        countOfNews = 0
+        fetchData(limit: limit)
     }
     
     private func showAlert(title: String, message: String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        let tryAgainAction = UIAlertAction(title: "Спробувати знову", style: .default) { (UIAlertAction) in
+            self.fetchData(limit: self.limit)
+        }
         alert.addAction(okAction)
+        alert.addAction(tryAgainAction)
         self.present(alert, animated: true)
         print("alert showed")
     }
     
-    public func fetchData(){
-        let limit = 15
-        let jsonUrlString = "https://ktgg.kiev.ua/uk/news.html?limit=15&format=json"
+    public func fetchData(limit: Int){
+        let jsonUrlString = "https://ktgg.kiev.ua/uk/news.html?limit=\(limit)&format=json"
         
         guard let url = URL(string: jsonUrlString) else { return }
         print("Starting to fetch data from \(jsonUrlString)")
-        
         //Alamofire request
         let alamofireSession = AF.request(url, method: .get)
         alamofireSession.validate()
@@ -58,19 +70,23 @@ class NewsTableViewController: UITableViewController {
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         self.refControl.endRefreshing()
+                        self.tableView.tableFooterView?.isHidden = true
                     }
                 }catch{
                     self.refControl.endRefreshing()
+                    self.tableView.tableFooterView?.isHidden = true
                     print("Failed to convert Data!")
                     self.showAlert(title: "Помилка", message: "Не вдалося отримати дані")
                 }
                 
             case let .failure(error):
                 self.refControl.endRefreshing()
+                self.tableView.tableFooterView?.isHidden = true
                 print("Failed to get JSON: ",error)
                 self.showAlert(title: "Помилка", message: "Відсутній зв'язок з сервером, спробуйте пізніше")
             }
         }
+        isLoading = false
     }
     private func configureCell(cell: NewsCell, for indexPath: IndexPath) {
         
@@ -87,10 +103,14 @@ class NewsTableViewController: UITableViewController {
         }
         
         if let introtext = new.introtext {
-            cell.newsText.text = introtext.withoutHtml
+            if introtext.withoutHtml != "" {
+                cell.newsText.text = introtext.withoutHtml
+            } else {
+                if let fulltext = new.fulltext {
+                    cell.newsText.text = fulltext.withoutHtml
+                }
+            }
         }
-        
-        
         
         guard self.new.imageMedium != "" else {
             print("Image not found")
@@ -119,8 +139,6 @@ class NewsTableViewController: UITableViewController {
                 }
             }
         }
-        
-        
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -146,16 +164,32 @@ class NewsTableViewController: UITableViewController {
         show(WebVC, sender: nil)
     }
     
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-            
-      print("prefetching row of \(indexPaths)")
-    }
-        
-    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-            
-      print("cancel prefetch row of \(indexPaths)")
-    }
+    //TEST
+//    func makeButtonToTop(){
+//        let button = UIButton()
+//        button.titleLabel?.text = "На початок 🔝"
+//        button.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+//        tableView.tableFooterView = button
+//        tableView.tableFooterView?.isHidden = false
+//    }
     
+//PAGINATION
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard isLoading == false else { return }
+        guard let count = news.items?.count else { return }
+        guard count != countOfNews else { return }
+        if indexPath.section == (count - 1) {
+            isLoading = true
+            limit += 15
+            fetchData(limit: limit)
+            countOfNews = news.items!.count
+            let spinner = UIActivityIndicatorView(style: .white)
+            spinner.startAnimating()
+            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+            tableView.tableFooterView = spinner
+            tableView.tableFooterView?.isHidden = false
+        }
+    }
 }
 extension String {
     public var withoutHtml: String {

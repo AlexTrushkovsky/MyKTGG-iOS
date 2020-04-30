@@ -12,7 +12,7 @@ import SOPullUpView
 
 class MainViewController: UIViewController {
     
-    let pullUpController = SOPullUpControl()
+    //let pullUpController = SOPullUpControl()
     
     var bottomPadding: CGFloat {
         let window = UIApplication.shared.keyWindow
@@ -21,8 +21,11 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        pullUpController.dataSource = self
-        pullUpController.setupCard(from: view)
+        //pullUpController.dataSource = self
+        //pullUpController.setupCard(from: view)]
+        self.tabBarController?.tabBar.layer.cornerRadius = 20
+        self.tabBarController?.tabBar.layer.maskedCorners = [.layerMinXMinYCorner,.layerMaxXMinYCorner]
+        self.tabBarController?.tabBar.layer.masksToBounds = true
     }
 }
 

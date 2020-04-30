@@ -28,6 +28,7 @@
 		6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */; };
 		6EC74D52241306B6005DA42B /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EC74D51241306B6005DA42B /* MapKit.framework */; };
 		6ECC5AEA243E3728006E456A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6ECC5AE9243E3728006E456A /* Main.storyboard */; };
+		6EDE523624599F6D00BC70DD /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDE523224599F6D00BC70DD /* CustomTabBarController.swift */; };
 		6EE352532444CC68001C434F /* PickedPull.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6EE352452444CC67001C434F /* PickedPull.storyboard */; };
 		6EE352562444CFCB001C434F /* PickedPullUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE352552444CFCB001C434F /* PickedPullUpViewController.swift */; };
 		B47B2D3C4D416A783847D427 /* Pods_MyKTGG.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D10F243D4FE6A1219D00377E /* Pods_MyKTGG.framework */; };
@@ -58,6 +59,7 @@
 		6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupChooseViewController.swift; sourceTree = "<group>"; };
 		6EC74D51241306B6005DA42B /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6ECC5AE9243E3728006E456A /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		6EDE523224599F6D00BC70DD /* CustomTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		6EE352452444CC67001C434F /* PickedPull.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = PickedPull.storyboard; sourceTree = "<group>"; };
 		6EE352552444CFCB001C434F /* PickedPullUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickedPullUpViewController.swift; sourceTree = "<group>"; };
 		D10F243D4FE6A1219D00377E /* Pods_MyKTGG.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyKTGG.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,7 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				6E3633322447604E00918364 /* Helpers */,
-				6EE352582444E5E3001C434F /* StorkV2 */,
+				6EDE522F24599F6D00BC70DD /* CustomTabBar */,
 				6EE352572444D148001C434F /* Stork */,
 				6E2549AC244464EE00E3D080 /* Model */,
 				6E7625912403F99E00C68C7F /* Assets */,
@@ -165,6 +167,15 @@
 			path = Assets;
 			sourceTree = "<group>";
 		};
+		6EDE522F24599F6D00BC70DD /* CustomTabBar */ = {
+			isa = PBXGroup;
+			children = (
+				6EDE523224599F6D00BC70DD /* CustomTabBarController.swift */,
+			);
+			name = CustomTabBar;
+			path = MyKTGG/CustomTabBar;
+			sourceTree = SOURCE_ROOT;
+		};
 		6EE352572444D148001C434F /* Stork */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,13 +183,6 @@
 				6EE352452444CC67001C434F /* PickedPull.storyboard */,
 			);
 			path = Stork;
-			sourceTree = "<group>";
-		};
-		6EE352582444E5E3001C434F /* StorkV2 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = StorkV2;
 			sourceTree = "<group>";
 		};
 		89B4EDAB5647BAF5C4328B71 /* Frameworks */ = {
@@ -340,6 +344,7 @@
 				6EE352562444CFCB001C434F /* PickedPullUpViewController.swift in Sources */,
 				6E7625892403F87F00C68C7F /* ForgotPassViewController.swift in Sources */,
 				6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */,
+				6EDE523624599F6D00BC70DD /* CustomTabBarController.swift in Sources */,
 				6E7625722403F6C100C68C7F /* MainViewController.swift in Sources */,
 				6E76258E2403F87F00C68C7F /* AuthViewController.swift in Sources */,
 				6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */,
