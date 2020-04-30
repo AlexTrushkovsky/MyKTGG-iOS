@@ -10,6 +10,7 @@ import Foundation
 struct Items: Decodable {
     var title: String?
     var introtext: String?
+    var fulltext: String?
     var created: String?
     var imageMedium: String?
     var category: Category?
