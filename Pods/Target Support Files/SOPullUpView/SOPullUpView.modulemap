@@ -1,4 +1,4 @@
-framework module SOPullUpView {
+module SOPullUpView {
   umbrella header "SOPullUpView-umbrella.h"
 
   export *
