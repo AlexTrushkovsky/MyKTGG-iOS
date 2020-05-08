@@ -50,14 +50,17 @@ class GroupChooseViewController: UIViewController {
         ActivityIndicator.startAnimating()
         ActivityIndicator.isHidden = false
         if !groupNumChoosen.isEmpty || !groupSpecChoosen.isEmpty{
-            ref.child(user!.uid).updateChildValues(["group":"\(groupNumChoosen)-\(groupSpecChoosen)\(bachelor)"]) {
+            let groupName = "\(groupNumChoosen)-\(groupSpecChoosen)\(bachelor)"
+            ref.child(user!.uid).updateChildValues(["group":groupName]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
                     print("Data could not be saved: \(error).")
                     self.showAlert(title: "Помилка", message: "Не вдалося зберегти дані.\n Перевірте з'єднання та спробуйте знову!")
                 } else {
                     print("Data saved succesfully!")
-                    
+                    print(groupName)
+                    UserDefaults.standard.set(groupName, forKey: "group")
+                    self.navigationController?.popViewController(animated: true)
                 }
                 self.darkView.isHidden=true
                 self.ActivityIndicator.stopAnimating()

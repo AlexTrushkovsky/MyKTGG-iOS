@@ -31,8 +31,8 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     
     func dateScrollPicker(_ dateScrollPicker: DateScrollPicker, didSelectDate date: Date) {
         dayLabel.text = date.format(dateFormat: "dd")
-        weekLabel.text = date.format(dateFormat: "EEEE")
-        monthNYearLabel.text = date.format(dateFormat: "MMM yyyy")
+        weekLabel.text = date.format(dateFormat: "EEEE").capitalized
+        monthNYearLabel.text = date.format(dateFormat: "MMM yyyy").capitalized
         if date.ignoringTime == Date().ignoringTime{
             todayButtonOutlet.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
             todayButtonOutlet.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
@@ -47,16 +47,20 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         dateScrollPicker(datePicker, didSelectDate: Date())
     }
     
-    func setupDateScroll() {
+    private func setupDateScroll() {
         var format = DateScrollPickerFormat()
         format.days = 6
         format.topDateFormat = "EEE"
-        format.topFont = UIFont.systemFont(ofSize: 13, weight: .semibold)
-        format.topTextColor = UIColor.black
+        format.topFont = UIFont(name: "Poppins-SemiBold", size: 13) ?? UIFont.systemFont(ofSize: 13, weight: .semibold)
+        format.topTextColor = UIColor(red: 0.74, green: 0.76, blue: 0.80, alpha: 1.00)
         format.topTextSelectedColor = UIColor.white
         format.mediumDateFormat = "dd"
-        format.mediumFont = UIFont.systemFont(ofSize: 20, weight: .bold)
-        format.mediumTextColor = UIColor.black
+        format.mediumFont = UIFont(name: "Poppins-SemiBold", size: 20) ?? UIFont.systemFont(ofSize: 20, weight: .semibold)
+        if #available(iOS 13.0, *) {
+            format.mediumTextColor = UIColor.label
+        } else {
+            format.mediumTextColor = UIColor.black
+        }
         format.mediumTextSelectedColor = UIColor.white
         format.bottomDateFormat = ""
         format.dayRadius = 12
@@ -74,34 +78,12 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         datePicker.dataSource = self
     }
     
-}
-extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+    private func configureCell(cell: TimeTableCell, for indexPath: IndexPath) {
+        cell.lessonView.layer.cornerRadius = 15
     }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell")
-        cell?.textLabel!.text = "Cell"
-        return cell!
-    }
-    
     
 }
-extension TimeTableViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TimeCell", for: indexPath)
-        return cell
-    }
-}
+
 extension Date {
     func format(dateFormat: String) -> String {
         let formatter = DateFormatter()
@@ -113,4 +95,25 @@ extension Date {
         let dateComponents = Calendar.current.dateComponents([.day, .month, .year], from: self)
         return Calendar.current.date(from: dateComponents)
     }
+}
+extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 4
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 140
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
+        configureCell(cell: cell, for: indexPath)
+        return cell
+    }
+    
+    
 }

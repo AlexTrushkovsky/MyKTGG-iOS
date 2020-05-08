@@ -136,12 +136,15 @@ class NewsTableViewController: UITableViewController {
             }
         }
     }
+    
+//MARK: TableView Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     override func numberOfSections(in tableView: UITableView) -> Int {
         return news.items?.count ?? 0
     }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
@@ -160,16 +163,7 @@ class NewsTableViewController: UITableViewController {
         show(WebVC, sender: nil)
     }
     
-    //TEST
-//    func makeButtonToTop(){
-//        let button = UIButton()
-//        button.titleLabel?.text = "На початок 🔝"
-//        button.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
-//        tableView.tableFooterView = button
-//        tableView.tableFooterView?.isHidden = false
-//    }
-    
-//PAGINATION
+//MARK: PAGINATION
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard isLoading == false else { return }
         guard let count = news.items?.count else { return }
@@ -208,7 +202,7 @@ extension String {
         
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = TimeZone(identifier: "Europe/Kiev")
-        dateFormatter.locale = Locale(identifier: "ua-UA")
+        dateFormatter.locale = Locale(identifier: "uk_UA")
         dateFormatter.calendar = Calendar(identifier: .gregorian)
         dateFormatter.dateFormat = format
         let date = dateFormatter.date(from: self)

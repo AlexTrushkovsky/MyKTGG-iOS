@@ -43,6 +43,11 @@ class AuthViewController: UIViewController {
         view.endEditing(true)
     }
     
+    func makeUpdateNotifications() {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if #available(iOS 13.0, *) {
@@ -113,6 +118,7 @@ class AuthViewController: UIViewController {
                                     print(result?.user.uid as Any)
                                     self.stopWaitingAnimation()
                                     self.dismiss(animated: true, completion: nil)
+                                    self.makeUpdateNotifications()
                                 }else{
                                     print(error as Any)
                                 }
@@ -164,6 +170,7 @@ class AuthViewController: UIViewController {
                         ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email])
                         self.stopWaitingAnimation()
                         self.dismiss(animated: true, completion: nil)
+                        self.makeUpdateNotifications()
                     }
                 }else{
                     print(error!._code)
@@ -251,6 +258,7 @@ extension AuthViewController: GIDSignInDelegate{
             print("Successfully logged into Firebase with Google")
             self.stopWaitingAnimation()
             self.dismiss(animated: true, completion: nil)
+            self.makeUpdateNotifications()
         }
         
     }
