@@ -18,18 +18,25 @@
 		6E7625722403F6C100C68C7F /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7625712403F6C100C68C7F /* MainViewController.swift */; };
 		6E7625772403F6C200C68C7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625762403F6C200C68C7F /* Assets.xcassets */; };
 		6E76257A2403F6C200C68C7F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625782403F6C200C68C7F /* LaunchScreen.storyboard */; };
-		6E7625882403F87F00C68C7F /* AcuminProSemiCondensed-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625812403F87F00C68C7F /* AcuminProSemiCondensed-Medium.otf */; };
 		6E7625892403F87F00C68C7F /* ForgotPassViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7625822403F87F00C68C7F /* ForgotPassViewController.swift */; };
-		6E76258A2403F87F00C68C7F /* ProximaNova-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625832403F87F00C68C7F /* ProximaNova-Bold.ttf */; };
 		6E76258C2403F87F00C68C7F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625852403F87F00C68C7F /* GoogleService-Info.plist */; };
-		6E76258D2403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625862403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf */; };
 		6E76258E2403F87F00C68C7F /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7625872403F87F00C68C7F /* AuthViewController.swift */; };
 		6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */; };
+		6E8D587F24605BAE00384ADC /* SourceSansPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587924605BAE00384ADC /* SourceSansPro-Regular.ttf */; };
+		6E8D588024605BAE00384ADC /* SourceSansPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587A24605BAE00384ADC /* SourceSansPro-Bold.ttf */; };
+		6E8D588124605BAE00384ADC /* SourceSansPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587B24605BAE00384ADC /* SourceSansPro-Light.ttf */; };
+		6E8D588224605BAE00384ADC /* SourceSansPro-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587C24605BAE00384ADC /* SourceSansPro-Black.ttf */; };
+		6E8D588324605BAE00384ADC /* SourceSansPro-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587D24605BAE00384ADC /* SourceSansPro-ExtraLight.ttf */; };
+		6E8D588424605BAE00384ADC /* SourceSansPro-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587E24605BAE00384ADC /* SourceSansPro-SemiBold.ttf */; };
+		6E8D58862460643A00384ADC /* TimeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D58852460643A00384ADC /* TimeTableCell.swift */; };
+		6E8D5888246074F100384ADC /* TimeTableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D5887246074F100384ADC /* TimeTableModel.swift */; };
+		6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D58892460750200384ADC /* ChangeModel.swift */; };
+		6EABD26A2464C9CE009CE27F /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EABD2692464C9CE009CE27F /* Defaults.swift */; };
+		6EABD26C2464D142009CE27F /* UserEditorTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EABD26B2464D142009CE27F /* UserEditorTableViewController.swift */; };
+		6EABD26E2464E78D009CE27F /* AvatarMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EABD26D2464E78D009CE27F /* AvatarMethods.swift */; };
 		6EB7A4F7245F5657004EF027 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6EB7A4F6245F5657004EF027 /* FacebookCore */; };
 		6EB7A4F9245F5657004EF027 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 6EB7A4F8245F5657004EF027 /* FacebookLogin */; };
 		6EB7A511245F66EA004EF027 /* DateViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB7A4FD245F66EA004EF027 /* DateViewCell.swift */; };
-		6EB7A512245F66EA004EF027 /* SeparatorViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6EB7A4FE245F66EA004EF027 /* SeparatorViewCell.xib */; };
-		6EB7A513245F66EA004EF027 /* SeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB7A4FF245F66EA004EF027 /* SeparatorViewCell.swift */; };
 		6EB7A514245F66EA004EF027 /* DateViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6EB7A500245F66EA004EF027 /* DateViewCell.xib */; };
 		6EB7A515245F66EA004EF027 /* .gitkeep in Resources */ = {isa = PBXBuildFile; fileRef = 6EB7A501245F66EA004EF027 /* .gitkeep */; };
 		6EB7A516245F66EA004EF027 /* DateScrollItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB7A502245F66EA004EF027 /* DateScrollItem.swift */; };
@@ -66,16 +73,23 @@
 		6E7625762403F6C200C68C7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E7625792403F6C200C68C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6E76257B2403F6C200C68C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6E7625812403F87F00C68C7F /* AcuminProSemiCondensed-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AcuminProSemiCondensed-Medium.otf"; sourceTree = "<group>"; };
 		6E7625822403F87F00C68C7F /* ForgotPassViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgotPassViewController.swift; sourceTree = "<group>"; };
-		6E7625832403F87F00C68C7F /* ProximaNova-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ProximaNova-Bold.ttf"; sourceTree = "<group>"; };
 		6E7625852403F87F00C68C7F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		6E7625862403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AcuminProSemiCondensed-Bold.otf"; sourceTree = "<group>"; };
 		6E7625872403F87F00C68C7F /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupChooseViewController.swift; sourceTree = "<group>"; };
+		6E8D587924605BAE00384ADC /* SourceSansPro-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Regular.ttf"; sourceTree = "<group>"; };
+		6E8D587A24605BAE00384ADC /* SourceSansPro-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Bold.ttf"; sourceTree = "<group>"; };
+		6E8D587B24605BAE00384ADC /* SourceSansPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Light.ttf"; sourceTree = "<group>"; };
+		6E8D587C24605BAE00384ADC /* SourceSansPro-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Black.ttf"; sourceTree = "<group>"; };
+		6E8D587D24605BAE00384ADC /* SourceSansPro-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-ExtraLight.ttf"; sourceTree = "<group>"; };
+		6E8D587E24605BAE00384ADC /* SourceSansPro-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-SemiBold.ttf"; sourceTree = "<group>"; };
+		6E8D58852460643A00384ADC /* TimeTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableCell.swift; sourceTree = "<group>"; };
+		6E8D5887246074F100384ADC /* TimeTableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableModel.swift; sourceTree = "<group>"; };
+		6E8D58892460750200384ADC /* ChangeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeModel.swift; sourceTree = "<group>"; };
+		6EABD2692464C9CE009CE27F /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
+		6EABD26B2464D142009CE27F /* UserEditorTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEditorTableViewController.swift; sourceTree = "<group>"; };
+		6EABD26D2464E78D009CE27F /* AvatarMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarMethods.swift; sourceTree = "<group>"; };
 		6EB7A4FD245F66EA004EF027 /* DateViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateViewCell.swift; sourceTree = "<group>"; };
-		6EB7A4FE245F66EA004EF027 /* SeparatorViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SeparatorViewCell.xib; sourceTree = "<group>"; };
-		6EB7A4FF245F66EA004EF027 /* SeparatorViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeparatorViewCell.swift; sourceTree = "<group>"; };
 		6EB7A500245F66EA004EF027 /* DateViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DateViewCell.xib; sourceTree = "<group>"; };
 		6EB7A501245F66EA004EF027 /* .gitkeep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		6EB7A502245F66EA004EF027 /* DateScrollItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateScrollItem.swift; sourceTree = "<group>"; };
@@ -116,7 +130,6 @@
 		6E2549AC244464EE00E3D080 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				6E06799724436565001FAE67 /* NewsModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -133,7 +146,7 @@
 		6E3CD3A6245E37CA0028A340 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				6E7625712403F6C100C68C7F /* MainViewController.swift */,
+				6EABD2642464ACF0009CE27F /* Controller */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -141,8 +154,7 @@
 		6E3CD3A7245E37D50028A340 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
-				6E7625872403F87F00C68C7F /* AuthViewController.swift */,
-				6E7625822403F87F00C68C7F /* ForgotPassViewController.swift */,
+				6EABD2632464ACE0009CE27F /* Controller */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -150,9 +162,9 @@
 		6E3CD3A8245E37DD0028A340 /* News */ = {
 			isa = PBXGroup;
 			children = (
-				6E067995244362E8001FAE67 /* NewsTableViewController.swift */,
-				6E0679932443625B001FAE67 /* NewsCell.swift */,
-				6E363333244A474700918364 /* NewsWebView.swift */,
+				6EABD2612464AC6A009CE27F /* Model */,
+				6EABD2602464AC39009CE27F /* View */,
+				6EABD25F2464AC24009CE27F /* Controller */,
 			);
 			path = News;
 			sourceTree = "<group>";
@@ -160,7 +172,8 @@
 		6E3CD3A9245E37EC0028A340 /* TimeTable */ = {
 			isa = PBXGroup;
 			children = (
-				6ED9F41F245C401100417F69 /* TimeTableViewController.swift */,
+				6EABD2622464AC75009CE27F /* Model */,
+				6EABD25E2464AC17009CE27F /* Controller */,
 			);
 			path = TimeTable;
 			sourceTree = "<group>";
@@ -168,8 +181,8 @@
 		6E3CD3AA245E37F70028A340 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */,
-				6E3633302447602300918364 /* SettingsViewController.swift */,
+				6EABD2682464C9AF009CE27F /* Defaults */,
+				6EABD25D2464ABF0009CE27F /* Controller */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -197,46 +210,153 @@
 			children = (
 				6E3633322447604E00918364 /* Helpers */,
 				6E7625912403F99E00C68C7F /* Assets */,
-				6E7625902403F97C00C68C7F /* AppDelegates */,
 				6EB7A4FA245F66EA004EF027 /* DateScrollPicker */,
 				6EE352572444D148001C434F /* Stork */,
+				6EABD2592464AA73009CE27F /* Application */,
 				6E2549AC244464EE00E3D080 /* Model */,
-				6E76258F2403F95A00C68C7F /* Controllers */,
-				6EB7A523245F7423004EF027 /* Views */,
-			);
-			path = MyKTGG;
-			sourceTree = "<group>";
-		};
-		6E76258F2403F95A00C68C7F /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
 				6E3CD3AA245E37F70028A340 /* Settings */,
 				6E3CD3A9245E37EC0028A340 /* TimeTable */,
 				6E3CD3A8245E37DD0028A340 /* News */,
 				6E3CD3A7245E37D50028A340 /* Auth */,
 				6E3CD3A6245E37CA0028A340 /* Main */,
+				6EB7A523245F7423004EF027 /* CommonView */,
 			);
-			path = Controllers;
-			sourceTree = "<group>";
-		};
-		6E7625902403F97C00C68C7F /* AppDelegates */ = {
-			isa = PBXGroup;
-			children = (
-				6E76256D2403F6C100C68C7F /* AppDelegate.swift */,
-				6E76256F2403F6C100C68C7F /* SceneDelegate.swift */,
-			);
-			path = AppDelegates;
+			path = MyKTGG;
 			sourceTree = "<group>";
 		};
 		6E7625912403F99E00C68C7F /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				6E7625862403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf */,
-				6E7625812403F87F00C68C7F /* AcuminProSemiCondensed-Medium.otf */,
-				6E7625832403F87F00C68C7F /* ProximaNova-Bold.ttf */,
+				6E8D587824605BAE00384ADC /* Source_Sans_Pro */,
 				6E7625762403F6C200C68C7F /* Assets.xcassets */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		6E8D587824605BAE00384ADC /* Source_Sans_Pro */ = {
+			isa = PBXGroup;
+			children = (
+				6E8D587924605BAE00384ADC /* SourceSansPro-Regular.ttf */,
+				6E8D587A24605BAE00384ADC /* SourceSansPro-Bold.ttf */,
+				6E8D587B24605BAE00384ADC /* SourceSansPro-Light.ttf */,
+				6E8D587C24605BAE00384ADC /* SourceSansPro-Black.ttf */,
+				6E8D587D24605BAE00384ADC /* SourceSansPro-ExtraLight.ttf */,
+				6E8D587E24605BAE00384ADC /* SourceSansPro-SemiBold.ttf */,
+			);
+			path = Source_Sans_Pro;
+			sourceTree = "<group>";
+		};
+		6EABD2592464AA73009CE27F /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				6EABD25C2464AA92009CE27F /* View */,
+				6EABD25B2464AA86009CE27F /* Model */,
+				6EABD25A2464AA7B009CE27F /* Controller */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		6EABD25A2464AA7B009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6E76256D2403F6C100C68C7F /* AppDelegate.swift */,
+				6E76256F2403F6C100C68C7F /* SceneDelegate.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD25B2464AA86009CE27F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6EABD25C2464AA92009CE27F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6E7625782403F6C200C68C7F /* LaunchScreen.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6EABD25D2464ABF0009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6E7CACB4240BC68E009C8B5F /* GroupChooseViewController.swift */,
+				6E3633302447602300918364 /* SettingsViewController.swift */,
+				6EABD26B2464D142009CE27F /* UserEditorTableViewController.swift */,
+				6EABD26D2464E78D009CE27F /* AvatarMethods.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD25E2464AC17009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6ED9F41F245C401100417F69 /* TimeTableViewController.swift */,
+				6E8D58852460643A00384ADC /* TimeTableCell.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD25F2464AC24009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6E067995244362E8001FAE67 /* NewsTableViewController.swift */,
+				6E363333244A474700918364 /* NewsWebView.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD2602464AC39009CE27F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6E0679932443625B001FAE67 /* NewsCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6EABD2612464AC6A009CE27F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6E06799724436565001FAE67 /* NewsModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6EABD2622464AC75009CE27F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6E8D5887246074F100384ADC /* TimeTableModel.swift */,
+				6E8D58892460750200384ADC /* ChangeModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6EABD2632464ACE0009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6E7625872403F87F00C68C7F /* AuthViewController.swift */,
+				6E7625822403F87F00C68C7F /* ForgotPassViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD2642464ACF0009CE27F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6E7625712403F6C100C68C7F /* MainViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		6EABD2682464C9AF009CE27F /* Defaults */ = {
+			isa = PBXGroup;
+			children = (
+				6EABD2692464C9CE009CE27F /* Defaults.swift */,
+			);
+			path = Defaults;
 			sourceTree = "<group>";
 		};
 		6EB7A4FA245F66EA004EF027 /* DateScrollPicker */ = {
@@ -269,8 +389,6 @@
 			isa = PBXGroup;
 			children = (
 				6EB7A4FD245F66EA004EF027 /* DateViewCell.swift */,
-				6EB7A4FE245F66EA004EF027 /* SeparatorViewCell.xib */,
-				6EB7A4FF245F66EA004EF027 /* SeparatorViewCell.swift */,
 				6EB7A500245F66EA004EF027 /* DateViewCell.xib */,
 			);
 			path = Cells;
@@ -288,13 +406,12 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		6EB7A523245F7423004EF027 /* Views */ = {
+		6EB7A523245F7423004EF027 /* CommonView */ = {
 			isa = PBXGroup;
 			children = (
 				6ECC5AE9243E3728006E456A /* Main.storyboard */,
-				6E7625782403F6C200C68C7F /* LaunchScreen.storyboard */,
 			);
-			path = Views;
+			path = CommonView;
 			sourceTree = "<group>";
 		};
 		6EE352572444D148001C434F /* Stork */ = {
@@ -393,15 +510,17 @@
 			files = (
 				6ECC5AEA243E3728006E456A /* Main.storyboard in Resources */,
 				6EE352532444CC68001C434F /* PickedPull.storyboard in Resources */,
+				6E8D588224605BAE00384ADC /* SourceSansPro-Black.ttf in Resources */,
 				6EB7A515245F66EA004EF027 /* .gitkeep in Resources */,
+				6E8D588124605BAE00384ADC /* SourceSansPro-Light.ttf in Resources */,
 				6E76257A2403F6C200C68C7F /* LaunchScreen.storyboard in Resources */,
 				6E7625772403F6C200C68C7F /* Assets.xcassets in Resources */,
+				6E8D587F24605BAE00384ADC /* SourceSansPro-Regular.ttf in Resources */,
+				6E8D588324605BAE00384ADC /* SourceSansPro-ExtraLight.ttf in Resources */,
 				6EB7A514245F66EA004EF027 /* DateViewCell.xib in Resources */,
-				6E76258D2403F87F00C68C7F /* AcuminProSemiCondensed-Bold.otf in Resources */,
-				6EB7A512245F66EA004EF027 /* SeparatorViewCell.xib in Resources */,
 				6EB7A521245F66EA004EF027 /* DateScrollPicker.xib in Resources */,
-				6E7625882403F87F00C68C7F /* AcuminProSemiCondensed-Medium.otf in Resources */,
-				6E76258A2403F87F00C68C7F /* ProximaNova-Bold.ttf in Resources */,
+				6E8D588424605BAE00384ADC /* SourceSansPro-SemiBold.ttf in Resources */,
+				6E8D588024605BAE00384ADC /* SourceSansPro-Bold.ttf in Resources */,
 				6E76258C2403F87F00C68C7F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -460,12 +579,15 @@
 				6E7625892403F87F00C68C7F /* ForgotPassViewController.swift in Sources */,
 				6EB7A511245F66EA004EF027 /* DateViewCell.swift in Sources */,
 				6EB7A51D245F66EA004EF027 /* DateScrollPicker.swift in Sources */,
+				6E8D58862460643A00384ADC /* TimeTableCell.swift in Sources */,
 				6EB7A519245F66EA004EF027 /* Date+Days.swift in Sources */,
 				6E7CACB5240BC68E009C8B5F /* GroupChooseViewController.swift in Sources */,
 				6EB7A51E245F66EA004EF027 /* DateInsertType.swift in Sources */,
 				6E7625722403F6C100C68C7F /* MainViewController.swift in Sources */,
 				6E76258E2403F87F00C68C7F /* AuthViewController.swift in Sources */,
+				6EABD26C2464D142009CE27F /* UserEditorTableViewController.swift in Sources */,
 				6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */,
+				6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */,
 				6EB7A516245F66EA004EF027 /* DateScrollItem.swift in Sources */,
 				6E0679942443625B001FAE67 /* NewsCell.swift in Sources */,
 				6EB7A51B245F66EA004EF027 /* UICollectionViewCell+Fade.swift in Sources */,
@@ -477,10 +599,12 @@
 				6E067996244362E8001FAE67 /* NewsTableViewController.swift in Sources */,
 				6EB7A520245F66EA004EF027 /* DateScrollPicker+Protocols.swift in Sources */,
 				6ED9F420245C401100417F69 /* TimeTableViewController.swift in Sources */,
-				6EB7A513245F66EA004EF027 /* SeparatorViewCell.swift in Sources */,
 				6EB7A51F245F66EA004EF027 /* DateScrollPickerFormat.swift in Sources */,
 				6E3633312447602300918364 /* SettingsViewController.swift in Sources */,
+				6EABD26A2464C9CE009CE27F /* Defaults.swift in Sources */,
+				6EABD26E2464E78D009CE27F /* AvatarMethods.swift in Sources */,
 				6EB7A51A245F66EA004EF027 /* UIView+Nib.swift in Sources */,
+				6E8D5888246074F100384ADC /* TimeTableModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,7 +672,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -602,7 +726,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
