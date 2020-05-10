@@ -1,35 +1,32 @@
+// This file was generated from JSON Schema using quicktype, do not modify it directly.
+// To parse the JSON, add this file to your project and do:
 //
-//  TimeTableModel.swift
-//  MyKTGG
-//
-//  Created by Алексей Трушковский on 04.05.2020.
-//  Copyright © 2020 Алексей Трушковский. All rights reserved.
-//
+//   let timeTableRoot = try? newJSONDecoder().decode(TimeTableRoot.self, from: jsonData)
 
 import Foundation
 
-struct TimeTableJsonRoot: Codable {
-    let timetable: Timetable?
+// MARK: - TimeTableRoot
+struct TimeTableRoot: Codable {
+    var timetable: Timetable?
 }
 
+// MARK: - Timetable
 struct Timetable: Codable {
-    let firstsubgroup, secondsubgroup: Subgroup?
+    var firstsubgroup, secondsubgroup: Subgroup?
 }
 
+// MARK: - Subgroup
 struct Subgroup: Codable {
-    let firstweek, secondweek: [Week]?
+    var firstweek, secondweek: [Week]?
 }
 
+// MARK: - Week
 struct Week: Codable {
-    let group: String?
-    let day: [Day]?
+    var mon, tue, wed, thu: [Fri]?
+    var fri, sun, sat: [Fri]?
 }
 
-struct Day: Codable {
-    let mon, tue, wed, thu: [[String: Fri]]?
-    let fri, sun, sat: [[String: Fri]]?
-}
-
+// MARK: - Fri
 struct Fri: Codable {
-    let lesson, teacher, room: String?
+    var lessonNum, lesson, teacher, room: String?
 }

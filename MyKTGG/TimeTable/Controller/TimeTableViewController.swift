@@ -10,6 +10,14 @@ import UIKit
 
 class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateScrollPickerDataSource {
 
+    let network = TimeTableNetworkController()
+    var timeTableRoot = TimeTableRoot()
+    var timetable = Timetable()
+    var subgroup = Subgroup()
+    var week = Week()
+    var fri = Fri()
+    
+    @IBOutlet weak var timeTable: UITableView!
     @IBOutlet weak var dayLabel: UILabel!
     @IBOutlet weak var weekLabel: UILabel!
     @IBOutlet weak var monthNYearLabel: UILabel!
@@ -27,6 +35,7 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     override func viewDidLoad() {
         super.viewDidLoad()
         todayButtonOutlet.layer.cornerRadius = 10
+        network.fetchData()
     }
     
     func dateScrollPicker(_ dateScrollPicker: DateScrollPicker, didSelectDate date: Date) {
@@ -77,13 +86,31 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         datePicker.delegate = self
         datePicker.dataSource = self
     }
+}
+extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
     
-    private func configureCell(cell: TimeTableCell, for indexPath: IndexPath) {
-        cell.lessonView.layer.cornerRadius = 15
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return network.fri.lesson?.count ?? 0
     }
     
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
+        cell.lessonView.layer.cornerRadius = 15
+       network.configureCell(cell: cell, for: indexPath)
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //TODO: frg
+        print("")
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 123
+    }
 }
-
 extension Date {
     func format(dateFormat: String) -> String {
         let formatter = DateFormatter()
@@ -95,25 +122,4 @@ extension Date {
         let dateComponents = Calendar.current.dateComponents([.day, .month, .year], from: self)
         return Calendar.current.date(from: dateComponents)
     }
-}
-extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 140
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
-        configureCell(cell: cell, for: indexPath)
-        return cell
-    }
-    
-    
 }

@@ -913,8 +913,8 @@
                                 </prototypes>
                                 <sections/>
                                 <connections>
-                                    <outlet property="dataSource" destination="5b4-xb-Mge" id="NK7-Bf-jkE"/>
-                                    <outlet property="delegate" destination="5b4-xb-Mge" id="eDp-4G-Hqi"/>
+                                    <outlet property="dataSource" destination="5b4-xb-Mge" id="oIH-tb-JqV"/>
+                                    <outlet property="delegate" destination="5b4-xb-Mge" id="FJQ-kO-eov"/>
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="L37-7a-GDA" userLabel="SeparatorView">
@@ -954,6 +954,7 @@
                         <outlet property="datePicker" destination="9q7-xn-7BF" id="479-uU-23d"/>
                         <outlet property="dayLabel" destination="Ezc-tl-m8x" id="oee-xc-sgd"/>
                         <outlet property="monthNYearLabel" destination="Wol-0V-TfW" id="SJD-po-3gR"/>
+                        <outlet property="timeTable" destination="fRI-ad-7bb" id="V1x-vI-8Ak"/>
                         <outlet property="todayButtonOutlet" destination="kXr-8n-6il" id="2MD-J3-R3P"/>
                         <outlet property="weekLabel" destination="JAE-JE-d1v" id="EBw-D0-aoW"/>
                     </connections>

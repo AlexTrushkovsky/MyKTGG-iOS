@@ -153,7 +153,7 @@ class NewsTableViewController: UITableViewController {
         
         return cell
     }
-    
+    //MARK: Opening WebView
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         new = news.items![indexPath.section]
         let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
