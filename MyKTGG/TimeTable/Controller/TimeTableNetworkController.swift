@@ -37,12 +37,9 @@ class TimeTableNetworkController {
                     let timeTableRoot = try decoder.decode(TimeTableRoot.self, from: response.data!)
                     self.newVar = timeTableRoot
                     self.timeTable = self.newVar.timetable!
-                    //MARK: SubGroup pick
-                    guard let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int else { return }
-                    self.subGroup = self.timeTable.firstsubgroup!
-                    if subGroup == 1 { self.subGroup = self.timeTable.secondsubgroup! }
-                    //self.getInfo(date: pickedDate)
-                    self.week = self.subGroup.firstweek!
+                    
+                    self.getSubGroup()
+                    self.getWeekNum(date: pickedDate)
                     
                     DispatchQueue.main.async {
                         print("Data saved")
@@ -56,6 +53,39 @@ class TimeTableNetworkController {
                 print("Failed to get JSON: ",error)
             }
         }
+    }
+    
+    func getWeekNum(date: Date){
+        let calendar = Calendar(identifier: .gregorian)
+        let firstOfSep = DateComponents(month: 9, day: 1)
+        guard let firstOfSepDate = calendar.date(from: firstOfSep) else { return }
+        let weekOfFirstOfSep = calendar.component(.weekOfYear, from: firstOfSepDate)
+        let pickedDateWeekday = calendar.component(.weekOfYear, from: date)
+        if pickedDateWeekday >= weekOfFirstOfSep && pickedDateWeekday <= 53{
+            if (pickedDateWeekday - weekOfFirstOfSep) % 2 == 0 {
+                self.week = self.subGroup.firstweek!
+                print("firstWeek")
+            } else {
+                self.week = self.subGroup.secondweek!
+                print("secondWeek")
+            }
+        } else {
+            if (53 - 36 + pickedDateWeekday) % 2 == 0 {
+                self.week = self.subGroup.secondweek!
+                print("secondWeek")
+            } else {
+                self.week = self.subGroup.firstweek!
+                print("firstWeek")
+            }
+        }
+        
+    }
+    
+    func getSubGroup(){
+        //MARK: SubGroup pick
+        guard let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int else { return }
+        self.subGroup = self.timeTable.firstsubgroup!
+        if subGroup == 1 { self.subGroup = self.timeTable.secondsubgroup! }
     }
     
     func getInfo(date: Date) {
@@ -120,6 +150,7 @@ class TimeTableNetworkController {
     }
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date) {
+        getWeekNum(date: date)
         print("cell configuring...")
         if let lesson = fri[indexPath.row].lesson{
             cell.lessonName.text = lesson
