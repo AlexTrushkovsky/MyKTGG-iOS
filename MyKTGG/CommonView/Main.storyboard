@@ -382,10 +382,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="groupchooselabel" translatesAutoresizingMaskIntoConstraints="NO" id="SxA-KX-AXW">
-                                <rect key="frame" x="45" y="109" width="240" height="47"/>
+                                <rect key="frame" x="47.5" y="31" width="225.5" height="47"/>
                             </imageView>
                             <pickerView multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2VQ-kD-Vna">
-                                <rect key="frame" x="35" y="176" width="235" height="216"/>
+                                <rect key="frame" x="0.0" y="86.5" width="320" height="216"/>
                             </pickerView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Alf-vX-3Au" userLabel="WaitingIndicator">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -401,20 +401,17 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="cbC-Ol-AbF">
-                                <rect key="frame" x="85" y="402" width="150" height="31"/>
+                                <rect key="frame" x="86" y="302.5" width="148" height="31"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Бакалавр" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5a-44-HWz">
-                                        <rect key="frame" x="0.0" y="0.0" width="93" height="31"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="91" height="31"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7TA-b1-ADb">
-                                        <rect key="frame" x="101" y="0.0" width="51" height="31"/>
+                                        <rect key="frame" x="99" y="0.0" width="51" height="31"/>
                                     </switch>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="150" id="8Wg-zg-86F"/>
-                                </constraints>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zHN-W3-bai">
                                 <rect key="frame" x="35" y="458" width="250" height="60"/>
@@ -423,20 +420,38 @@
                                     <action selector="chooseButtonAction:" destination="wJu-1p-ihV" eventType="touchUpInside" id="ILF-E7-5Ft"/>
                                 </connections>
                             </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Qik-ts-cq1">
+                                <rect key="frame" x="99.5" y="363.5" width="121" height="59.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="підгрупа" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PLV-lc-uuT">
+                                        <rect key="frame" x="0.0" y="0.0" width="121" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="6is-H2-yqA">
+                                        <rect key="frame" x="0.0" y="28.5" width="121" height="32"/>
+                                        <segments>
+                                            <segment title="перша"/>
+                                            <segment title="друга"/>
+                                        </segments>
+                                    </segmentedControl>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="zHN-W3-bai" firstAttribute="leading" secondItem="ejt-G4-AFj" secondAttribute="leading" constant="35" id="0vb-3Q-pS2"/>
-                            <constraint firstItem="ejt-G4-AFj" firstAttribute="bottom" secondItem="zHN-W3-bai" secondAttribute="bottom" constant="30" id="2Sg-5F-b6Z"/>
-                            <constraint firstItem="ejt-G4-AFj" firstAttribute="trailing" secondItem="2VQ-kD-Vna" secondAttribute="trailing" constant="50" id="40T-gJ-bfS"/>
-                            <constraint firstItem="SxA-KX-AXW" firstAttribute="leading" secondItem="ejt-G4-AFj" secondAttribute="leading" constant="45" id="4BR-Hj-7ym"/>
-                            <constraint firstItem="ejt-G4-AFj" firstAttribute="trailing" secondItem="zHN-W3-bai" secondAttribute="trailing" constant="35" id="Dk7-t8-mOV"/>
-                            <constraint firstItem="cbC-Ol-AbF" firstAttribute="centerX" secondItem="sxi-pC-mFz" secondAttribute="centerX" id="NDq-iT-4ZL"/>
-                            <constraint firstItem="2VQ-kD-Vna" firstAttribute="top" secondItem="SxA-KX-AXW" secondAttribute="bottom" constant="20" id="QdC-ff-HIN"/>
-                            <constraint firstItem="zHN-W3-bai" firstAttribute="top" secondItem="cbC-Ol-AbF" secondAttribute="bottom" constant="25" id="RGP-Eo-0sI"/>
-                            <constraint firstItem="cbC-Ol-AbF" firstAttribute="top" secondItem="2VQ-kD-Vna" secondAttribute="bottom" constant="10" id="Rmt-qy-oyY"/>
-                            <constraint firstItem="2VQ-kD-Vna" firstAttribute="leading" secondItem="ejt-G4-AFj" secondAttribute="leading" constant="35" id="VpF-oE-TWa"/>
-                            <constraint firstItem="ejt-G4-AFj" firstAttribute="trailing" secondItem="SxA-KX-AXW" secondAttribute="trailing" constant="35" id="biY-Ca-DJg"/>
+                            <constraint firstItem="Qik-ts-cq1" firstAttribute="centerX" secondItem="sxi-pC-mFz" secondAttribute="centerX" id="3ka-LT-yGA"/>
+                            <constraint firstItem="zHN-W3-bai" firstAttribute="top" secondItem="Qik-ts-cq1" secondAttribute="bottom" constant="35" id="8J8-qW-xZY"/>
+                            <constraint firstItem="zHN-W3-bai" firstAttribute="leading" secondItem="ejt-G4-AFj" secondAttribute="leading" constant="35" id="BLg-eI-TBO"/>
+                            <constraint firstItem="ejt-G4-AFj" firstAttribute="trailing" secondItem="zHN-W3-bai" secondAttribute="trailing" constant="35" id="FJn-IN-s4s"/>
+                            <constraint firstItem="ejt-G4-AFj" firstAttribute="bottom" secondItem="zHN-W3-bai" secondAttribute="bottom" constant="30" id="GcJ-1g-aL1"/>
+                            <constraint firstItem="2VQ-kD-Vna" firstAttribute="top" secondItem="SxA-KX-AXW" secondAttribute="bottom" constant="8.5" id="M5F-60-pha"/>
+                            <constraint firstItem="SxA-KX-AXW" firstAttribute="centerX" secondItem="sxi-pC-mFz" secondAttribute="centerX" id="VFK-bF-gyk"/>
+                            <constraint firstItem="cbC-Ol-AbF" firstAttribute="centerX" secondItem="sxi-pC-mFz" secondAttribute="centerX" id="ZUR-ho-t2l"/>
+                            <constraint firstItem="Qik-ts-cq1" firstAttribute="top" secondItem="cbC-Ol-AbF" secondAttribute="bottom" constant="30" id="ua7-cQ-Vwu"/>
+                            <constraint firstItem="2VQ-kD-Vna" firstAttribute="centerX" secondItem="sxi-pC-mFz" secondAttribute="centerX" id="wkC-AX-DlZ"/>
+                            <constraint firstItem="cbC-Ol-AbF" firstAttribute="top" secondItem="2VQ-kD-Vna" secondAttribute="bottom" id="ySG-Su-9kb"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ejt-G4-AFj"/>
                         <variation key="default">
@@ -454,11 +469,12 @@
                         <outlet property="bachelorSwitch" destination="7TA-b1-ADb" id="YrS-on-OVn"/>
                         <outlet property="chooseButtonView" destination="zHN-W3-bai" id="x6g-Xe-7zb"/>
                         <outlet property="darkView" destination="Alf-vX-3Au" id="yG0-v3-Kaq"/>
+                        <outlet property="subgroupPicker" destination="6is-H2-yqA" id="Mhb-kN-iQl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CB6-7v-r6m" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4302.898550724638" y="-2777.0089285714284"/>
+            <point key="canvasLocation" x="4301.25" y="-2777.1126760563379"/>
         </scene>
         <!--Головна-->
         <scene sceneID="MAo-aD-Jza">
@@ -954,7 +970,7 @@
                         <outlet property="datePicker" destination="9q7-xn-7BF" id="479-uU-23d"/>
                         <outlet property="dayLabel" destination="Ezc-tl-m8x" id="oee-xc-sgd"/>
                         <outlet property="monthNYearLabel" destination="Wol-0V-TfW" id="SJD-po-3gR"/>
-                        <outlet property="timeTable" destination="fRI-ad-7bb" id="V1x-vI-8Ak"/>
+                        <outlet property="timeTableView" destination="fRI-ad-7bb" id="uAd-7b-CdT"/>
                         <outlet property="todayButtonOutlet" destination="kXr-8n-6il" id="2MD-J3-R3P"/>
                         <outlet property="weekLabel" destination="JAE-JE-d1v" id="EBw-D0-aoW"/>
                     </connections>

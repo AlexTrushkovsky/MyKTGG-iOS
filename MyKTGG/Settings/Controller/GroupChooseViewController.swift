@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 
 class GroupChooseViewController: UIViewController {
+    @IBOutlet weak var subgroupPicker: UISegmentedControl!
     @IBOutlet weak var bachelorSwitch: UISwitch!
     @IBOutlet weak var GroupPicker: UIPickerView!
     @IBOutlet weak var chooseButtonView: UIButton!
@@ -70,8 +71,23 @@ class GroupChooseViewController: UIViewController {
         }else{
             return
         }
+        let subgroup = subgroupPicker.selectedSegmentIndex
+        ref.child(user!.uid).updateChildValues(["subgroup":subgroup]) {
+            (error: Error?, ref:DatabaseReference) in
+            if let error = error {
+                print("Data could not be saved: \(error).")
+                self.showAlert(title: "Помилка", message: "Не вдалося зберегти дані.\n Перевірте з'єднання та спробуйте знову!")
+            } else {
+                print("Data saved succesfully!")
+                print("subgroupIndex = \(subgroup)")
+                UserDefaults.standard.set(subgroup, forKey: "subGroup")
+                self.navigationController?.popViewController(animated: true)
+            }
+            self.darkView.isHidden=true
+            self.ActivityIndicator.stopAnimating()
+            self.ActivityIndicator.isHidden = true
+        }
     }
-    
 }
 extension GroupChooseViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {

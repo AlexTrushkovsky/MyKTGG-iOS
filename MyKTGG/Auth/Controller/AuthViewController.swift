@@ -63,7 +63,7 @@ class AuthViewController: UIViewController {
         passwordTextFieldView.layer.cornerRadius = 15
         
         nameTextField.attributedPlaceholder = NSAttributedString(string: "ім'я та призвіще",
-        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+                                                                 attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         emailTextField.attributedPlaceholder = NSAttributedString(string: "email",
         attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         passwordTextField.attributedPlaceholder = NSAttributedString(string: "пароль",

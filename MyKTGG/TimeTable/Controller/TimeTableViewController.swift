@@ -11,13 +11,9 @@ import UIKit
 class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateScrollPickerDataSource {
 
     let network = TimeTableNetworkController()
-    var timeTableRoot = TimeTableRoot()
-    var timetable = Timetable()
-    var subgroup = Subgroup()
-    var week = Week()
-    var fri = Fri()
+    var pickedDate = Date()
     
-    @IBOutlet weak var timeTable: UITableView!
+    @IBOutlet weak var timeTableView: UITableView!
     @IBOutlet weak var dayLabel: UILabel!
     @IBOutlet weak var weekLabel: UILabel!
     @IBOutlet weak var monthNYearLabel: UILabel!
@@ -25,20 +21,23 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     @IBOutlet weak var todayButtonOutlet: UIButton!
     @IBAction func todayButtonAction(_ sender: UIButton) {
         scrollToday()
+        timeTableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         setupDateScroll()
         scrollToday()
+        timeTableView.reloadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         todayButtonOutlet.layer.cornerRadius = 10
-        network.fetchData()
+        network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
     }
     
     func dateScrollPicker(_ dateScrollPicker: DateScrollPicker, didSelectDate date: Date) {
+        pickedDate = date
         dayLabel.text = date.format(dateFormat: "dd")
         weekLabel.text = date.format(dateFormat: "EEEE").capitalized
         monthNYearLabel.text = date.format(dateFormat: "MMM yyyy").capitalized
@@ -49,6 +48,7 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
             todayButtonOutlet.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
             todayButtonOutlet.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
         }
+        timeTableView.reloadData()
     }
 
     func scrollToday(){
@@ -90,21 +90,17 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
 extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return network.fri.lesson?.count ?? 0
+        network.getInfo(date: pickedDate)
+        return network.lessonCount
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
         cell.lessonView.layer.cornerRadius = 15
-       network.configureCell(cell: cell, for: indexPath)
+        network.configureCell(cell: cell, for: indexPath, date: pickedDate)
         
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //TODO: frg
-        print("")
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
