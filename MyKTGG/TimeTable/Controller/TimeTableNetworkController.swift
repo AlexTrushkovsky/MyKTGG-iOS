@@ -73,27 +73,24 @@ class TimeTableNetworkController {
         if pickedDateWeekday >= weekOfFirstOfSep && pickedDateWeekday <= 53{
             if (pickedDateWeekday - weekOfFirstOfSep) % 2 == 0 {
                 self.week = self.subGroup.firstweek!
-                //print("firstWeek")
             } else {
                 self.week = self.subGroup.secondweek!
-                //print("secondWeek")
             }
         } else {
             if (53 - 36 + pickedDateWeekday) % 2 == 0 {
-//MARK: Crash on first start
                 self.week = self.subGroup.secondweek!
-                //print("secondWeek")
             } else {
                 self.week = self.subGroup.firstweek!
-                //print("firstWeek")
             }
         }
         
     }
     
     func getSubGroup(){
-        //MARK: SubGroup pick
+        //MARK: subGroup pick
+        print("getSubGroup defaults get")
         guard let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int else { return }
+        print(subGroup)
         self.subGroup = self.timeTable.firstsubgroup!
         if subGroup == 1 { self.subGroup = self.timeTable.secondsubgroup! }
     }

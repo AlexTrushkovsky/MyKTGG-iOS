@@ -41,7 +41,7 @@ class SettingsViewController: UITableViewController {
             let value = snapshot.value as? NSDictionary
             let name = value?["name"] as? String ?? ""
             let group = value?["group"] as? String ?? ""
-            let subGroup = value?["group"] as? String ?? ""
+            let subGroup = value?["subgroup"] as? Int ?? 0
             
             if name != "" {
                 UserDefaults.standard.set(name, forKey: "name")
@@ -54,11 +54,9 @@ class SettingsViewController: UITableViewController {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
             }
             
-            if subGroup != "" {
-                UserDefaults.standard.set(group, forKey: "SubGroup")
+                UserDefaults.standard.set(subGroup, forKey: "subGroup")
                 print(subGroup)
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
-            }
             
             self.setUserLabels()
             
@@ -76,9 +74,9 @@ class SettingsViewController: UITableViewController {
             let text = group as? String {
             groupLabel.text = text
         }
-        if let subGroup = UserDefaults.standard.object(forKey: "subGroup"),
-            let text = subGroup as? Int {
-            subGroupLabel.text = "\(text + 1) підгрупа"
+        if let subGroup = UserDefaults.standard.object(forKey: "subGroup") {
+            print("set user labels",subGroup)
+            subGroupLabel.text = "\(subGroup as! Int + 1) підгрупа"
         }
     }
     
