@@ -24,12 +24,14 @@ class NewsTableViewController: UITableViewController {
         super.viewDidLoad()
         tableView.refreshControl = refControl
         refControl.addTarget(self, action: #selector(refreshNews(_:)), for: .valueChanged)
-        refControl.attributedTitle = NSAttributedString(string: "Потягніть для оновлення")
+        //refControl.attributedTitle = NSAttributedString(string: "Потягніть для оновлення")
         let spinner = UIActivityIndicatorView()
         spinner.startAnimating()
         spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
         tableView.tableFooterView = spinner
         tableView.tableFooterView?.isHidden = false
+        tableView.estimatedRowHeight = 380
+        tableView.rowHeight = UITableView.automaticDimension
         fetchData(limit: limit)
     }
     
@@ -89,9 +91,11 @@ class NewsTableViewController: UITableViewController {
         isLoading = false
     }
     private func configureCell(cell: NewsCell, for indexPath: IndexPath) {
-        
         new = news.items![indexPath.section]
-        cell.heading.text = new.title?.withoutHtml
+        
+        if let title = new.title{
+            cell.heading.text = title.withoutHtml
+        }
         
         if let created = new.created{
             let date = created.toDate()
@@ -103,119 +107,119 @@ class NewsTableViewController: UITableViewController {
         }
         
         if let introtext = new.introtext {
-            if introtext.withoutHtml != "" {
-                cell.newsText.text = introtext.withoutHtml
-            }
-        }
-        
-        guard self.new.imageMedium != "" else {
-            print("Image not found")
-            cell.NewsImage!.image = #imageLiteral(resourceName: "newPlaceholder")
-            cell.NewsImage!.layer.cornerRadius = 10
-            return
-        }
-        
-        let url = "https://ktgg.kiev.ua\(self.new.imageMedium!)"
-        guard let imageUrl = URL(string: url) else { return }
-        
-        
-        
-        if let image = imageCache.image(withIdentifier: url)
-        {
-            cell.NewsImage!.image = image
-            cell.NewsImage!.layer.cornerRadius = 10
-        } else {
-            
-            AF.request(imageUrl).responseImage { response in
-                if case .success(let image) = response.result {
-                    print("image downloaded: \(url)")
-                    cell.NewsImage!.image = image
-                    cell.NewsImage!.layer.cornerRadius = 10
-                    self.imageCache.add(image, withIdentifier: url)
+            cell.newsText.isHidden = true
+            if !introtext.withoutHtml.isEmpty && introtext.withoutHtml.count > 3{
+                if cell.rubric.text != "Календар подій" {
+                    cell.newsText.isHidden = false
+                    cell.newsText.text = introtext.withoutHtml
                 }
             }
         }
-    }
-    
-//MARK: TableView Methods
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return news.items?.count ?? 0
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
-        
-        configureCell(cell: cell, for: indexPath)
-        
-        return cell
-    }
-    //MARK: Opening WebView
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        new = news.items![indexPath.section]
-        let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let WebVC:NewsWebView = storyBoard.instantiateViewController(withIdentifier: "NewsWebView") as! NewsWebView
-        WebVC.url = new.link
-        WebVC.title = new.title
-        show(WebVC, sender: nil)
-    }
-    
-//MARK: PAGINATION
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard isLoading == false else { return }
-        guard let count = news.items?.count else { return }
-        guard count != countOfNews else { return }
-        if indexPath.section == (count - 1) {
-            isLoading = true
-            limit += 15
-            fetchData(limit: limit)
-            countOfNews = news.items!.count
-            let spinner = UIActivityIndicatorView()
-            spinner.startAnimating()
-            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
-            tableView.tableFooterView = spinner
-            tableView.tableFooterView?.isHidden = false
-        }
-    }
-}
-extension String {
-    public var withoutHtml: String {
-        guard let data = self.data(using: .utf8) else {
-            return self
+            guard self.new.imageMedium != "" else {
+                print("Image not found")
+                cell.NewsImage!.image = #imageLiteral(resourceName: "newPlaceholder")
+                cell.NewsImage!.layer.cornerRadius = 10
+                return
+            }
+            
+            let url = "https://ktgg.kiev.ua\(self.new.imageMedium!)"
+            guard let imageUrl = URL(string: url) else { return }
+            
+            if let image = imageCache.image(withIdentifier: url) {
+                cell.NewsImage!.image = image
+                cell.NewsImage!.layer.cornerRadius = 10
+            } else {
+                AF.request(imageUrl).responseImage { response in
+                    if case .success(let image) = response.result {
+                        print("image downloaded: \(url)")
+                        cell.NewsImage!.image = image
+                        cell.NewsImage!.layer.cornerRadius = 10
+                        self.imageCache.add(image, withIdentifier: url)
+                    }
+                }
+            }
         }
         
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-            .documentType: NSAttributedString.DocumentType.html,
-            .characterEncoding: String.Encoding.utf8.rawValue
-        ]
-        
-        guard let stringWoHTML = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
-            return self
+        //MARK: TableView Methods
+        override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+            return 1
+        }
+        override func numberOfSections(in tableView: UITableView) -> Int {
+            return news.items?.count ?? 0
         }
         
-        return stringWoHTML.string
-    }
-    public func toDate(withFormat format: String = "yyyy-MM-dd HH:mm:ss")-> Date?{
+        override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
+            
+            configureCell(cell: cell, for: indexPath)
+            
+            return cell
+        }
+    
+        //MARK: Opening WebView
+        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            new = news.items![indexPath.section]
+            let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let WebVC:NewsWebView = storyBoard.instantiateViewController(withIdentifier: "NewsWebView") as! NewsWebView
+            WebVC.url = new.link
+            WebVC.title = new.title
+            show(WebVC, sender: nil)
+        }
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(identifier: "Europe/Kiev")
-        dateFormatter.locale = Locale(identifier: "uk_UA")
-        dateFormatter.calendar = Calendar(identifier: .gregorian)
-        dateFormatter.dateFormat = format
-        let date = dateFormatter.date(from: self)
-        
-        return date
-        
+        //MARK: PAGINATION
+        override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+            guard isLoading == false else { return }
+            guard let count = news.items?.count else { return }
+            guard count != countOfNews else { return }
+            if indexPath.section == (count - 1) {
+                isLoading = true
+                limit += 15
+                fetchData(limit: limit)
+                countOfNews = news.items!.count
+                let spinner = UIActivityIndicatorView()
+                spinner.startAnimating()
+                spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+                tableView.tableFooterView = spinner
+                tableView.tableFooterView?.isHidden = false
+            }
+        }
     }
-}
-extension Date{
-    func toString( dateFormat format  : String ) -> String
-    {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: self)
+    extension String {
+        public var withoutHtml: String {
+            guard let data = self.data(using: .utf8) else {
+                return self
+            }
+            
+            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ]
+            
+            guard let stringWoHTML = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
+                return self
+            }
+            
+            return stringWoHTML.string
+        }
+        public func toDate(withFormat format: String = "yyyy-MM-dd HH:mm:ss")-> Date?{
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeZone = TimeZone(identifier: "Europe/Kiev")
+            dateFormatter.locale = Locale(identifier: "uk_UA")
+            dateFormatter.calendar = Calendar(identifier: .gregorian)
+            dateFormatter.dateFormat = format
+            let date = dateFormatter.date(from: self)
+            
+            return date
+            
+        }
     }
+    extension Date{
+        func toString( dateFormat format  : String ) -> String
+        {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = format
+            return dateFormatter.string(from: self)
+        }
 }

@@ -11,9 +11,10 @@ import UIKit
 class TimeTableCell: UITableViewCell {
     @IBOutlet weak var lessonView: UIView!
     @IBOutlet weak var timeView: UIView!
+    @IBOutlet weak var roomImage: UIImageView!
+    @IBOutlet weak var teacherImage: UIImageView!
     
     @IBOutlet weak var lessonName: UILabel!
-    @IBOutlet weak var lesssonType: UILabel!
     @IBOutlet weak var lessonRoom: UILabel!
     @IBOutlet weak var teacher: UILabel!
     @IBOutlet weak var startTime: UILabel!

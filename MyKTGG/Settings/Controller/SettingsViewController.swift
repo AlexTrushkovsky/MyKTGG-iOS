@@ -12,6 +12,7 @@ class SettingsViewController: UITableViewController {
     
     @IBOutlet weak var avatar: UIImageView!
     @IBOutlet weak var groupLabel: UILabel!
+    @IBOutlet weak var subGroupLabel: UILabel!
     @IBOutlet weak var UserNameLabel: UILabel!
     
     override func viewDidLoad() {
@@ -40,6 +41,7 @@ class SettingsViewController: UITableViewController {
             let value = snapshot.value as? NSDictionary
             let name = value?["name"] as? String ?? ""
             let group = value?["group"] as? String ?? ""
+            let subGroup = value?["group"] as? String ?? ""
             
             if name != "" {
                 UserDefaults.standard.set(name, forKey: "name")
@@ -49,6 +51,13 @@ class SettingsViewController: UITableViewController {
             if group != "" {
                 UserDefaults.standard.set(group, forKey: "group")
                 print(group)
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
+            }
+            
+            if subGroup != "" {
+                UserDefaults.standard.set(group, forKey: "SubGroup")
+                print(subGroup)
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
             }
             
             self.setUserLabels()
@@ -67,13 +76,18 @@ class SettingsViewController: UITableViewController {
             let text = group as? String {
             groupLabel.text = text
         }
+        if let subGroup = UserDefaults.standard.object(forKey: "subGroup"),
+            let text = subGroup as? Int {
+            subGroupLabel.text = "\(text + 1) підгрупа"
+        }
     }
     
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        let text = "Розробка: Трушковський Олексій\nДизайн: Федюк Денис"
         switch (section) {
-        case 4:
-            return text
+        case 2:
+            return "Переводити на наступний курс щороку"
+        case 5:
+            return "Розробка: Трушковський Олексій\nДизайн: Федюк Денис"
         default:
             return nil
         }

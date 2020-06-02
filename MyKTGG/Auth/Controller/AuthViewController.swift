@@ -190,7 +190,7 @@ class AuthViewController: UIViewController {
             
             email=emailTextField.text!
             password=passwordTextField.text!
-//
+            
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                 if error == nil{
                     

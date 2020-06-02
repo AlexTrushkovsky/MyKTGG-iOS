@@ -13,6 +13,9 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     let network = TimeTableNetworkController()
     var pickedDate = Date()
     
+    @IBOutlet weak var background: UIView!
+    @IBOutlet weak var weekEndImage: UIImageView!
+    @IBOutlet weak var timeTableSeparator: UIView!
     @IBOutlet weak var timeTableView: UITableView!
     @IBOutlet weak var dayLabel: UILabel!
     @IBOutlet weak var weekLabel: UILabel!
@@ -32,8 +35,18 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        background.layer.cornerRadius = 30
         todayButtonOutlet.layer.cornerRadius = 10
         network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
+        timeTableView.estimatedRowHeight = 123
+        timeTableView.rowHeight = UITableView.automaticDimension
+        NotificationCenter.default.addObserver(self, selector: #selector(refetchData), name:NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
+    }
+    
+    @objc func refetchData() {
+        print("Updating TableView")
+        network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
+        timeTableView.reloadData()
     }
     
     func dateScrollPicker(_ dateScrollPicker: DateScrollPicker, didSelectDate date: Date) {
@@ -91,6 +104,13 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         network.getInfo(date: pickedDate)
+        if network.lessonCount == 0 {
+            timeTableSeparator.isHidden = true
+            weekEndImage.isHidden = false
+        } else {
+            timeTableSeparator.isHidden = false
+            weekEndImage.isHidden = true
+        }
         return network.lessonCount
     }
     
@@ -103,9 +123,6 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 123
-    }
 }
 extension Date {
     func format(dateFormat: String) -> String {

@@ -19,7 +19,10 @@ class TimeTableNetworkController {
     var week = Week()
     var timeTable = Timetable()
     
+    let change = ChangeController()
+    
     public func fetchData(tableView: UITableView, pickedDate: Date){
+        change.fetchData(tableView: tableView)
         guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
         let jsonUrlString = "http://217.76.201.219:5000/\(transliterate(nonLatin: group))"
         guard let url = URL(string: jsonUrlString) else { return }
@@ -47,10 +50,16 @@ class TimeTableNetworkController {
                     }
                 }catch{
                     print("Failed to convert Data!")
+                    self.deinitModel()
+                    tableView.reloadData()
+                    
+                    
                 }
                 
             case let .failure(error):
                 print("Failed to get JSON: ",error)
+                self.deinitModel()
+                tableView.reloadData()
             }
         }
     }
@@ -64,18 +73,19 @@ class TimeTableNetworkController {
         if pickedDateWeekday >= weekOfFirstOfSep && pickedDateWeekday <= 53{
             if (pickedDateWeekday - weekOfFirstOfSep) % 2 == 0 {
                 self.week = self.subGroup.firstweek!
-                print("firstWeek")
+                //print("firstWeek")
             } else {
                 self.week = self.subGroup.secondweek!
-                print("secondWeek")
+                //print("secondWeek")
             }
         } else {
             if (53 - 36 + pickedDateWeekday) % 2 == 0 {
+//MARK: Crash on first start
                 self.week = self.subGroup.secondweek!
-                print("secondWeek")
+                //print("secondWeek")
             } else {
                 self.week = self.subGroup.firstweek!
-                print("firstWeek")
+                //print("firstWeek")
             }
         }
         
@@ -92,7 +102,7 @@ class TimeTableNetworkController {
         //MARK: Day pick
         let calendar = Calendar(identifier: .gregorian)
         let weekday = calendar.component(.weekday, from: date)
-        print("day: \(weekday)")
+        //print("day: \(weekday)")
         switch weekday {
         case 1:
             if let fri = week.sun {
@@ -146,22 +156,62 @@ class TimeTableNetworkController {
         default:
             print("weekDay undefined")
         }
-        print("Lessons: ",lessonCount)
+        //print("Lessons: ",lessonCount)
+    }
+    
+    func deinitModel() {
+        self.timeTableRoot = TimeTableRoot()
+        self.newVar = TimeTableRoot()
+        self.lessonCount = 0
+        self.fri = [Fri]()
+        self.subGroup = Subgroup()
+        self.week = Week()
+        self.timeTable = Timetable()
+    }
+    
+    func formatCellToChange(cell: TimeTableCell) {
+        cell.lessonView.backgroundColor = UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00)
+        cell.lessonRoom.isHidden = true
+        cell.roomImage.isHidden = true
+    }
+    func formatCellToLesson(cell: TimeTableCell) {
+        cell.lessonView.backgroundColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00)
+        cell.lessonRoom.isHidden = false
+        cell.roomImage.isHidden = false
     }
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date) {
         getWeekNum(date: date)
-        print("cell configuring...")
-        if let lesson = fri[indexPath.row].lesson{
-            cell.lessonName.text = lesson
-        }
+        //print("cell configuring...")
         
-        if let room = fri[indexPath.row].room {
-            cell.lessonRoom.text = room
-        }
-        
-        if let teacher = fri[indexPath.row].teacher {
-            cell.teacher.text = teacher
+        if date.ignoringTime == change.day.ignoringTime {
+            if let lesson = change.change.para {
+                if indexPath.row >= 0 && indexPath.row < lesson.count {
+                    let ChangeNum = lesson[indexPath.row].trimmingCharacters(in: CharacterSet(charactersIn: "0123456789").inverted)
+                    print("Change lessonnum: \(ChangeNum)")
+                    formatCellToChange(cell: cell)
+                    if let lesson = change.change.disChange?[indexPath.row]{
+                        cell.lessonName.text = lesson
+                    }
+                    
+                    if let teacher = change.change.teacherChange?[indexPath.row] {
+                        cell.teacher.text = teacher
+                    }
+                }
+            }
+        } else {
+            formatCellToLesson(cell: cell)
+            if let lesson = fri[indexPath.row].lesson{
+                cell.lessonName.text = lesson
+            }
+            
+            if let room = fri[indexPath.row].room {
+                cell.lessonRoom.text = room
+            }
+            
+            if let teacher = fri[indexPath.row].teacher {
+                cell.teacher.text = teacher
+            }
         }
         
         switch fri[indexPath.row].lessonNum {

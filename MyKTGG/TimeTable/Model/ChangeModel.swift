@@ -9,7 +9,6 @@
 import Foundation
 
 struct Change: Codable {
-    let date: String?
-    let dis, disChange, group, para: [String]?
-    let teacher, teacherChange: [String]?
+    var date: String?
+    var dis, disChange, group, para, teacher, teacherChange: [String]?
 }

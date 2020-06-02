@@ -13,5 +13,5 @@ class NewsCell: UITableViewCell {
     @IBOutlet weak var rubric: UILabel!
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var heading: UILabel!
-    @IBOutlet weak var newsText: UITextView!
+    @IBOutlet weak var newsText: UILabel!
 }
