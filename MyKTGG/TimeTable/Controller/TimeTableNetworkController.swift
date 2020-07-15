@@ -22,6 +22,7 @@ class TimeTableNetworkController {
     let change = ChangeController()
     
     public func fetchData(tableView: UITableView, pickedDate: Date){
+        print("fetch data network")
         change.fetchData(tableView: tableView)
         guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
         let jsonUrlString = "http://217.76.201.219:5000/\(transliterate(nonLatin: group))"
@@ -44,16 +45,10 @@ class TimeTableNetworkController {
                     self.getSubGroup()
                     self.getWeekNum(date: pickedDate)
                     
-                    DispatchQueue.main.async {
-                        print("Data saved")
-                        tableView.reloadData()
-                    }
                 }catch{
                     print("Failed to convert Data!")
                     self.deinitModel()
                     tableView.reloadData()
-                    
-                    
                 }
                 
             case let .failure(error):
@@ -65,6 +60,7 @@ class TimeTableNetworkController {
     }
     
     func getWeekNum(date: Date){
+        print("get week num")
         let calendar = Calendar(identifier: .gregorian)
         let firstOfSep = DateComponents(month: 9, day: 1)
         guard let firstOfSepDate = calendar.date(from: firstOfSep) else { return }
@@ -87,19 +83,33 @@ class TimeTableNetworkController {
     }
     
     func getSubGroup(){
+        print("get sub sroup")
         //MARK: subGroup pick
-        print("getSubGroup defaults get")
         guard let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int else { return }
-        print(subGroup)
         self.subGroup = self.timeTable.firstsubgroup!
         if subGroup == 1 { self.subGroup = self.timeTable.secondsubgroup! }
     }
     
+    func checkAdditionalLessons(date: Date) {
+        print("checkaddlessons")
+        if date.ignoringTime == change.day.ignoringTime {
+            guard let changes = change.change.para else { return }
+            let intChanges = changes.map { Int($0.trimmingCharacters(in: CharacterSet(charactersIn: "0123456789").inverted))!}
+            for change in intChanges {
+                if lessonCount < change {
+                    let add = Fri(lessonNum: String(change), lesson: "", teacher: "", room: "")
+                    self.fri.append(add)
+                    lessonCount+=1
+                }
+            }
+        }
+    }
+    
     func getInfo(date: Date) {
+        print("get info")
         //MARK: Day pick
         let calendar = Calendar(identifier: .gregorian)
         let weekday = calendar.component(.weekday, from: date)
-        //print("day: \(weekday)")
         switch weekday {
         case 1:
             if let fri = week.sun {
@@ -153,10 +163,11 @@ class TimeTableNetworkController {
         default:
             print("weekDay undefined")
         }
-        //print("Lessons: ",lessonCount)
+        checkAdditionalLessons(date: date)
     }
     
     func deinitModel() {
+        print("deinit model")
         self.timeTableRoot = TimeTableRoot()
         self.newVar = TimeTableRoot()
         self.lessonCount = 0
@@ -178,36 +189,33 @@ class TimeTableNetworkController {
     }
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date) {
-        getWeekNum(date: date)
-        //print("cell configuring...")
-        
+        print("config cell")
+        formatCellToLesson(cell: cell)
+        if let lesson = fri[indexPath.row].lesson{
+            cell.lessonName.text = lesson
+        }
+        if let room = fri[indexPath.row].room {
+            cell.lessonRoom.text = room
+        }
+        if let teacher = fri[indexPath.row].teacher {
+            cell.teacher.text = teacher
+        }
         if date.ignoringTime == change.day.ignoringTime {
             if let lesson = change.change.para {
-                if indexPath.row >= 0 && indexPath.row < lesson.count {
-                    let ChangeNum = lesson[indexPath.row].trimmingCharacters(in: CharacterSet(charactersIn: "0123456789").inverted)
-                    print("Change lessonnum: \(ChangeNum)")
-                    formatCellToChange(cell: cell)
-                    if let lesson = change.change.disChange?[indexPath.row]{
-                        cell.lessonName.text = lesson
-                    }
-                    
-                    if let teacher = change.change.teacherChange?[indexPath.row] {
-                        cell.teacher.text = teacher
+                if indexPath.row >= 0 && indexPath.row < lessonCount {
+                    for item in 0..<lesson.count {
+                        let changeNum = lesson[item].trimmingCharacters(in: CharacterSet(charactersIn: "0123456789").inverted)
+                        if fri[indexPath.row].lessonNum! == changeNum {
+                            formatCellToChange(cell: cell)
+                            if let lesson = change.change.disChange?[item]{
+                                cell.lessonName.text = lesson
+                            }
+                            if let teacher = change.change.teacherChange?[item] {
+                                cell.teacher.text = teacher
+                            }
+                        }
                     }
                 }
-            }
-        } else {
-            formatCellToLesson(cell: cell)
-            if let lesson = fri[indexPath.row].lesson{
-                cell.lessonName.text = lesson
-            }
-            
-            if let room = fri[indexPath.row].room {
-                cell.lessonRoom.text = room
-            }
-            
-            if let teacher = fri[indexPath.row].teacher {
-                cell.teacher.text = teacher
             }
         }
         
@@ -230,6 +238,12 @@ class TimeTableNetworkController {
         case "6":
             cell.startTime.text = "16:50"
             cell.endTime.text = "18:10"
+        case "7":
+            cell.startTime.text = "18:20"
+            cell.endTime.text = "19:40"
+        case "8":
+            cell.startTime.text = "19:50"
+            cell.endTime.text = "21:10"
         default:
             cell.startTime.text = "00:00"
             cell.endTime.text = "00:00"

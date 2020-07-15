@@ -9,6 +9,15 @@
           "revision": "cdb8c71fb7f22b4f1af05c21246c12c1aa49f89e",
           "version": "6.5.2"
         }
+      },
+      {
+        "package": "UBottomSheet",
+        "repositoryURL": "https://github.com/OfTheWolf/UBottomSheet",
+        "state": {
+          "branch": "master",
+          "revision": "4b92d794208b4023abc330524f8d20888830a7d9",
+          "version": null
+        }
       }
     ]
   },

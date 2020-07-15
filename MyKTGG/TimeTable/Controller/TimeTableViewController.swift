@@ -10,6 +10,7 @@ import UIKit
 
 class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateScrollPickerDataSource {
 
+    let settings = SettingsViewController()
     let network = TimeTableNetworkController()
     var pickedDate = Date()
     
@@ -37,9 +38,10 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         super.viewDidLoad()
         background.layer.cornerRadius = 30
         todayButtonOutlet.layer.cornerRadius = 10
-        network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
         timeTableView.estimatedRowHeight = 123
         timeTableView.rowHeight = UITableView.automaticDimension
+        settings.getUserInfo()
+        network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
         NotificationCenter.default.addObserver(self, selector: #selector(refetchData), name:NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
     }
     
@@ -111,7 +113,9 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
             timeTableSeparator.isHidden = false
             weekEndImage.isHidden = true
         }
+        print("table created, lesson count =", network.lessonCount)
         return network.lessonCount
+       
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -119,7 +123,6 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
         cell.lessonView.layer.cornerRadius = 15
         network.configureCell(cell: cell, for: indexPath, date: pickedDate)
-        
         return cell
     }
     

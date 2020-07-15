@@ -13,6 +13,7 @@ class ChangeController {
     var change = Change()
     var day = Date()
     public func fetchData(tableView: UITableView){
+        print("fetch data change")
         guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
         let formattedGroup = group.replacingOccurrences(of: "-", with: " ", options: .literal, range: nil)
         let jsonUrlString = "http://217.76.201.219:5000/change/\(formattedGroup.encodeUrl)"
@@ -32,7 +33,6 @@ class ChangeController {
                     self.change = change
                     DispatchQueue.main.async {
                         print("Data saved")
-                        //print(self.change)
                         self.getDayOfChange()
                         tableView.reloadData()
                     }

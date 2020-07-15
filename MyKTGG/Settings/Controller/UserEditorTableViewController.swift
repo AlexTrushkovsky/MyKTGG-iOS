@@ -19,6 +19,28 @@ class UserEditorTableViewController: UITableViewController {
     @IBOutlet weak var bachelorSwitch: UISwitch!
     @IBOutlet weak var GroupPicker: UIPickerView!
     
+    @IBOutlet weak var changePassField: UITextField!
+    @IBOutlet weak var changePassConfirmField: UITextField!
+    
+    @IBAction func changePassAction(_ sender: Any) {
+        if changePassField.text == changePassConfirmField.text {
+            if changePassConfirmField.text!.count > 6 {
+                Auth.auth().currentUser?.updatePassword(to: changePassConfirmField.text!) { (error) in
+                    if let error = error {
+                        print("Pass change error: \(error)")
+                        self.showAlert(title: "Помилка", message: "\(error.localizedDescription)")
+                    } else {
+                        self.showAlert(title: "Успіх", message: "Пароль успішно змінено!")
+                    }
+                }
+            } else {
+                self.showAlert(title: "Помилка", message: "пароль має містити більше 6 символів")
+            }
+        } else {
+            self.showAlert(title: "Помилка", message: "паролі не співпадають")
+        }
+    }
+    
     @IBAction func DoneButtonAction(_ sender: UIButton) {
         
         var bachelor = ""

@@ -19,4 +19,6 @@ class TimeTableCell: UITableViewCell {
     @IBOutlet weak var teacher: UILabel!
     @IBOutlet weak var startTime: UILabel!
     @IBOutlet weak var endTime: UILabel!
+    
+    
 }
