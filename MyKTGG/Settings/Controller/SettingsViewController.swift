@@ -7,13 +7,23 @@
 //
 import UIKit
 import Firebase
+import StoreKit
 
 class SettingsViewController: UITableViewController {
     
+    @IBAction func autoProm(_ sender: UISwitch) {
+        UserDefaults.standard.set(autoPromoutionSwitch.isOn, forKey: "AutoPromStatus")
+        if autoPromoutionSwitch.isOn {
+            print("AutoProm is turned on")
+        } else {
+            print("AutoProm is turned off")
+        }
+    }
     @IBOutlet weak var avatar: UIImageView!
     @IBOutlet weak var groupLabel: UILabel!
     @IBOutlet weak var subGroupLabel: UILabel!
     @IBOutlet weak var UserNameLabel: UILabel!
+    @IBOutlet weak var autoPromoutionSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,12 +61,12 @@ class SettingsViewController: UITableViewController {
             if group != "" {
                 UserDefaults.standard.set(group, forKey: "group")
                 print(group)
-//                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
+                //                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
             }
             
-                UserDefaults.standard.set(subGroup, forKey: "subGroup")
-                print(subGroup)
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
+            UserDefaults.standard.set(subGroup, forKey: "subGroup")
+            print(subGroup)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
             
         }) { (error) in
             print(error.localizedDescription)
@@ -95,7 +105,7 @@ class SettingsViewController: UITableViewController {
                 self.navigationController?.pushViewController(vc!, animated: true)
             }
         }
-        if indexPath.section == 2 {
+        if indexPath.section == 3 {
             if indexPath.row == 0 {
                 if let url = URL(string: "https://next.privat24.ua/payments/form/%7B%22token%22:%22e287b0fa-9f54-487f-9ed3-cb4f67e9a2cb%22%7D") {
                     UIApplication.shared.open(url)
@@ -107,12 +117,16 @@ class SettingsViewController: UITableViewController {
                 }
             }
         }
-        if indexPath.section == 3 {
+        if indexPath.section == 4 {
             if indexPath.row == 0 {
                 if let url = URL(string: "https://t.me/esen1n25") {
                     UIApplication.shared.open(url)
                 }
             }
+            if indexPath.row == 1 {
+                SKStoreReviewController.requestReview()
+            }
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

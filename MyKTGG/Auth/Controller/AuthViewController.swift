@@ -65,9 +65,9 @@ class AuthViewController: UIViewController {
         nameTextField.attributedPlaceholder = NSAttributedString(string: "ім'я та призвіще",
                                                                  attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         emailTextField.attributedPlaceholder = NSAttributedString(string: "email",
-        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+                                                                  attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         passwordTextField.attributedPlaceholder = NSAttributedString(string: "пароль",
-        attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
+                                                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
@@ -91,7 +91,7 @@ class AuthViewController: UIViewController {
         darkView.isHidden=true
         ActivityIndicator.stopAnimating()
         ActivityIndicator.isHidden = true
-       }
+    }
     
     @IBAction func forgotPasswordAction(_ sender: UIButton) {
     }
@@ -100,7 +100,7 @@ class AuthViewController: UIViewController {
         showAlert(title: "Помилка", message: "Авторизація за допомогою Apple на даний час недоступна")
     }
     //  Facebook SignIn
-    @IBAction func signInWithFaceBookAction(_ sender: UIButton) {
+    @IBAction func signInWithFacebookAction(_ sender: UIButton) {
         let login = LoginManager()
         login.logIn(permissions: ["email","public_profile"], from: self) {(result, error) in
             if result!.isCancelled{
@@ -116,6 +116,8 @@ class AuthViewController: UIViewController {
                             Auth.auth().signIn(with: credential, completion: {(result, error) in
                                 if error == nil{
                                     print(result?.user.uid as Any)
+                                    let avatarMethods = AvatarMethods()
+                                    avatarMethods.getAvatarFromFacebookAcc()
                                     self.stopWaitingAnimation()
                                     self.dismiss(animated: true, completion: nil)
                                     self.makeUpdateNotifications()
@@ -220,12 +222,12 @@ extension AuthViewController:UITextFieldDelegate{
             if textField == nameTextField {
                 textField.resignFirstResponder()
                 emailTextField.becomeFirstResponder()
-             } else if textField == emailTextField {
+            } else if textField == emailTextField {
                 textField.resignFirstResponder()
                 passwordTextField.becomeFirstResponder()
-             } else if textField == passwordTextField {
+            } else if textField == passwordTextField {
                 textField.resignFirstResponder()
-             }
+            }
         }else{
             if textField == emailTextField {
                 textField.resignFirstResponder()
@@ -247,20 +249,55 @@ extension AuthViewController: GIDSignInDelegate{
             return
         }
         print("Succesfuly logged into Google")
+        
         guard let authentication = user.authentication else { return }
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
-        Auth.auth().signIn(with: credential) { (user, error) in
+        Auth.auth().signIn(with: credential) { (firUser, error) in
             if let error = error {
                 print("Something went wrong with out google user: ", error)
                 return
             }
-            
+            let avatarMethods = AvatarMethods()
+            avatarMethods.getAvatarFromGoogleAcc()
             print("Successfully logged into Firebase with Google")
+            self.getGoogleAccName(user: user)
             self.stopWaitingAnimation()
             self.dismiss(animated: true, completion: nil)
             self.makeUpdateNotifications()
         }
         
+    }
+    func getGoogleAccName(user: GIDGoogleUser) {
+        guard let givenName = user.profile.givenName else { return }
+        let familyName = user.profile.familyName ?? ""
+        let GoogleName = "\(givenName) \(familyName)"
+        print(givenName,familyName)
+        
+        let userID = Auth.auth().currentUser?.uid
+        let db = Database.database().reference().child("users")
+        db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+            let value = snapshot.value as? NSDictionary
+            let name = value?["name"] as? String ?? ""
+            
+            if name != "" {
+                UserDefaults.standard.set(name, forKey: "name")
+                print(name)
+            } else {
+                db.child(userID!).updateChildValues(["name":GoogleName]) {
+                    (error: Error?, ref:DatabaseReference) in
+                    if let error = error {
+                        print("Data could not be saved: \(error).")
+                    } else {
+                        print("Name saved succesfully!")
+                        print(GoogleName)
+                        UserDefaults.standard.set(GoogleName, forKey: "name")
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
+                    }
+                }
+            }
+        }) { (error) in
+            print(error.localizedDescription)
+        }
     }
 }
 extension AuthErrorCode {
@@ -290,13 +327,13 @@ extension UIViewController{
         if let errorCode = AuthErrorCode(rawValue: error._code) {
             print(errorCode.errorMessage)
             let alert = UIAlertController(title: "Помилка", message: errorCode.errorMessage, preferredStyle: .alert)
-
+            
             let okAction = UIAlertAction(title: "ОК", style: .default, handler: nil)
-
+            
             alert.addAction(okAction)
-
+            
             self.present(alert, animated: true, completion: nil)
-
+            
         }
     }
 }

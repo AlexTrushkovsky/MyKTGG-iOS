@@ -112,6 +112,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PromisesObjC (1.2.8)
+  - UBottomSheet (1.0.7)
 
 DEPENDENCIES:
   - Alamofire
@@ -122,6 +123,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Storage
   - GoogleSignIn
+  - UBottomSheet
 
 SPEC REPOS:
   trunk:
@@ -148,6 +150,7 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - UBottomSheet
 
 SPEC CHECKSUMS:
   Alamofire: 9d5c5f602928e512395b30950c5984eca840093c
@@ -173,7 +176,8 @@ SPEC CHECKSUMS:
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
+  UBottomSheet: f5b325d5f06e952ae337d2d806307f61fe806a79
 
-PODFILE CHECKSUM: 9e93f8508c5ec09b118dd7c8a158e85c5e86ffc9
+PODFILE CHECKSUM: 476cfd880e55f6c7d4b541391352428a5928a468
 
 COCOAPODS: 1.9.1

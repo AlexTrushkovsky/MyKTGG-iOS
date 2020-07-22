@@ -13,6 +13,8 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     let settings = SettingsViewController()
     let network = TimeTableNetworkController()
     var pickedDate = Date()
+    var cell = TimeTableCell()
+    
     
     @IBOutlet weak var background: UIView!
     @IBOutlet weak var weekEndImage: UIImageView!
@@ -118,12 +120,30 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
        
     }
     
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
         cell.lessonView.layer.cornerRadius = 15
+        self.cell = cell
         network.configureCell(cell: cell, for: indexPath, date: pickedDate)
+        var recognizer = UITapGestureRecognizer(target: self, action: #selector(checkAction))
+        // Add gesture recognizer to your image view
+        cell.lessonView.addGestureRecognizer(recognizer)
+        cell.lessonView.isUserInteractionEnabled = true
+        
         return cell
+    }
+    @objc func checkAction(sender : UITapGestureRecognizer) {
+        print("row selected")
+        print(self.cell)
+        UIView.animate(withDuration: 0.2, animations: {
+            self.cell.lessonView.backgroundColor = UIColor(red: 0.00, green: 0.40, blue: 0.31, alpha: 1.00)
+        }, completion: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        print("row selected")
     }
     
 }

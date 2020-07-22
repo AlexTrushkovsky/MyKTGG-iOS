@@ -27,6 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         requestAutorization()
+        
         return true
     }
     
