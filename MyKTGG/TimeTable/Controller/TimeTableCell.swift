@@ -19,4 +19,9 @@ class TimeTableCell: UITableViewCell {
     @IBOutlet weak var teacher: UILabel!
     @IBOutlet weak var startTime: UILabel!
     @IBOutlet weak var endTime: UILabel!
+    @IBOutlet weak var turnAlarm: UIButton!
+    @IBOutlet weak var makeNote: UIButton!
+    
+    @IBOutlet weak var noteText: UILabel!
+    @IBOutlet weak var noteImage: UIImageView!
 }

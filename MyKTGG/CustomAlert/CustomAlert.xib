@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SourceSansPro-Bold.ttf">
+            <string>SourceSansPro-Bold</string>
+        </array>
+        <array key="SourceSansPro-SemiBold.ttf">
+            <string>SourceSansPro-SemiBold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="iN0-l3-epB" customClass="CustomAlert" customModule="Мій_КТГГ" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="314" height="220"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HRn-FN-eeg">
+                    <rect key="frame" x="0.0" y="0.0" width="314" height="220"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OLv-ZJ-xMz">
+                            <rect key="frame" x="209" y="172" width="90" height="33"/>
+                            <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="33" id="c4c-Jk-c7v"/>
+                                <constraint firstAttribute="width" constant="90" id="rh8-Tr-uNd"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
+                            <state key="normal" title="Гаразд">
+                                <color key="titleColor" red="0.2765339315" green="0.7769432664" blue="0.56336402890000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="okAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="j7O-J9-QoU"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="401-wi-4UV">
+                            <rect key="frame" x="109" y="172" width="90" height="33"/>
+                            <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="33" id="EfA-wk-ymm"/>
+                                <constraint firstAttribute="width" constant="90" id="Kso-AO-ewR"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
+                            <state key="normal" title="Відміна">
+                                <color key="titleColor" red="0.2765339315" green="0.7769432664" blue="0.56336402890000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="YwK-Bz-853"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="буде заведено за 1 годину до пари." lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vW7-KM-dRF">
+                            <rect key="frame" x="15" y="57" width="289" height="20.5"/>
+                            <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
+                            <color key="textColor" red="0.24910089369999999" green="0.78099983930000005" blue="0.55918037890000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    <constraints>
+                        <constraint firstItem="OLv-ZJ-xMz" firstAttribute="leading" secondItem="401-wi-4UV" secondAttribute="trailing" constant="10" id="9Wx-uf-w4f"/>
+                        <constraint firstAttribute="trailing" secondItem="OLv-ZJ-xMz" secondAttribute="trailing" constant="15" id="RWJ-kq-5K5"/>
+                        <constraint firstItem="OLv-ZJ-xMz" firstAttribute="top" secondItem="401-wi-4UV" secondAttribute="top" id="XgO-Lq-0R4"/>
+                        <constraint firstAttribute="bottom" secondItem="OLv-ZJ-xMz" secondAttribute="bottom" constant="15" id="fBR-pa-t3s"/>
+                        <constraint firstAttribute="trailing" secondItem="vW7-KM-dRF" secondAttribute="trailing" constant="10" id="gQk-ot-a8U"/>
+                        <constraint firstItem="vW7-KM-dRF" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="kWa-Yp-ajw"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Будильник" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JDN-fN-KQZ">
+                    <rect key="frame" x="10" y="10" width="222" height="50.5"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="222" id="FHq-r4-0gl"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="40"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Цей час завжди можна змінити в налаштуваннях." lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oPN-nz-VBb">
+                    <rect key="frame" x="16" y="96" width="284" height="38"/>
+                    <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="15"/>
+                    <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <textField hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Iu0-Tk-x15">
+                    <rect key="frame" x="16" y="98" width="282" height="34"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="Iu0-Tk-x15" firstAttribute="trailing" secondItem="HRn-FN-eeg" secondAttribute="trailing" constant="-16" id="59a-w4-lhf"/>
+                <constraint firstItem="vW7-KM-dRF" firstAttribute="top" secondItem="JDN-fN-KQZ" secondAttribute="bottom" constant="-3.5" id="A4i-Oy-5Z4"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="Dvz-X2-118"/>
+                <constraint firstItem="oPN-nz-VBb" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="FV9-bF-Nad"/>
+                <constraint firstAttribute="trailing" secondItem="oPN-nz-VBb" secondAttribute="trailing" constant="14" id="Mkq-Co-gj7"/>
+                <constraint firstItem="JDN-fN-KQZ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="VnY-8F-0Ae"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="YM4-n5-kbF"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dC2-KT-pMM"/>
+                <constraint firstItem="Iu0-Tk-x15" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="20.5" id="daG-Gy-iQ9"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="fRZ-j3-DJW"/>
+                <constraint firstItem="JDN-fN-KQZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="jvg-2h-WRT"/>
+                <constraint firstItem="oPN-nz-VBb" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="18.5" id="rSM-mX-BhA"/>
+                <constraint firstItem="Iu0-Tk-x15" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="16" id="wJa-Ch-RbI"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="backgroundView" destination="HRn-FN-eeg" id="hOB-CJ-xH9"/>
+                <outlet property="cancelOutlet" destination="401-wi-4UV" id="0v0-xg-FUr"/>
+                <outlet property="okOutlet" destination="OLv-ZJ-xMz" id="sYj-Tw-vOk"/>
+                <outlet property="subTitleLabel" destination="vW7-KM-dRF" id="cOx-ix-0jv"/>
+                <outlet property="textField" destination="Iu0-Tk-x15" id="rh4-PX-lPN"/>
+                <outlet property="textLabel" destination="oPN-nz-VBb" id="tNz-OK-KNK"/>
+                <outlet property="titleLabel" destination="JDN-fN-KQZ" id="BEK-Ph-YDG"/>
+            </connections>
+            <point key="canvasLocation" x="63.768115942028992" y="-115.17857142857142"/>
+        </view>
+    </objects>
+</document>

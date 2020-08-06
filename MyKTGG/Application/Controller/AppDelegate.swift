@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         requestAutorization()
-        
+        notificationCenter.delegate = self
         return true
     }
     
@@ -37,6 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
                 self.showModalAuth()
             }
         }
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
     
     func showModalAuth(){
@@ -61,14 +62,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
             print("Notification settings: \(settings)")
         }
     }
-    func scheduleNotification(notificationType: String) {
+    func scheduleNotification(notificationType: String, body: String, date: Date) {
+        
         let content = UNMutableNotificationContent()
         content.title = notificationType
-        content.body = "Заміна: Математика 1 пара"+notificationType
+        content.body = body
         content.sound = .default
         content.badge = 1
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        let identifier = "Local Notification"
+        let timeInterval = date.timeIntervalSinceNow
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+        let identifier = "Change Notification"
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         notificationCenter.add(request) { (error) in
             if let error = error {
@@ -78,3 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
     }
 }
 
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound])
+    }
+}

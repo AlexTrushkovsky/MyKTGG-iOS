@@ -44,8 +44,8 @@ class AuthViewController: UIViewController {
     }
     
     func makeUpdateNotifications() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
     }
     
     override func viewDidLoad() {
@@ -281,7 +281,7 @@ extension AuthViewController: GIDSignInDelegate{
             
             if name != "" {
                 UserDefaults.standard.set(name, forKey: "name")
-                print(name)
+                print("Google name:",name)
             } else {
                 db.child(userID!).updateChildValues(["name":GoogleName]) {
                     (error: Error?, ref:DatabaseReference) in

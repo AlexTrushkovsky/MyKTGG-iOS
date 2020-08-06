@@ -44,7 +44,7 @@ class AvatarMethods {
             
             if name != "" {
                 UserDefaults.standard.set(name, forKey: "name")
-                print(name)
+                print("FaceBook name:",name)
             } else {
                 db.child(userID!).updateChildValues(["name":facebookName]) {
                     (error: Error?, ref:DatabaseReference) in
@@ -179,7 +179,6 @@ class AvatarMethods {
             let value = snapshot.value as? NSDictionary
             let url = value?["avatarUrl"] as? String ?? ""
             guard url != "" else { return }
-            print("url:",url)
             let ref = Storage.storage().reference(forURL: url)
             let megaByte = Int64(1 * 1024 * 1024)
             ref.getData(maxSize: megaByte) { (data, error) in

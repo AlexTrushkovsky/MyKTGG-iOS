@@ -1,4 +1,4 @@
-module UBottomSheet {
+framework module UBottomSheet {
   umbrella header "UBottomSheet-umbrella.h"
 
   export *
