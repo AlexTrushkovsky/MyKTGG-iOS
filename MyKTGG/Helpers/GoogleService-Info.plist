@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>553926416029-87a44ja16p4vnc70lm4pci9l0fi80h6a.apps.googleusercontent.com</string>
+	<string>553926416029-octmnptm8a822mpng5jmrp3g7s2ugcio.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.553926416029-87a44ja16p4vnc70lm4pci9l0fi80h6a</string>
+	<string>com.googleusercontent.apps.553926416029-octmnptm8a822mpng5jmrp3g7s2ugcio</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>553926416029-9m2jeg79bo8bhb4uamg23ifksicpmfbe.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDPw4yy8Cgn7G9jHPNMSP7ACX-ttfhZLMQ</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,23 +15,23 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>AlexTrushkovsky.MyKTGG</string>
+	<string>ua.pp.trushkovsky.myktgg</string>
 	<key>PROJECT_ID</key>
 	<string>ktggauth</string>
 	<key>STORAGE_BUCKET</key>
 	<string>ktggauth.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:553926416029:ios:8432116d33148837eae674</string>
+	<string>1:553926416029:ios:dd52b9175f2dd831eae674</string>
 	<key>DATABASE_URL</key>
 	<string>https://ktggauth.firebaseio.com</string>
 </dict>
