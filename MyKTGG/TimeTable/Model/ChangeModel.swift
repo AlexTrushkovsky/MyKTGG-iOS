@@ -10,5 +10,5 @@ import Foundation
 
 struct Change: Codable {
     var date: String?
-    var dis, disChange, group, para, teacher, teacherChange: [String]?
+    var dis, cab, subgroup ,disChange, group, para, teacher, teacherChange: [String]?
 }

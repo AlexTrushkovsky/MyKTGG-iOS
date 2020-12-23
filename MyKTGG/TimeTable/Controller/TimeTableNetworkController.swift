@@ -1,12 +1,12 @@
 //
-//  File.swift
+//  TimeTableNetworkController.swift
 //  MyKTGG
 //
 //  Created by Алексей Трушковский on 08.05.2020.
 //  Copyright © 2020 Алексей Трушковский. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Alamofire
 
 class TimeTableNetworkController {
@@ -41,12 +41,10 @@ class TimeTableNetworkController {
                     let timeTableRoot = try decoder.decode(TimeTableRoot.self, from: response.data!)
                     self.newVar = timeTableRoot
                     self.timeTable = self.newVar.timetable!
-                    
                     self.getSubGroup()
                     self.getWeekNum(date: pickedDate)
-                    
                 }catch{
-                    print("Failed to convert Data!")
+                    print("TimeTable: Failed to convert Data!")
                     self.deinitModel()
                     tableView.reloadData()
                 }
@@ -54,7 +52,7 @@ class TimeTableNetworkController {
             case let .failure(error):
                 print("Failed to get JSON: ",error)
                 self.deinitModel()
-                tableView.reloadData()
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showNoConnectionWithServer"), object: nil)
             }
         }
     }
@@ -189,7 +187,7 @@ class TimeTableNetworkController {
     }
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date) {
-        print("config cell")
+        print("TT: config cell")
         formatCellToLesson(cell: cell)
         if let lesson = fri[indexPath.row].lesson{
             cell.lessonName.text = lesson

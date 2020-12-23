@@ -35,7 +35,7 @@ class AvatarMethods {
             }
         }
     }
-    func getFacebookAccName(facebookName: String) {
+    func setAccName(setName: String) {
         let userID = Auth.auth().currentUser?.uid
         let db = Database.database().reference().child("users")
         db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -44,16 +44,16 @@ class AvatarMethods {
             
             if name != "" {
                 UserDefaults.standard.set(name, forKey: "name")
-                print("FaceBook name:",name)
+                print("Updated name:",name)
             } else {
-                db.child(userID!).updateChildValues(["name":facebookName]) {
+                db.child(userID!).updateChildValues(["name":setName]) {
                     (error: Error?, ref:DatabaseReference) in
                     if let error = error {
                         print("Data could not be saved: \(error).")
                     } else {
                         print("Name saved succesfully!")
-                        print(facebookName)
-                        UserDefaults.standard.set(facebookName, forKey: "name")
+                        print(setName)
+                        UserDefaults.standard.set(setName, forKey: "name")
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
                     }
                 }
@@ -86,7 +86,7 @@ class AvatarMethods {
                         print(result!)
                         let field = result! as? [String:Any]
                         let facebookName = field!["name"] as! String
-                        self.getFacebookAccName(facebookName: facebookName)
+                        self.setAccName(setName: facebookName)
                         if let imageURL = ((field!["picture"] as? [String: Any])?["data"] as? [String: Any])?["url"] as? String {
                             print(imageURL)
                             let url  = NSURL(string: imageURL)! as URL
@@ -212,7 +212,7 @@ class AvatarMethods {
     func setupUserImageView(imageView: UIImageView) {
         imageView.layer.borderWidth = 1
         imageView.layer.masksToBounds = false
-        imageView.layer.borderColor = UIColor.black.cgColor
+//        imageView.layer.borderColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00).cgColor
         imageView.layer.cornerRadius = imageView.frame.height/2
         imageView.clipsToBounds = true
     }

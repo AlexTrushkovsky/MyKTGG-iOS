@@ -9,7 +9,7 @@
 import UIKit
 
 class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateScrollPickerDataSource {
-
+    
     let settings = SettingsViewController()
     let network = TimeTableNetworkController()
     var pickedDate = Date()
@@ -58,43 +58,35 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     override func viewDidAppear(_ animated: Bool) {
         setupDateScroll()
         scrollToday()
+        refetchData()
         timeTableView.reloadData()
         timeTableView.allowsSelection = true
+        
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        background.layer.cornerRadius = 30
-        todayButtonOutlet.layer.cornerRadius = 10
-        timeTableView.estimatedRowHeight = 123
-        timeTableView.rowHeight = UITableView.automaticDimension
-        timeTableView.allowsSelection = false
         setUpGestures()
+        setUpMainView()
         settings.getUserInfo()
+        refetchData()
         setupVisualEffectView()
-        //network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
-        NotificationCenter.default.addObserver(self, selector: #selector(refetchData), name:NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
-        refControl.tintColor = UIColor(red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)
-        timeTableView.refreshControl = refControl
-        refControl.addTarget(self, action: #selector(refetchData), for: .valueChanged)
+        NotificationCenter.default.addObserver(self, selector: #selector(showNoConnectAlert), name:NSNotification.Name(rawValue: "showNoConnectionWithServer"), object: nil)
     }
     
-    @objc func refetchData() {
+    @objc func showNoConnectAlert(){
+        self.setAlert(type: .alert)
+        self.alertView.setText(title: "Помилка", subTitle: "Bідсутнє з'єднання з сервером", body: "cпробуйте будь ласка пізніше")
+        self.animateIn(animationDuration: self.animationDuration)
+    }
+    
+   @objc func refetchData() {
         print("Updating TableView")
         deselectRows()
         network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
         refControl.endRefreshing()
         checkNotes()
         timeTableView.reloadData()
-    }
-    
-    func setUpGestures() {
-        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(sender:)))
-        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(sender:)))
-        leftSwipe.direction = .left
-        
-        view.addGestureRecognizer(rightSwipe)
-        view.addGestureRecognizer(leftSwipe)
     }
     
     func turnGestures(bool: Bool) {
@@ -104,14 +96,77 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         }
     }
     
-    func setupVisualEffectView() {
-        view.addSubview(visualEffectView)
-        visualEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        visualEffectView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        visualEffectView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        visualEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        visualEffectView.alpha = 0
-
+    @objc func handleSwipe(sender: UISwipeGestureRecognizer) {
+        if sender.state == .ended {
+            switch sender.direction {
+            case .right:
+                let swipeToDate = pickedDate.addDays(-1)
+                datePicker.selectDate(swipeToDate!)
+                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
+                print("right")
+            case .left:
+                let swipeToDate = pickedDate.addDays(1)
+                datePicker.selectDate(swipeToDate!)
+                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
+                print("left")
+            default:
+                break
+            }
+        }
+    }
+    
+    func deselectRows() {
+        if let index = timeTableView.indexPathForSelectedRow {
+            print("indexPath: ", index)
+            timeTableView.deselectRow(at: index, animated: true)
+            CellIsHighlighted = false
+        }
+    }
+    
+    func makeButtonsVisible(bool: Bool, cell: TimeTableCell) {
+        switch bool {
+        case true:
+            cell.lessonName.isHidden = true
+            cell.lessonRoom.isHidden = true
+            cell.roomImage.isHidden = true
+            cell.teacher.isHidden = true
+            cell.teacherImage.isHidden = true
+            UIView.animate(withDuration: 0.2, animations: {
+                cell.makeNote.isHidden = false
+                cell.turnAlarm.isHidden = false
+            }, completion: nil)
+        default:
+            cell.makeNote.isHidden = true
+            cell.turnAlarm.isHidden = true
+            cell.lessonName.isHidden = false
+            cell.lessonRoom.isHidden = false
+            cell.roomImage.isHidden = false
+            UIView.animate(withDuration: 0.2, animations: {
+                cell.teacher.isHidden = false
+                cell.teacherImage.isHidden = false
+            }, completion: nil)
+        }
+    }
+    
+    func checkAction(_ tableView: UITableView, cellForRowAt indexPath: IndexPath, status: Bool) {
+        guard let selectedCell = tableView.cellForRow(at: indexPath) as? TimeTableCell else { return }
+        switch status {
+        case true:
+            self.makeButtonsVisible(bool: status, cell: selectedCell)
+            self.cellInitColor = selectedCell.lessonView.backgroundColor!
+            UIView.animate(withDuration: 0.2, animations: {
+                if self.cellInitColor == UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00) {
+                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.09, green: 0.40, blue: 0.31, alpha: 1.00)
+                } else if self.cellInitColor == UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00) {
+                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.98, green: 0.46, blue: 0.28, alpha: 1.00)
+                }
+            }, completion: nil)
+        default:
+            self.makeButtonsVisible(bool: status, cell: selectedCell)
+            UIView.animate(withDuration: 0.2, animations: {
+                selectedCell.lessonView.backgroundColor = self.cellInitColor
+            }, completion: nil)
+        }
     }
     
     func animateIn(animationDuration: TimeInterval) {
@@ -139,25 +194,7 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         }
     }
     
-    @objc func handleSwipe(sender: UISwipeGestureRecognizer) {
-        if sender.state == .ended {
-            switch sender.direction {
-            case .right:
-                let swipeToDate = pickedDate.addDays(-1)
-                datePicker.selectDate(swipeToDate!)
-                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
-                print("right")
-            case .left:
-                let swipeToDate = pickedDate.addDays(1)
-                datePicker.selectDate(swipeToDate!)
-                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
-                print("left")
-            default:
-                break
-            }
-        }
-    }
-    
+//MARK: DatePicker methods
     func dateScrollPicker(_ dateScrollPicker: DateScrollPicker, didSelectDate date: Date) {
         pickedDate = date
         dayLabel.text = date.format(dateFormat: "dd")
@@ -171,6 +208,7 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
             todayButtonOutlet.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
         }
         if let index = timeTableView.indexPathForSelectedRow {
+            print("indexPath: ", index)
             timeTableView.deselectRow(at: index, animated: true)
             CellIsHighlighted = false
             self.makeButtonsVisible(bool: false, cell: timeTableView.cellForRow(at: index) as! TimeTableCell)
@@ -178,20 +216,14 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         timeTableView.reloadData()
         checkNotes()
     }
-
+    
     func scrollToday(){
         deselectRows()
         datePicker.selectToday()
         dateScrollPicker(datePicker, didSelectDate: Date())
     }
     
-    func deselectRows() {
-        if let index = timeTableView.indexPathForSelectedRow {
-            timeTableView.deselectRow(at: index, animated: true)
-            CellIsHighlighted = false
-            self.makeButtonsVisible(bool: false, cell: timeTableView.cellForRow(at: index) as! TimeTableCell)
-        }
-    }
+//MARK: Setup views
     
     private func setupDateScroll() {
         var format = DateScrollPickerFormat()
@@ -223,100 +255,6 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         datePicker.delegate = self
         datePicker.dataSource = self
     }
-}
-extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        network.getInfo(date: pickedDate)
-        if network.lessonCount == 0 {
-            timeTableSeparator.isHidden = true
-            weekEndImage.isHidden = false
-        } else {
-            timeTableSeparator.isHidden = false
-            weekEndImage.isHidden = true
-        }
-        print("table created, lesson count =", network.lessonCount)
-        return network.lessonCount
-       
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
-        cell.lessonView.layer.cornerRadius = 15
-        cell.makeNote.layer.cornerRadius = 15
-        cell.turnAlarm.layer.cornerRadius = 15
-        network.configureCell(cell: cell, for: indexPath, date: pickedDate)
-        cell.selectionStyle = .none
-        return cell
-    }
-    func checkAction(_ tableView: UITableView, cellForRowAt indexPath: IndexPath, status: Bool) {
-        guard let selectedCell = tableView.cellForRow(at: indexPath) as? TimeTableCell else { return }
-        switch status {
-        case true:
-            self.makeButtonsVisible(bool: status, cell: selectedCell)
-            self.cellInitColor = selectedCell.lessonView.backgroundColor!
-            UIView.animate(withDuration: 0.2, animations: {
-                if self.cellInitColor == UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00) {
-                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.09, green: 0.40, blue: 0.31, alpha: 1.00)
-                } else if self.cellInitColor == UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00) {
-                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.98, green: 0.46, blue: 0.28, alpha: 1.00)
-                }
-            }, completion: nil)
-        default:
-            self.makeButtonsVisible(bool: status, cell: selectedCell)
-            UIView.animate(withDuration: 0.2, animations: {
-                selectedCell.lessonView.backgroundColor = self.cellInitColor
-            }, completion: nil)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("row selected")
-        if CellIsHighlighted == false {
-            checkAction(tableView, cellForRowAt: indexPath, status: true)
-            CellIsHighlighted = true
-        } else {
-            checkAction(tableView, cellForRowAt: indexPath, status: false)
-            CellIsHighlighted = false
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        print("row deselected")
-        checkAction(tableView, cellForRowAt: indexPath, status: false)
-        CellIsHighlighted = false
-    }
-    
-    func makeButtonsVisible(bool: Bool, cell: TimeTableCell) {
-        switch bool {
-        case true:
-            cell.lessonName.isHidden = true
-            cell.lessonRoom.isHidden = true
-            cell.roomImage.isHidden = true
-            cell.teacher.isHidden = true
-            cell.teacherImage.isHidden = true
-            //cell.noteImage.isHidden = true
-            //cell.noteText.isHidden = true
-            UIView.animate(withDuration: 0.2, animations: {
-                cell.makeNote.isHidden = false
-                cell.turnAlarm.isHidden = false
-            }, completion: nil)
-        default:
-            cell.makeNote.isHidden = true
-            cell.turnAlarm.isHidden = true
-            cell.lessonName.isHidden = false
-            cell.lessonRoom.isHidden = false
-            cell.roomImage.isHidden = false
-            //cell.noteImage.isHidden = false
-            //cell.noteText.isHidden = false
-            UIView.animate(withDuration: 0.2, animations: {
-                cell.teacher.isHidden = false
-                cell.teacherImage.isHidden = false
-            }, completion: nil)
-        }
-    }
     
     func setAlert(type: AlertStatus) {
         self.tabBarController?.setTabBarVisible(visible: false, animated: true)
@@ -328,6 +266,35 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         alertView.setStyle(type: type)
     }
     
+    func setupVisualEffectView() {
+        view.addSubview(visualEffectView)
+        visualEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        visualEffectView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        visualEffectView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        visualEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        visualEffectView.alpha = 0
+    }
+    
+    func setUpGestures() {
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(sender:)))
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(sender:)))
+        leftSwipe.direction = .left
+        view.addGestureRecognizer(rightSwipe)
+        view.addGestureRecognizer(leftSwipe)
+    }
+    
+    func setUpMainView() {
+        background.layer.cornerRadius = 30
+        todayButtonOutlet.layer.cornerRadius = 10
+        timeTableView.estimatedRowHeight = 123
+        timeTableView.rowHeight = UITableView.automaticDimension
+        timeTableView.allowsSelection = false
+        refControl.tintColor = UIColor(red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)
+        timeTableView.refreshControl = refControl
+        refControl.addTarget(self, action: #selector(refetchData), for: .valueChanged)
+    }
+    
+//MARK: Alarm methods
     func scheduleAlarm() {
         //User reserve got from settings
         let alertReserve = 1
@@ -348,16 +315,15 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         let convertedDate = dateFormatter.date(from: stringDateWithTime)!
         //time with user reserve
         let convertedDateWithReserve = Calendar.current.date(
-        byAdding: .hour,
-        value: -alertReserve,
-        to: convertedDate)!
+            byAdding: .hour,
+            value: -alertReserve,
+            to: convertedDate)!
         
         print(stringDateWithTime)
         print(convertedDate)
         print(convertedDateWithReserve)
         
         guard convertedDateWithReserve > Date() else {
-//            self.showAlert(title: "Ехх...", message: "На жаль в минуле повернутись неможливо")
             self.setAlert(type: .lateAlarm)
             alertView.setText(title: "Будильник", subTitle: "на жаль в минуле повернутись неможливо", body: "заведіть будильник на інший час")
             self.animateIn(animationDuration: self.animationDuration)
@@ -369,7 +335,6 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         var alertText = dateDiff.day == 0 ? "" : "\(dateDiff.day!) днів"
         alertText += dateDiff.hour == 0 ? "" : " \(dateDiff.hour!) годин"
         alertText += dateDiff.minute == 0 ? "" : " \(dateDiff.minute!) хвилин"
-//        self.showAlert(title: "Будильник спрацює через", message: "\(alertText)")
         self.setAlert(type: .alarmTurned)
         alertView.setText(title: "Будильник", subTitle: "cпрацює через \(alertText)", body: "*цей час завжди можна змінити в налаштуваннях.")
         self.animateIn(animationDuration: self.animationDuration)
@@ -391,8 +356,12 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
+//MARK: Note methods
     func showNoteAlert(){
         self.setAlert(type: .note)
+        alertView.textField.becomeFirstResponder()
+        alertView.frame.origin.y -= 129
+        alertView.layoutIfNeeded()
         alertView.setText(title: "Замітки", subTitle: "нова замітка", body: "")
         self.animateIn(animationDuration: self.animationDuration)
     }
@@ -451,93 +420,51 @@ extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
 }
-extension Date {
-    func format(dateFormat: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = dateFormat
-        formatter.locale = Locale(identifier: "uk_UA")
-        return formatter.string(from: self)
-    }
-    var ignoringTime: Date? {
-        let dateComponents = Calendar.current.dateComponents([.day, .month, .year], from: self)
-        return Calendar.current.date(from: dateComponents)
-    }
-}
-extension TimeTableViewController: CustomAlertDelegate {
-    func cancelAction() {
-        self.animateOut(animationDuration: animationDuration)
+//MARK: TableView methods
+extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        network.getInfo(date: pickedDate)
+        if network.lessonCount == 0 {
+            timeTableSeparator.isHidden = true
+            weekEndImage.isHidden = false
+        } else {
+            timeTableSeparator.isHidden = false
+            weekEndImage.isHidden = true
+        }
+        print("table created, lesson count =", network.lessonCount)
+        return network.lessonCount
     }
     
-    func okAction() {
-        self.okAction(type: self.alertStatus)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
+        cell.lessonView.layer.cornerRadius = 15
+        cell.makeNote.layer.cornerRadius = 15
+        cell.turnAlarm.layer.cornerRadius = 15
+        network.configureCell(cell: cell, for: indexPath, date: pickedDate)
+        cell.selectionStyle = .none
+        return cell
     }
-}
-
-
-extension UITabBarController {
-
-    private struct AssociatedKeys {
-        // Declare a global var to produce a unique address as the assoc object handle
-        static var orgFrameView:     UInt8 = 0
-        static var movedFrameView:   UInt8 = 1
-    }
-
-    var orgFrameView:CGRect? {
-        get { return objc_getAssociatedObject(self, &AssociatedKeys.orgFrameView) as? CGRect }
-        set { objc_setAssociatedObject(self, &AssociatedKeys.orgFrameView, newValue, .OBJC_ASSOCIATION_COPY) }
-    }
-
-    var movedFrameView:CGRect? {
-        get { return objc_getAssociatedObject(self, &AssociatedKeys.movedFrameView) as? CGRect }
-        set { objc_setAssociatedObject(self, &AssociatedKeys.movedFrameView, newValue, .OBJC_ASSOCIATION_COPY) }
-    }
-
-    override open func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        if let movedFrameView = movedFrameView {
-            view.frame = movedFrameView
-        }
-    }
-
-    func setTabBarVisible(visible:Bool, animated:Bool) {
-        //since iOS11 we have to set the background colour to the bar color it seams the navbar seams to get smaller during animation; this visually hides the top empty space...
-//        view.backgroundColor =  self.tabBar.barTintColor
-        // bail if the current state matches the desired state
-        if (tabBarIsVisible() == visible) { return }
-
-        //we should show it
-        if visible {
-            tabBar.isHidden = false
-            UIView.animate(withDuration: animated ? 0.3 : 0.0) {
-                self.tabBar.alpha = 1
-                //restore form or frames
-                self.view.frame = self.orgFrameView!
-                //errase the stored locations so that...
-                self.orgFrameView = nil
-                self.movedFrameView = nil
-                //...the layoutIfNeeded() does not move them again!
-                self.view.layoutIfNeeded()
-                
-            }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if CellIsHighlighted == false {
+            checkAction(tableView, cellForRowAt: indexPath, status: true)
+            CellIsHighlighted = true
+            print("row selected")
         } else {
-            //safe org positions
-            orgFrameView = view.frame
-            // get a frame calculation ready
-            let offsetY = self.tabBar.frame.size.height
-            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY)
-            //animate
-            UIView.animate(withDuration: animated ? 0.3 : 0.0, animations: {
-                self.tabBar.alpha = 0.35
-                self.view.frame = self.movedFrameView!
-                self.view.layoutIfNeeded()
-            }) {
-                (_) in
-                self.tabBar.isHidden = true
-            }
+            checkAction(tableView, cellForRowAt: indexPath, status: false)
+            CellIsHighlighted = false
+            print("row deselected")
         }
     }
-
-    func tabBarIsVisible() ->Bool {
-        return orgFrameView == nil
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        checkAction(tableView, cellForRowAt: indexPath, status: false)
+        CellIsHighlighted = false
+        print("row deselected")
+    }
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? TimeTableCell {
+            self.makeButtonsVisible(bool: false, cell: cell)
+        }
     }
 }

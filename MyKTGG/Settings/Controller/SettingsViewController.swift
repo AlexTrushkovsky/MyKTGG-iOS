@@ -30,6 +30,7 @@ class SettingsViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.separatorStyle = .none
         let avatarMethods = AvatarMethods()
         avatarMethods.setupUserImageView(imageView: avatar)
         updateLabels()
@@ -100,7 +101,6 @@ class SettingsViewController: UITableViewController {
             UserDefaults.standard.set(subGroup, forKey: "subGroup")
             print("getUserDefaults subGroup:",subGroup)
             NotificationCenter.default.post(name: NSNotification.Name("setUserLabels"), object: nil)
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
             
         }) { (error) in
             print(error.localizedDescription)

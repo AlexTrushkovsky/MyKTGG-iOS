@@ -6,12 +6,13 @@
 //  Copyright © 2020 Алексей Трушковский. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Alamofire
 
 class ChangeController {
     var change = Change()
     var day = Date()
+    
     public func fetchData(tableView: UITableView){
         print("fetch data change")
         guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
@@ -31,17 +32,18 @@ class ChangeController {
                 do {
                     let change = try decoder.decode(Change.self, from: response.data!)
                     self.change = change
+                    print(change)
                     DispatchQueue.main.async {
                         print("Data saved")
                         self.getDayOfChange()
                         tableView.reloadData()
                     }
                 }catch{
-                    print("Failed to convert Data!")
+                    print("Changes: Failed to convert Data!")
                 }
                 
             case let .failure(error):
-                print("Failed to get JSON: ",error)
+                print("Changes: Failed to get JSON: ",error)
             }
         }
     }

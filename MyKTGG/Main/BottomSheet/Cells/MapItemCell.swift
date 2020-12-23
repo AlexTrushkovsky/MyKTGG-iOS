@@ -8,13 +8,13 @@
 
 import UIKit
 
-struct BottomSheetCellViewModel {
+struct MapItemCellViewModel {
     let image: UIImage?
     let title: String
     let subtitle: String
 }
 
-class BottomSheetCell: UITableViewCell {
+class MapItemCell: UITableViewCell {
 
     @IBOutlet weak var leftImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
@@ -25,7 +25,7 @@ class BottomSheetCell: UITableViewCell {
         selectionStyle = .none
     }
     
-    func configure(model: BottomSheetCellViewModel){
+    func configure(model: MapItemCellViewModel){
         nameLabel.text = model.title
         descriptionLabel.text = model.subtitle
 //        leftImageView.image = model.image

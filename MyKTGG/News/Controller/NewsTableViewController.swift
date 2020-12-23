@@ -17,11 +17,17 @@ class NewsTableViewController: UITableViewController {
     private var imageCache = AutoPurgingImageCache()
     let refControl = UIRefreshControl()
     var limit = 15
-    var isLoading: Bool = false
+    var isLoading = false
     var countOfNews = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTableView()
+        fetchData(limit: limit)
+    }
+    
+    func setupTableView() {
+        self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         tableView.refreshControl = refControl
         refControl.addTarget(self, action: #selector(refreshNews(_:)), for: .valueChanged)
         //refControl.attributedTitle = NSAttributedString(string: "Потягніть для оновлення")
@@ -32,7 +38,6 @@ class NewsTableViewController: UITableViewController {
         tableView.tableFooterView?.isHidden = false
         tableView.estimatedRowHeight = 380
         tableView.rowHeight = UITableView.automaticDimension
-        fetchData(limit: limit)
     }
     
     @objc private func refreshNews(_ sender: Any) {
@@ -90,101 +95,112 @@ class NewsTableViewController: UITableViewController {
         }
         isLoading = false
     }
+    
     private func configureCell(cell: NewsCell, for indexPath: IndexPath) {
         new = news.items![indexPath.section]
-        
-        if let title = new.title{
-            cell.heading.text = title.withoutHtml
-        }
+        cell.selectionStyle = .none
         
         if let created = new.created{
-            let date = created.toDate()
-            cell.date.text = date?.toString(dateFormat: "dd'.'MM'.'YYYY")
+            cell.date.text = created.toDate()?.toString(dateFormat: "dd'.'MM'.'YYYY")
+        }
+        if let rubric = new.category?.name?.withoutHtml {
+            cell.rubric.text = rubric
         }
         
-        if let rubric = new.category?.name {
-            cell.rubric.text = rubric.withoutHtml
+        if let title = new.title?.withoutHtml{
+            cell.heading.text = title
         }
         
-        if let introtext = new.introtext {
-            cell.newsText.isHidden = true
-            if !introtext.withoutHtml.isEmpty && introtext.withoutHtml.count > 3{
-                if cell.rubric.text != "Календар подій" {
-                    cell.newsText.isHidden = false
-                    cell.newsText.text = introtext.withoutHtml
-                }
-            }
-        }
-            guard self.new.imageMedium != "" else {
-                print("Image not found")
-                cell.NewsImage!.image = #imageLiteral(resourceName: "newPlaceholder")
-                cell.NewsImage!.layer.cornerRadius = 10
-                return
-            }
-            
-            let url = "https://ktgg.kiev.ua\(self.new.imageMedium!)"
-            guard let imageUrl = URL(string: url) else { return }
-            
-            if let image = imageCache.image(withIdentifier: url) {
-                cell.NewsImage!.image = image
-                cell.NewsImage!.layer.cornerRadius = 10
+        if let introtext = new.introtext?.withoutHtml {
+            if !introtext.isEmpty && introtext.count > 3 && cell.rubric.text != "Календар подій" {
+                cell.newsText.text = introtext
             } else {
-                AF.request(imageUrl).responseImage { response in
-                    if case .success(let image) = response.result {
-                        print("image downloaded: \(url)")
-                        cell.NewsImage!.image = image
-                        cell.NewsImage!.layer.cornerRadius = 10
-                        self.imageCache.add(image, withIdentifier: url)
-                    }
-                }
+                cell.newsText.text = ""
             }
         }
         
-        //MARK: TableView Methods
-        override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return 1
-        }
-        override func numberOfSections(in tableView: UITableView) -> Int {
-            return news.items?.count ?? 0
-        }
-        
-        override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            
-            let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
-            
-            configureCell(cell: cell, for: indexPath)
-            
-            return cell
-        }
-    
-        //MARK: Opening WebView
-        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            new = news.items![indexPath.section]
-            let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let WebVC:NewsWebView = storyBoard.instantiateViewController(withIdentifier: "NewsWebView") as! NewsWebView
-            WebVC.url = new.link
-            WebVC.title = new.title
-            show(WebVC, sender: nil)
-        }
-        
-        //MARK: PAGINATION
-        override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            guard isLoading == false else { return }
-            guard let count = news.items?.count else { return }
-            guard count != countOfNews else { return }
-            if indexPath.section == (count - 1) {
-                isLoading = true
-                limit += 15
-                fetchData(limit: limit)
-                countOfNews = news.items!.count
-                let spinner = UIActivityIndicatorView()
-                spinner.startAnimating()
-                spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
-                tableView.tableFooterView = spinner
-                tableView.tableFooterView?.isHidden = false
+        //MARK: - Getting image
+        cell.NewsImage!.image = #imageLiteral(resourceName: "newPlaceholder")
+        guard self.new.imageMedium != "" else { return }
+
+        let url = "https://ktgg.kiev.ua\(self.new.imageMedium!)"
+        guard let imageUrl = URL(string: url) else { return }
+
+        if let image = imageCache.image(withIdentifier: url) {
+            cell.NewsImage!.image = image
+            print("image founded in cache")
+        } else {
+            AF.request(imageUrl).responseImage { response in
+                if case .success(let image) = response.result {
+                    print("image downloaded")
+                    cell.NewsImage!.image = image
+                    self.imageCache.add(image, withIdentifier: url)
+                }
             }
         }
     }
+    
+    //MARK: TableView Methods
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return news.items?.count ?? 0
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
+        configureCell(cell: cell, for: indexPath)
+        return cell
+    }
+    
+    //MARK: Opening WebView
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        new = news.items![indexPath.section]
+        let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let WebVC:NewsWebView = storyBoard.instantiateViewController(withIdentifier: "NewsWebView") as! NewsWebView
+        WebVC.url = new.link
+        WebVC.title = new.title
+        show(WebVC, sender: nil)
+    }
+    
+    override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) as? NewsCell {
+            if let cellBackground = cell.cellBackground {
+                UIView.animate(withDuration: 2) {
+                    cellBackground.layer.shadowRadius = 2
+                }
+            }
+        }
+    }
+    override func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) as? NewsCell {
+            if let cellBackground = cell.cellBackground {
+                UIView.animate(withDuration: 2) {
+                    cellBackground.layer.shadowRadius = 4
+                }
+            }
+        }
+    }
+    
+    //MARK: PAGINATION
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard isLoading == false else { return }
+        guard let count = news.items?.count else { return }
+        guard count != countOfNews else { return }
+        if indexPath.section == (count - 1) {
+            isLoading = true
+            limit += 15
+            fetchData(limit: limit)
+            countOfNews = news.items!.count
+            let spinner = UIActivityIndicatorView()
+            spinner.startAnimating()
+            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+            tableView.tableFooterView = spinner
+            tableView.tableFooterView?.isHidden = false
+        }
+    }
+}
     extension String {
         public var withoutHtml: String {
             guard let data = self.data(using: .utf8) else {

@@ -11,16 +11,29 @@ import Firebase
 
 class UserEditorTableViewController: UITableViewController {
     
+    @IBOutlet weak var logOutButton: UIButton!
+    
     @IBOutlet weak var EditorAvatar: UIImageView!
     @IBOutlet weak var FirstLastNameOutlet: UITextField!
     @IBOutlet weak var DoneButtonOutlet: UIBarButtonItem!
     
     @IBOutlet weak var subgroupPicker: UISegmentedControl!
-    @IBOutlet weak var bachelorSwitch: UISwitch!
     @IBOutlet weak var GroupPicker: UIPickerView!
     
     @IBOutlet weak var changePassField: UITextField!
     @IBOutlet weak var changePassConfirmField: UITextField!
+    
+    var groupNum = [
+        "11","12","13","14","15",
+        "21","22","23","24","25",
+        "31","32","33","34","35",
+        "41","42","43","44","45"]
+    var groupSpec = ["ІПЗ","КІ","ОО","ПТБД","ФБС","ПВ","ПВб","ГРС(РО)","ГРС(ГО)","ГРСб","ХТ","Т" ,"Тб","ФО"]
+    var groupChoosen = ""
+    let ref = Database.database().reference().child("users")
+    let user = Auth.auth().currentUser
+    lazy var groupNumChoosen = groupNum[0]
+    lazy var groupSpecChoosen = groupSpec[0]
     
     @IBAction func changePassAction(_ sender: Any) {
         if changePassField.text == changePassConfirmField.text {
@@ -42,13 +55,8 @@ class UserEditorTableViewController: UITableViewController {
     }
     
     @IBAction func DoneButtonAction(_ sender: UIButton) {
-        
-        var bachelor = ""
-        if bachelorSwitch.isOn{
-            bachelor = "б"
-        }
         if !groupNumChoosen.isEmpty || !groupSpecChoosen.isEmpty{
-            let groupName = "\(groupNumChoosen)-\(groupSpecChoosen)\(bachelor)"
+            let groupName = "\(groupNumChoosen)-\(groupSpecChoosen)"
             ref.child(user!.uid).updateChildValues(["group":groupName]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
@@ -58,7 +66,6 @@ class UserEditorTableViewController: UITableViewController {
                     print("Data saved succesfully!")
                     print(groupName)
                     UserDefaults.standard.set(groupName, forKey: "group")
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateGroupParameters"), object: nil)
                     self.navigationController?.popViewController(animated: true)
                 }
             }
@@ -82,21 +89,49 @@ class UserEditorTableViewController: UITableViewController {
         saveEdited()
         navigationController?.popViewController(animated: true)
     }
+    
     @IBAction func logOutAction(_ sender: UIButton) {
         navigationController?.popViewController(animated: true)
         logOut()
     }
     
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
         let avatar = AvatarMethods()
         avatar.setupUserImageView(imageView: EditorAvatar)
         avatar.getAvatarFromUserDefaults(forKey: "avatar", imageView: EditorAvatar)
         FirstLastNameOutlet.text = getUserName()
         FirstLastNameOutlet.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
-        
+        logOutButton.layer.cornerRadius = 15
         GroupPicker.delegate = self
-        bachelorSwitch.isOn=false
+        selectCurrentGroupOnPicker()
+    }
+    
+    func selectCurrentGroupOnPicker() {
+        if let group = UserDefaults.standard.object(forKey: "group") as? String{
+            print(group)
+            let first = group.prefix(2)
+            let second = group.suffix(from: group.index(group.startIndex, offsetBy: 3)).filter { $0 != "-" }
+            let bachelor = group.suffix(1)
+            print(bachelor)
+            print(first)
+            print(second)
+            guard let firstIndex = groupNum.firstIndex(of: String(first)) else { return }
+            guard let secondIndex = groupSpec.firstIndex(of: String(second)) else { return }
+            GroupPicker.selectRow(firstIndex, inComponent: 0, animated: true)
+            GroupPicker.selectRow(secondIndex, inComponent: 1, animated: true)
+            groupNumChoosen = groupNum[firstIndex]
+            groupSpecChoosen = groupSpec[secondIndex]
+        }
+        if let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int{
+            subgroupPicker.selectedSegmentIndex = subGroup
+        }
     }
     
     func getUserName() -> String?{
@@ -107,7 +142,9 @@ class UserEditorTableViewController: UITableViewController {
         return nil
     }
     
-    func logOut() {
+    func logOut(){
+        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        UserDefaults.standard.synchronize()
         do{
             try Auth.auth().signOut()
         }catch{
@@ -187,19 +224,8 @@ class UserEditorTableViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "ОК", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
-    
-    var groupNum = [
-        "11","12","13","14","15",
-        "21","22","23","24","25",
-        "31","32","33","34","35",
-        "41","42","43","44","45"]
-    var groupSpec = ["ІПЗ","КІ","ОО","ПТБД","ФБС","ПВ","ГРС(РО)","ГРС(ГО)","ХТ","Т","ФО"]
-    var groupChoosen = ""
-    let ref = Database.database().reference().child("users")
-    let user = Auth.auth().currentUser
-    lazy var groupNumChoosen = groupNum[0]
-    lazy var groupSpecChoosen = groupSpec[0]
 }
+
 extension UserEditorTableViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()

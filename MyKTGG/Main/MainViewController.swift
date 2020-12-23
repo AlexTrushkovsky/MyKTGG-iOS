@@ -8,39 +8,87 @@
 
 import UIKit
 import AVFoundation
-import UBottomSheet
 import StoreKit
 
 class MainViewController: UIViewController {
-    var sheetCoordinator: UBottomSheetCoordinator!
-    var backView: PassThroughView?
     let weather = weatherController()
+    
+    var sheetCoordinator: UBottomSheetCoordinator!
+    var sheetVC = ListViewController()
+    var dataSource: UBottomSheetCoordinatorDataSource?
+    
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var weatherTempLabel: UILabel!
     @IBOutlet weak var weatherDescription: UILabel!
     @IBOutlet weak var mainImage: UIImageView!
     @IBOutlet weak var search: UIButton!
+    @IBOutlet weak var weatherBackgroundView: UIView!
+    @IBOutlet weak var chat: UIButton!
     
-    @IBAction func turnOnTorch(_ sender: UIButton) {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video), device.hasTorch else { return }
-        do {
-            try device.lockForConfiguration()
-            let torchOn = !device.isTorchActive
-            try device.setTorchModeOn(level: 1.0)
-            device.torchMode = torchOn ? .on : .off
-            device.unlockForConfiguration()
-        } catch {
-            print("Error toggling Flashlight: \(error)")
+    //MARK: - Search Button
+    @IBAction func searchButton(_ sender: UIButton) {
+        if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
+            UIApplication.shared.open(url)
         }
     }
-    private func showTorchNotSupported() {
-        let alertController = UIAlertController(title: "Flashlight is not supported", message: nil, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "Understand", style: .default, handler: nil))
-        present(alertController, animated: true)
+    @IBAction func chatButton(_ sender: Any) {
+        let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "chat") as? ChatVC
+        self.navigationController?.pushViewController(vc!, animated: true)
     }
+    @IBOutlet weak var chatButton: UIButton!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTabBar()
+        addWeatherUpdateObserver()
+        makeElementsTransparent(bool: true)
+        makeWeatherTransparent(bool: true)
+        getAutoPromotionInfo()
+        EnterCount()
+        search.layer.cornerRadius = 15
+        chat.layer.cornerRadius = 15
+        weatherBackgroundView.layer.cornerRadius = 15
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        UIView.animate(withDuration: 1) {
+            self.search.imageView?.transform = CGAffineTransform(rotationAngle: .pi)
+            self.search.imageView?.transform = CGAffineTransform(rotationAngle: .pi * 2)
+        }
+        makeElementsTransparent(bool: false)
+        weather.fetchData()
+    }
+    override func viewWillLayoutSubviews() {
+        setupBottomSheet()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    //MARK: - Setup Tabbar
+    func setupBottomSheet() {
+        guard sheetCoordinator == nil else {return}
+        sheetCoordinator = UBottomSheetCoordinator(parent: self)
+        if dataSource != nil{
+            sheetCoordinator.dataSource = dataSource!
+        }
+        let vc = sheetVC
+        sheetVC.sheetCoordinator = sheetCoordinator
+        sheetCoordinator.addSheet(vc, to: self, didContainerCreate: { container in
+            let f = self.view.frame
+            let rect = CGRect(x: f.minX, y: f.minY, width: f.width, height: f.height)
+            container.roundCorners(corners: [.topLeft, .topRight], radius: 30, rect: rect)
+        })
+    }
+    
+    func setupTabBar() {
         if #available(iOS 13.0, *) {
             let appearance = self.tabBarController?.tabBar.standardAppearance
             appearance!.shadowImage = nil
@@ -50,56 +98,51 @@ class MainViewController: UIViewController {
         } else {
             self.tabBarController?.tabBar.backgroundImage = UIImage()
             self.tabBarController?.tabBar.shadowImage = UIImage()
-            
         }
         self.tabBarController?.tabBar.unselectedItemTintColor = UIColor(red: 0.62, green: 0.62, blue: 0.69, alpha: 1.00)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateWeather), name:NSNotification.Name(rawValue: "updateWeather"), object: nil)
-        makeElementsTransparent(bool: true)
-        getAutoPromotionInfo()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        EnterCount()
-        weather.fetchData()
-    }
-    
+    //MARK: - Weather Update
     @objc func updateWeather() {
         print("set up weather")
         let temp = weather.weatherModel.main?.temp
         let icon = weather.weatherModel.weather![0].icon
         let description = weather.weatherModel.weather![0].description
-        makeElementsTransparent(bool: false)
         weatherIcon.image = UIImage(named: icon ?? "01d")
-        weatherTempLabel.text = "\(Int(temp ?? 0))°"
+        weatherTempLabel.text = "\(Int(temp ?? 0))"
         weatherDescription.text = description
+        makeWeatherTransparent(bool: false)
+    }
+    func addWeatherUpdateObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeather), name:NSNotification.Name(rawValue: "updateWeather"), object: nil)
     }
     
+    //MARK: - Make elements transparent before view appear
     func makeElementsTransparent(bool: Bool) {
         if bool {
-            weatherIcon.alpha = 0
-            weatherTempLabel.alpha = 0
-            weatherDescription.alpha = 0
             mainImage.alpha = 0
             search.alpha = 0
         } else {
-            UIImageView.animate(withDuration: 0.2) {
-                self.weatherIcon.alpha = 1
-            }
-            UIView.animate(withDuration: 0.2) {
-                self.weatherTempLabel.alpha = 1
-            }
-            UIView.animate(withDuration: 0.2) {
-                self.weatherDescription.alpha = 1
-            }
             UIView.animate(withDuration: 0.2) {
                 self.mainImage.alpha = 1
-            }
-            UIView.animate(withDuration: 0.2) {
                 self.search.alpha = 1
             }
         }
     }
     
+    func makeWeatherTransparent(bool: Bool) {
+        if bool {
+            weatherIcon.alpha = 0
+            weatherTempLabel.alpha = 0
+            weatherDescription.alpha = 0
+        } else {
+            UIImageView.animate(withDuration: 0.3) {
+                self.weatherIcon.alpha = 1
+                self.weatherTempLabel.alpha = 1
+                self.weatherDescription.alpha = 1
+            }
+        }
+    }
+    // MARK: - Count of enters in app to display rate pop-up
     func EnterCount() {
         if let count = UserDefaults.standard.object(forKey: "EnterCount") as? Int {
             print("count of enter: ", count)
@@ -111,34 +154,7 @@ class MainViewController: UIViewController {
             UserDefaults.standard.set(1, forKey: "EnterCount")
         }
     }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        
-        guard sheetCoordinator == nil else {return}
-        sheetCoordinator = UBottomSheetCoordinator(parent: self,
-                                                   delegate: self)
-        
-        let vc = AppleMapsSheetViewController()
-        vc.sheetCoordinator = sheetCoordinator
-        sheetCoordinator.addSheet(vc, to: self, didContainerCreate: { container in
-            let f = self.view.frame
-            let rect = CGRect(x: f.minX, y: f.minY, width: f.width, height: f.height)
-            container.roundCorners(corners: [.topLeft, .topRight], radius: 10, rect: rect)
-        })
-        sheetCoordinator.setCornerRadius(10)
-    }
-    
-    private func addBackDimmingBackView(below container: UIView){
-        backView = PassThroughView()
-        self.view.insertSubview(backView!, belowSubview: container)
-        backView!.translatesAutoresizingMaskIntoConstraints = false
-        backView!.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        backView!.bottomAnchor.constraint(equalTo: container.topAnchor, constant: 10).isActive = true
-        backView!.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        backView!.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-    }
-    
+    //MARK: - Get promotion info BETA
     func getAutoPromotionInfo() {
         guard let status = Bool(UserDefaults.standard.object(forKey: "AutoPromStatus") as? String ?? "") else { return }
         if status {
@@ -158,46 +174,17 @@ class MainViewController: UIViewController {
             }
         }
     }
-}
-
-extension MainViewController: UBottomSheetCoordinatorDelegate{
-    
-    func bottomSheet(_ container: UIView?, didPresent state: SheetTranslationState) {
-        //        self.addBackDimmingBackView(below: container!)
-        self.sheetCoordinator.addDropShadowIfNotExist()
-        self.handleState(state)
-    }
-    
-    func bottomSheet(_ container: UIView?, didChange state: SheetTranslationState) {
-        handleState(state)
-    }
-    
-    func bottomSheet(_ container: UIView?, finishTranslateWith extraAnimation: @escaping ((CGFloat) -> Void) -> Void) {
-        extraAnimation({ percent in
-            self.backView?.backgroundColor = UIColor.black.withAlphaComponent(percent/100 * 0.8)
-        })
-    }
-    
-    func handleState(_ state: SheetTranslationState){
-        switch state {
-        case .progressing(_, let percent):
-            self.backView?.backgroundColor = UIColor.black.withAlphaComponent(percent/100 * 0.8)
-        case .finished(_, let percent):
-            self.backView?.backgroundColor = UIColor.black.withAlphaComponent(percent/100 * 0.8)
-        default:
-            break
-        }
-    }
+    //MARK: - Setup bottom view
 }
 extension String {
-
+    
     var numbersOnly: String {
-
+        
         let numbers = self.replacingOccurrences(
-             of: "[^0-9]",
-             with: "",
-             options: .regularExpression,
-             range:nil)
+            of: "[^0-9]",
+            with: "",
+            options: .regularExpression,
+            range:nil)
         return numbers
     }
 }

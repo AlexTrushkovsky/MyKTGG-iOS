@@ -19,17 +19,27 @@
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="iN0-l3-epB" customClass="CustomAlert" customModule="Мій_КТГГ" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="314" height="220"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HRn-FN-eeg">
                     <rect key="frame" x="0.0" y="0.0" width="314" height="220"/>
                     <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Будильник" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JDN-fN-KQZ">
+                            <rect key="frame" x="8" y="0.0" width="197" height="50.5"/>
+                            <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="40"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Iu0-Tk-x15">
+                            <rect key="frame" x="14" y="93" width="284" height="34"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OLv-ZJ-xMz">
-                            <rect key="frame" x="209" y="172" width="90" height="33"/>
+                            <rect key="frame" x="209" y="171" width="90" height="33"/>
                             <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="33" id="c4c-Jk-c7v"/>
-                                <constraint firstAttribute="width" constant="90" id="rh8-Tr-uNd"/>
+                                <constraint firstAttribute="width" constant="90" id="VAq-6P-5iE"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
                             <state key="normal" title="Гаразд">
@@ -40,11 +50,10 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="401-wi-4UV">
-                            <rect key="frame" x="109" y="172" width="90" height="33"/>
+                            <rect key="frame" x="109" y="171" width="90" height="33"/>
                             <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="33" id="EfA-wk-ymm"/>
-                                <constraint firstAttribute="width" constant="90" id="Kso-AO-ewR"/>
+                                <constraint firstAttribute="width" constant="90" id="NUR-HT-x0G"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
                             <state key="normal" title="Відміна">
@@ -55,57 +64,43 @@
                             </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="буде заведено за 1 годину до пари." lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vW7-KM-dRF">
-                            <rect key="frame" x="15" y="57" width="289" height="20.5"/>
+                            <rect key="frame" x="15" y="57" width="257.5" height="20.5"/>
                             <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
                             <color key="textColor" red="0.24910089369999999" green="0.78099983930000005" blue="0.55918037890000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Цей час завжди можна змінити в налаштуваннях." lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oPN-nz-VBb">
+                            <rect key="frame" x="15" y="91" width="284" height="38"/>
+                            <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="15"/>
+                            <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     <constraints>
-                        <constraint firstItem="OLv-ZJ-xMz" firstAttribute="leading" secondItem="401-wi-4UV" secondAttribute="trailing" constant="10" id="9Wx-uf-w4f"/>
-                        <constraint firstAttribute="trailing" secondItem="OLv-ZJ-xMz" secondAttribute="trailing" constant="15" id="RWJ-kq-5K5"/>
-                        <constraint firstItem="OLv-ZJ-xMz" firstAttribute="top" secondItem="401-wi-4UV" secondAttribute="top" id="XgO-Lq-0R4"/>
-                        <constraint firstAttribute="bottom" secondItem="OLv-ZJ-xMz" secondAttribute="bottom" constant="15" id="fBR-pa-t3s"/>
-                        <constraint firstAttribute="trailing" secondItem="vW7-KM-dRF" secondAttribute="trailing" constant="10" id="gQk-ot-a8U"/>
-                        <constraint firstItem="vW7-KM-dRF" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="kWa-Yp-ajw"/>
+                        <constraint firstItem="JDN-fN-KQZ" firstAttribute="top" secondItem="HRn-FN-eeg" secondAttribute="top" id="1Bm-0c-V9T"/>
+                        <constraint firstItem="Iu0-Tk-x15" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="14" id="7VA-Pu-TKc"/>
+                        <constraint firstAttribute="trailing" secondItem="OLv-ZJ-xMz" secondAttribute="trailing" constant="15" id="Dha-hu-Ga3"/>
+                        <constraint firstItem="OLv-ZJ-xMz" firstAttribute="leading" secondItem="401-wi-4UV" secondAttribute="trailing" constant="10" id="GpS-2B-i0q"/>
+                        <constraint firstItem="vW7-KM-dRF" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="LFS-Ow-PHD"/>
+                        <constraint firstItem="401-wi-4UV" firstAttribute="bottom" secondItem="OLv-ZJ-xMz" secondAttribute="bottom" id="SpU-NA-Vr7"/>
+                        <constraint firstItem="Iu0-Tk-x15" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="15.5" id="VpT-yn-Xkz"/>
+                        <constraint firstItem="vW7-KM-dRF" firstAttribute="top" secondItem="JDN-fN-KQZ" secondAttribute="bottom" constant="6.5" id="ZfV-71-7ud"/>
+                        <constraint firstItem="401-wi-4UV" firstAttribute="top" secondItem="OLv-ZJ-xMz" secondAttribute="top" id="biJ-BP-3p9"/>
+                        <constraint firstAttribute="bottom" secondItem="OLv-ZJ-xMz" secondAttribute="bottom" constant="16" id="eFQ-2L-pDk"/>
+                        <constraint firstAttribute="trailing" secondItem="Iu0-Tk-x15" secondAttribute="trailing" constant="16" id="fSW-wW-Ql2"/>
+                        <constraint firstAttribute="trailing" secondItem="oPN-nz-VBb" secondAttribute="trailing" constant="15" id="jU7-Fa-CIK"/>
+                        <constraint firstItem="oPN-nz-VBb" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="lpS-eH-8xb"/>
+                        <constraint firstItem="JDN-fN-KQZ" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="8" id="piI-eK-4ho"/>
+                        <constraint firstItem="oPN-nz-VBb" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="13.5" id="xMJ-IY-wX5"/>
                     </constraints>
                 </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Будильник" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JDN-fN-KQZ">
-                    <rect key="frame" x="10" y="10" width="222" height="50.5"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="222" id="FHq-r4-0gl"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="40"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Цей час завжди можна змінити в налаштуваннях." lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oPN-nz-VBb">
-                    <rect key="frame" x="16" y="96" width="284" height="38"/>
-                    <fontDescription key="fontDescription" name="SourceSansPro-SemiBold" family="Source Sans Pro" pointSize="15"/>
-                    <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <textField hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Iu0-Tk-x15">
-                    <rect key="frame" x="16" y="98" width="282" height="34"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <textInputTraits key="textInputTraits"/>
-                </textField>
             </subviews>
             <constraints>
-                <constraint firstItem="Iu0-Tk-x15" firstAttribute="trailing" secondItem="HRn-FN-eeg" secondAttribute="trailing" constant="-16" id="59a-w4-lhf"/>
-                <constraint firstItem="vW7-KM-dRF" firstAttribute="top" secondItem="JDN-fN-KQZ" secondAttribute="bottom" constant="-3.5" id="A4i-Oy-5Z4"/>
-                <constraint firstItem="HRn-FN-eeg" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="Dvz-X2-118"/>
-                <constraint firstItem="oPN-nz-VBb" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="FV9-bF-Nad"/>
-                <constraint firstAttribute="trailing" secondItem="oPN-nz-VBb" secondAttribute="trailing" constant="14" id="Mkq-Co-gj7"/>
-                <constraint firstItem="JDN-fN-KQZ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="VnY-8F-0Ae"/>
-                <constraint firstItem="HRn-FN-eeg" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="YM4-n5-kbF"/>
-                <constraint firstItem="HRn-FN-eeg" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dC2-KT-pMM"/>
-                <constraint firstItem="Iu0-Tk-x15" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="20.5" id="daG-Gy-iQ9"/>
-                <constraint firstItem="HRn-FN-eeg" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="fRZ-j3-DJW"/>
-                <constraint firstItem="JDN-fN-KQZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="jvg-2h-WRT"/>
-                <constraint firstItem="oPN-nz-VBb" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="18.5" id="rSM-mX-BhA"/>
-                <constraint firstItem="Iu0-Tk-x15" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="16" id="wJa-Ch-RbI"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="EJW-mM-rhr"/>
+                <constraint firstAttribute="trailing" secondItem="HRn-FN-eeg" secondAttribute="trailing" id="akt-qO-vWM"/>
+                <constraint firstAttribute="bottom" secondItem="HRn-FN-eeg" secondAttribute="bottom" id="bp8-F1-Jut"/>
+                <constraint firstItem="HRn-FN-eeg" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="lZd-2e-I9y"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>

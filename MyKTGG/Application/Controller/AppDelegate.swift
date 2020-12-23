@@ -13,7 +13,7 @@ import GoogleSignIn
 import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate{
+class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
     
     var window: UIWindow?
     let notificationCenter = UNUserNotificationCenter.current()
@@ -26,12 +26,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
         FirebaseApp.configure()
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
-        requestAutorization()
         notificationCenter.delegate = self
+        Messaging.messaging().delegate = self
+        requestAutorization()
+        application.registerForRemoteNotifications()
         return true
     }
     
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+      print("Firebase registration token: \(String(describing: fcmToken))")
+
+      let dataDict:[String: String] = ["token": fcmToken ?? ""]
+      NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
+      // TODO: If necessary send token to application server.
+        // Note: This callback is fired at each app strtup and whenever a new token is generated.
+    }
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
+        NotificationCenter.default.addObserver(self, selector: #selector(showModalGroupChoose), name:NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
         Auth.auth().addStateDidChangeListener { (auth, user) in
             if user == nil{
                 self.showModalAuth()
@@ -45,11 +57,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
         let newvc = storyboard.instantiateViewController(withIdentifier: "RegViewController") as! AuthViewController
         self.window?.rootViewController?.present(newvc, animated: true, completion: nil)
     }
-//    func showModalGroupChoose(){
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        let newvc = storyboard.instantiateViewController(withIdentifier: "GroupChooseViewController") as! GroupChooseViewController
-//        self.window?.rootViewController?.present(newvc, animated: true, completion: nil)
-//    }
+    
+   @objc func showModalGroupChoose() {
+    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+    let newvc = storyboard.instantiateViewController(withIdentifier: "groupChooseVC") as! GroupChooseViewController
+    self.window?.rootViewController?.present(newvc, animated: true, completion: nil)
+        print("windows may be opened")
+    }
+    
     func requestAutorization() {
         notificationCenter.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
             print("Permission granted: \(granted)")
@@ -57,13 +72,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate{
             self.getNotificationSettings()
         }
     }
+    
     func getNotificationSettings() {
         notificationCenter.getNotificationSettings { (settings) in
             print("Notification settings: \(settings)")
+            
+            guard settings.authorizationStatus == .authorized else { return }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
         }
     }
-    func scheduleNotification(notificationType: String, body: String, date: Date) {
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         
+        let tokenParts = deviceToken.map { data -> String in
+            return String(format: "%02.2hhx", data)
+        }
+        
+        let token = tokenParts.joined()
+        print("Device token: \(token)")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register APNS")
+    }
+    
+    func scheduleNotification(notificationType: String, body: String, date: Date) {
         let content = UNMutableNotificationContent()
         content.title = notificationType
         content.body = body

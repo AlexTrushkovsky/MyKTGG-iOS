@@ -7,3 +7,14 @@
 //
 
 import Foundation
+
+struct BottomSheetModelItem: Decodable {
+    var title: String?
+    var subtitle: String?
+    var image: String?
+    var date: Date?
+}
+
+struct BottomSheetModel: Decodable {
+    var items: [BottomSheetModelItem]?
+}

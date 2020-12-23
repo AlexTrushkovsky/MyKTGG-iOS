@@ -2,7 +2,15 @@ import UIKit
 import Firebase
 import FBSDKLoginKit
 import GoogleSignIn
-class AuthViewController: UIViewController {
+import CryptoKit
+import AuthenticationServices
+
+class AuthViewController: UIViewController, ASAuthorizationControllerPresentationContextProviding {
+    @available(iOS 13.0, *)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
     @IBOutlet weak var AuthLabel: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var nameTextFieldView: UIView!
@@ -39,6 +47,12 @@ class AuthViewController: UIViewController {
     var email = ""
     var password = ""
     
+    var image = UIImage()
+    var microsoftProvider : OAuthProvider?
+    
+    fileprivate var currentNonce: String?
+    
+    
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
@@ -53,7 +67,7 @@ class AuthViewController: UIViewController {
         if #available(iOS 13.0, *) {
             isModalInPresentation = true
         } else {
-            // Fallback on earlier versions
+            signInWithAppleButton.isHidden = true
         }
         nameTextField.delegate = self
         nameTextFieldView.layer.cornerRadius = 15
@@ -75,6 +89,7 @@ class AuthViewController: UIViewController {
         view.addGestureRecognizer(tap)
         darkView.isHidden=true
         ActivityIndicator.isHidden=true
+        self.microsoftProvider = OAuthProvider(providerID: "microsoft.com")
     }
     func showAlert(title: String, message: String){
         stopWaitingAnimation()
@@ -96,9 +111,14 @@ class AuthViewController: UIViewController {
     @IBAction func forgotPasswordAction(_ sender: UIButton) {
     }
     //  Apple SignIn
+    @available(iOS 13.0, *)
     @IBAction func signInWithAppleAction(_ sender: UIButton) {
-        showAlert(title: "Помилка", message: "Авторизація за допомогою Apple на даний час недоступна")
+      startSignInWithAppleFlow()
     }
+
+  
+    
+    
     //  Facebook SignIn
     @IBAction func signInWithFacebookAction(_ sender: UIButton) {
         let login = LoginManager()
@@ -119,8 +139,9 @@ class AuthViewController: UIViewController {
                                     let avatarMethods = AvatarMethods()
                                     avatarMethods.getAvatarFromFacebookAcc()
                                     self.stopWaitingAnimation()
-                                    self.dismiss(animated: true, completion: nil)
                                     self.makeUpdateNotifications()
+                                    self.checkGroupInfoFromFirebase()
+                                    self.dismiss(animated: true, completion: nil)
                                 }else{
                                     print(error as Any)
                                 }
@@ -136,6 +157,190 @@ class AuthViewController: UIViewController {
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
     }
+    
+    @IBAction func signInWithTeams(_ sender: UIButton) {
+        self.microsoftProvider?.getCredentialWith(_: nil){credential, error in
+            if error != nil {
+                // Handle error.
+            }
+            if let credential = credential {
+                Auth.auth().signIn(with: credential) { (authResult, error) in
+                    if error != nil {
+                        // Handle error.
+                    }
+                    
+                    guard let authResult = authResult else {
+                        print("Couldn't get graph authResult")
+                        return
+                    }
+                    
+                    // get credential and token when login successfully
+                    let microCredential = authResult.credential as! OAuthCredential
+                    let token = microCredential.accessToken!
+                    
+                    // use token to call Microsoft Graph API
+                    self.getUserNameFromTeams(accessToken: token)
+                    self.getGroupNameFromTeams(accessToken: token)
+                    self.getAvatarFromTeams(accessToken: token)
+                    self.checkGroupInfoFromFirebase()
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }
+        }
+    }
+    
+    func getUserNameFromTeams(accessToken: String) {
+        let url = URL(string: "https://graph.microsoft.com/beta/me/displayname/$value")
+        var request = URLRequest(url: url!)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            let userName = String(decoding: data!, as: UTF8.self)
+            print("Teams userName: \(userName)")
+            
+            let userID = Auth.auth().currentUser?.uid
+            let db = Database.database().reference().child("users")
+            db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+                let value = snapshot.value as? NSDictionary
+                let name = value?["name"] as? String ?? ""
+                
+                if name != "" {
+                    UserDefaults.standard.set(name, forKey: "name")
+                    print("Teams name:",name)
+                } else {
+                    db.child(userID!).updateChildValues(["name":userName]) {
+                        (error: Error?, ref:DatabaseReference) in
+                        if let error = error {
+                            print("Data could not be saved: \(error).")
+                        } else {
+                            print("Name saved succesfully!")
+                            UserDefaults.standard.set(userName, forKey: "name")
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
+                        }
+                    }
+                }
+            }) { (error) in
+                print(error.localizedDescription)
+            }
+            
+        }.resume()
+    }
+    
+    func getGroupNameFromTeams(accessToken: String) {
+        let url = URL(string: "https://graph.microsoft.com/beta/me/jobtitle/$value")
+        var request = URLRequest(url: url!)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            let groupName = String(decoding: data!, as: UTF8.self)
+            print("GroupName: \(groupName)")
+            
+            let userID = Auth.auth().currentUser?.uid
+            let db = Database.database().reference()
+            db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+                let value = snapshot.value as? NSDictionary
+                let group = value?["group"] as? String ?? ""
+                let subGroup = value?["subgroup"] as? Int ?? 0
+            
+                if group != "" {
+                    UserDefaults.standard.set(group, forKey: "group")
+                    print("getUserDefaults group:",group)
+                } else if groupName.count<15 {
+                    UserDefaults.standard.set(groupName, forKey: "group")
+                    print("setUserDefaults group:",groupName)
+                    let ref = Database.database().reference().child("users")
+                    let user = Auth.auth().currentUser
+                    ref.child(user!.uid).updateChildValues(["group":groupName]) {
+                        (error: Error?, ref:DatabaseReference) in
+                        if let error = error {
+                            print("Data could not be saved: \(error).")
+                        } else {
+                            print("groupName saved succesfully!")
+                            print(groupName)
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
+                        }
+                    }
+                } else {
+                    print("Failed to get group from teams")
+                }
+                
+                UserDefaults.standard.set(subGroup, forKey: "subGroup")
+                print("getUserDefaults subGroup:",subGroup)
+                NotificationCenter.default.post(name: NSNotification.Name("setUserLabels"), object: nil)
+            }) { (error) in
+                print(error.localizedDescription)
+            }
+        }.resume()
+    }
+    
+    func getAvatarFromTeams(accessToken: String) {
+        let url = URL(string: "https://graph.microsoft.com/v1.0/me/photo/$value")
+        var request = URLRequest(url: url!)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Couldn't get graph result: \(error)")
+                return
+            }
+            let base64String = data!.base64EncodedString()
+            let dataDecoded = Data(base64Encoded: base64String, options: NSData.Base64DecodingOptions(rawValue: 0))!
+            if let decodedimage = UIImage(data: dataDecoded) {
+                let avatar = AvatarMethods()
+                avatar.uploadAvatar(photo: decodedimage) { (result) in
+                    switch result {
+                    
+                    case .success(let url):
+                        let ref = Database.database().reference().child("users")
+                        let user = Auth.auth().currentUser
+                        ref.child(user!.uid).updateChildValues(["avatarUrl":"\(url)"]) {
+                            (error: Error?, ref:DatabaseReference) in
+                            if let error = error {
+                                print("Data could not be saved: \(error).")
+                            } else {
+                                print("Photo saved succesfully!")
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
+                            }
+                        }
+                    case .failure(_): break
+                    }
+                }
+            } else {
+                print("Failed to get avatar from teams")
+            }
+        }.resume()
+    }
+    
+    
+    func checkGroupInfoFromFirebase() {
+        let userID = Auth.auth().currentUser?.uid
+        let db = Database.database().reference()
+        db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+            let value = snapshot.value as? NSDictionary
+            
+            if value?["group"] as? String != nil {
+                let group = value!["group"] as! String
+                UserDefaults.standard.set(group, forKey: "group")
+                print("set group from firebase:",group)
+            } else {
+                print("goto groupChooseVC")
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
+                return
+            }
+            
+            if value?["subgroup"] as? Int != nil {
+                let subGroup = value!["subgroup"] as! Int
+                UserDefaults.standard.set(subGroup, forKey: "subGroup")
+                print("set subgroup from firebase:",subGroup)
+            } else {
+                print("goto groupChooseVC")
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
+                return
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    
     @IBAction func regOrLogButton(_ sender: UIButton) {
         startWaitingAnimation()
         if (signup){
@@ -169,10 +374,13 @@ class AuthViewController: UIViewController {
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                         changeRequest?.displayName = self.name
                         changeRequest?.commitChanges { (error) in }
-                        ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email])
+                        ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email,"perm":0])
                         self.stopWaitingAnimation()
-                        self.dismiss(animated: true, completion: nil)
+                        self.checkGroupInfoFromFirebase()
                         self.makeUpdateNotifications()
+                        self.dismiss(animated: true, completion: nil)
+                        
+                        
                     }
                 }else{
                     print(error!._code)
@@ -262,8 +470,9 @@ extension AuthViewController: GIDSignInDelegate{
             print("Successfully logged into Firebase with Google")
             self.getGoogleAccName(user: user)
             self.stopWaitingAnimation()
-            self.dismiss(animated: true, completion: nil)
+            self.checkGroupInfoFromFirebase()
             self.makeUpdateNotifications()
+            self.dismiss(animated: true, completion: nil)
         }
         
     }
@@ -273,31 +482,8 @@ extension AuthViewController: GIDSignInDelegate{
         let GoogleName = "\(givenName) \(familyName)"
         print(givenName,familyName)
         
-        let userID = Auth.auth().currentUser?.uid
-        let db = Database.database().reference().child("users")
-        db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
-            let value = snapshot.value as? NSDictionary
-            let name = value?["name"] as? String ?? ""
-            
-            if name != "" {
-                UserDefaults.standard.set(name, forKey: "name")
-                print("Google name:",name)
-            } else {
-                db.child(userID!).updateChildValues(["name":GoogleName]) {
-                    (error: Error?, ref:DatabaseReference) in
-                    if let error = error {
-                        print("Data could not be saved: \(error).")
-                    } else {
-                        print("Name saved succesfully!")
-                        print(GoogleName)
-                        UserDefaults.standard.set(GoogleName, forKey: "name")
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
-                    }
-                }
-            }
-        }) { (error) in
-            print(error.localizedDescription)
-        }
+        let avatar = AvatarMethods()
+        avatar.setAccName(setName: GoogleName)
     }
 }
 extension AuthErrorCode {
@@ -335,5 +521,129 @@ extension UIViewController{
             self.present(alert, animated: true, completion: nil)
             
         }
+    }
+}
+@available(iOS 13.0, *)
+extension AuthViewController: ASAuthorizationControllerDelegate {
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            
+            // Save authorised user ID for future reference
+            UserDefaults.standard.set(appleIDCredential.user, forKey: "appleAuthorizedUserIdKey")
+            
+            // Retrieve the secure nonce generated during Apple sign in
+            guard let nonce = self.currentNonce else {
+                fatalError("Invalid state: A login callback was received, but no login request was sent.")
+            }
+
+            // Retrieve Apple identity token
+            guard let appleIDToken = appleIDCredential.identityToken else {
+                print("Failed to fetch identity token")
+                return
+            }
+
+            // Convert Apple identity token to string
+            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                print("Failed to decode identity token")
+                return
+            }
+
+            // Initialize a Firebase credential using secure nonce and Apple identity token
+            let firebaseCredential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                              idToken: idTokenString,
+                                                              rawNonce: nonce)
+                
+            // Sign in with Firebase
+            Auth.auth().signIn(with: firebaseCredential) { (authResult, error) in
+                
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                // Mak a request to set user's display name on Firebase
+                let changeRequest = authResult?.user.createProfileChangeRequest()
+                if appleIDCredential.fullName?.givenName != nil && appleIDCredential.fullName?.familyName != nil{
+                    
+                    changeRequest?.displayName = "\(appleIDCredential.fullName!.givenName!) \(appleIDCredential.fullName!.familyName!)"
+                    changeRequest?.commitChanges(completion: { (error) in
+
+                        if let error = error {
+                            print(error.localizedDescription)
+                        } else {
+                            print("Updated display name: \(Auth.auth().currentUser!.displayName!)")
+                            let avatar = AvatarMethods()
+                            avatar.setAccName(setName: Auth.auth().currentUser!.displayName!)
+                        }
+                    })
+                }
+                self.checkGroupInfoFromFirebase()
+                self.makeUpdateNotifications()
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
+    }
+
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    // Handle error.
+    print("Sign in with Apple errored: \(error)")
+  }
+
+    func startSignInWithAppleFlow() {
+      let nonce = randomNonceString()
+      currentNonce = nonce
+      let appleIDProvider = ASAuthorizationAppleIDProvider()
+      let request = appleIDProvider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+      request.nonce = sha256(nonce)
+
+      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+      authorizationController.delegate = self
+      authorizationController.presentationContextProvider = self
+      authorizationController.performRequests()
+    }
+
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        return String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: Array<Character> =
+          Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
     }
 }

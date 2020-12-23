@@ -83,7 +83,7 @@ class CustomAlert: UIView {
     
     func setText(title: String, subTitle: String, body: String) {
         titleLabel.text = title
-        subTitleLabel.text = subTitle
+        subTitleLabel.text = subTitle//
         textLabel.text = body
     }
     
