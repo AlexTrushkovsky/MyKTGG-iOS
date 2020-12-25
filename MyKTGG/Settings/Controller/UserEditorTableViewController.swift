@@ -23,17 +23,10 @@ class UserEditorTableViewController: UITableViewController {
     @IBOutlet weak var changePassField: UITextField!
     @IBOutlet weak var changePassConfirmField: UITextField!
     
-    var groupNum = [
-        "11","12","13","14","15",
-        "21","22","23","24","25",
-        "31","32","33","34","35",
-        "41","42","43","44","45"]
-    var groupSpec = ["ІПЗ","КІ","ОО","ПТБД","ФБС","ПВ","ПВб","ГРС(РО)","ГРС(ГО)","ГРСб","ХТ","Т" ,"Тб","ФО"]
-    var groupChoosen = ""
+    var group = [String]()
     let ref = Database.database().reference().child("users")
     let user = Auth.auth().currentUser
-    lazy var groupNumChoosen = groupNum[0]
-    lazy var groupSpecChoosen = groupSpec[0]
+    lazy var groupNumChoosen = group[0]
     
     @IBAction func changePassAction(_ sender: Any) {
         if changePassField.text == changePassConfirmField.text {
@@ -55,8 +48,8 @@ class UserEditorTableViewController: UITableViewController {
     }
     
     @IBAction func DoneButtonAction(_ sender: UIButton) {
-        if !groupNumChoosen.isEmpty || !groupSpecChoosen.isEmpty{
-            let groupName = "\(groupNumChoosen)-\(groupSpecChoosen)"
+        if !group.isEmpty{
+            let groupName = "\(groupNumChoosen)"
             ref.child(user!.uid).updateChildValues(["group":groupName]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
@@ -109,25 +102,19 @@ class UserEditorTableViewController: UITableViewController {
         FirstLastNameOutlet.text = getUserName()
         FirstLastNameOutlet.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
         logOutButton.layer.cornerRadius = 15
+        let groupCheck = GroupNetworkController()
+        group = groupCheck.fetchData()
         GroupPicker.delegate = self
         selectCurrentGroupOnPicker()
+        
     }
     
     func selectCurrentGroupOnPicker() {
         if let group = UserDefaults.standard.object(forKey: "group") as? String{
             print(group)
-            let first = group.prefix(2)
-            let second = group.suffix(from: group.index(group.startIndex, offsetBy: 3)).filter { $0 != "-" }
-            let bachelor = group.suffix(1)
-            print(bachelor)
-            print(first)
-            print(second)
-            guard let firstIndex = groupNum.firstIndex(of: String(first)) else { return }
-            guard let secondIndex = groupSpec.firstIndex(of: String(second)) else { return }
+            guard let firstIndex = self.group.firstIndex(of: String(group)) else { return }
             GroupPicker.selectRow(firstIndex, inComponent: 0, animated: true)
-            GroupPicker.selectRow(secondIndex, inComponent: 1, animated: true)
-            groupNumChoosen = groupNum[firstIndex]
-            groupSpecChoosen = groupSpec[secondIndex]
+            groupNumChoosen = self.group[firstIndex]
         }
         if let subGroup = UserDefaults.standard.object(forKey: "subGroup") as? Int{
             subgroupPicker.selectedSegmentIndex = subGroup
@@ -260,34 +247,17 @@ extension UserEditorTableViewController: UIImagePickerControllerDelegate, UINavi
 }
 extension UserEditorTableViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 2
+        return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if (component == 0) {
-            return groupNum.count ;
-        }
-        else if (component == 1) {
-            return groupSpec.count ;
-        }
-        return 0
+        return self.group.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if (component == 0) {
-            return groupNum[row] ;
-        }
-        else if (component == 1) {
-            return groupSpec[row] ;
-        }
-        return nil
+        return self.group[row];
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if (component == 0) {
-            groupNumChoosen = "\(groupNum[row])"
-        }
-        else if (component == 1) {
-            groupSpecChoosen = "\(groupSpec[row])"
-        }
+        return groupNumChoosen = "\(self.group[row])"
     }
 }

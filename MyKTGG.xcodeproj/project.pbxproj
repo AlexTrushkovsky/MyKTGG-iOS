@@ -73,6 +73,7 @@
 		6EB7D9BC25928DBD004BEFEB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6EB7D9BB25928DBD004BEFEB /* GoogleService-Info.plist */; };
 		6ECC5AEA243E3728006E456A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6ECC5AE9243E3728006E456A /* Main.storyboard */; };
 		6ED9F420245C401100417F69 /* TimeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED9F41F245C401100417F69 /* TimeTableViewController.swift */; };
+		6EF0F5DA25954A6200D6020E /* GroupNetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF0F5D925954A6200D6020E /* GroupNetworkController.swift */; };
 		FE9C2AC18D39F2AA60535605 /* libPods-MyKTGG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 755B5CACB910E6D315C7B47C /* libPods-MyKTGG.a */; };
 /* End PBXBuildFile section */
 
@@ -145,6 +146,7 @@
 		6EB7D9BB25928DBD004BEFEB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6ECC5AE9243E3728006E456A /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		6ED9F41F245C401100417F69 /* TimeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableViewController.swift; sourceTree = "<group>"; };
+		6EF0F5D925954A6200D6020E /* GroupNetworkController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupNetworkController.swift; sourceTree = "<group>"; };
 		755B5CACB910E6D315C7B47C /* libPods-MyKTGG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MyKTGG.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -468,6 +470,7 @@
 				6E3633302447602300918364 /* SettingsViewController.swift */,
 				6EABD26B2464D142009CE27F /* UserEditorTableViewController.swift */,
 				6EABD26D2464E78D009CE27F /* AvatarMethods.swift */,
+				6EF0F5D925954A6200D6020E /* GroupNetworkController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -691,6 +694,7 @@
 				6E9E2C742468781700AFC756 /* DateInsertType.swift in Sources */,
 				6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */,
 				6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */,
+				6EF0F5DA25954A6200D6020E /* GroupNetworkController.swift in Sources */,
 				6E9E2C7E2468781700AFC756 /* UICollectionViewCell+Fade.swift in Sources */,
 				6E114B0224C19B7900CC78FB /* weatherController.swift in Sources */,
 				6E1600E124ED3E2D001DE4B1 /* UBottomSheetCoordinatorDataSource.swift in Sources */,
