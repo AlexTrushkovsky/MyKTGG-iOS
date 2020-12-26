@@ -20,13 +20,8 @@ class ForgotPassViewController: UIViewController {
     func showAlertOk(alert: UIAlertAction!) {
         self.dismiss(animated: true, completion: nil)
     }
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
     override func viewDidLoad() {
-        super.viewDidLoad()
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-        view.addGestureRecognizer(tap)
+        hideKeyboardWhenTappedAround()
         emailTextField.delegate = self
         emailTextField.becomeFirstResponder()
         emailFieldView.layer.cornerRadius = 15

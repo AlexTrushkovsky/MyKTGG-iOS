@@ -11,7 +11,7 @@ import UIKit
 class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateScrollPickerDataSource {
     
     let settings = SettingsViewController()
-    let network = TimeTableNetworkController()
+    let network = NewTimetableController()
     var pickedDate = Date()
     var cellInitColor = UIColor.white
     var CellIsHighlighted = false
@@ -213,7 +213,7 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
             CellIsHighlighted = false
             self.makeButtonsVisible(bool: false, cell: timeTableView.cellForRow(at: index) as! TimeTableCell)
         }
-        timeTableView.reloadData()
+        refetchData()
         checkNotes()
     }
     

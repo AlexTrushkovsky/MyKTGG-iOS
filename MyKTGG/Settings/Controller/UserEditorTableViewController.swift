@@ -88,14 +88,8 @@ class UserEditorTableViewController: UITableViewController {
         logOut()
     }
     
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-        view.addGestureRecognizer(tap)
         let avatar = AvatarMethods()
         avatar.setupUserImageView(imageView: EditorAvatar)
         avatar.getAvatarFromUserDefaults(forKey: "avatar", imageView: EditorAvatar)
@@ -106,7 +100,7 @@ class UserEditorTableViewController: UITableViewController {
         group = groupCheck.fetchData()
         GroupPicker.delegate = self
         selectCurrentGroupOnPicker()
-        
+        hideKeyboardWhenTappedAround()
     }
     
     func selectCurrentGroupOnPicker() {
@@ -259,5 +253,16 @@ extension UserEditorTableViewController: UIPickerViewDataSource, UIPickerViewDel
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         return groupNumChoosen = "\(self.group[row])"
+    }
+}
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }

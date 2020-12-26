@@ -52,11 +52,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     
     fileprivate var currentNonce: String?
     
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
     func makeUpdateNotifications() {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
@@ -85,8 +80,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-        view.addGestureRecognizer(tap)
+        hideKeyboardWhenTappedAround()
         darkView.isHidden=true
         ActivityIndicator.isHidden=true
         self.microsoftProvider = OAuthProvider(providerID: "microsoft.com")
