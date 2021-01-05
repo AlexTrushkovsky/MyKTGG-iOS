@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="SourceSansPro-Bold.ttf">
+            <string>SourceSansPro-Bold</string>
+        </array>
+    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ListViewController" customModule="Мій_КТГГ" customModuleProvider="target">
             <connections>
+                <outlet property="noNewsLabel" destination="ByX-8J-LA2" id="UWK-ib-FzY"/>
                 <outlet property="tableView" destination="roa-1a-DgS" id="5Qe-Wu-jTY"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -24,16 +31,30 @@
                     <color key="backgroundColor" red="0.98039215686274506" green="0.97647058823529409" blue="0.97647058823529409" alpha="1" colorSpace="calibratedRGB"/>
                     <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                 </tableView>
+                <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Нових повідомлень немає" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ByX-8J-LA2">
+                    <rect key="frame" x="30" y="20" width="315" height="26"/>
+                    <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="20"/>
+                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" red="0.98039215690000003" green="0.97647058819999999" blue="0.97647058819999999" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
+                <constraint firstItem="ByX-8J-LA2" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="20" id="G3E-10-evI"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="ByX-8J-LA2" secondAttribute="trailing" constant="30" id="SbF-gi-DWh"/>
                 <constraint firstItem="roa-1a-DgS" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="cPc-up-iPE"/>
+                <constraint firstItem="ByX-8J-LA2" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="30" id="cwu-pj-TBf"/>
                 <constraint firstItem="roa-1a-DgS" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="dyR-ov-Gfj"/>
                 <constraint firstAttribute="bottom" secondItem="roa-1a-DgS" secondAttribute="bottom" id="uEq-U3-osD"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="roa-1a-DgS" secondAttribute="trailing" id="vM4-C9-4nS"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <point key="canvasLocation" x="138.40000000000001" y="104.7976011994003"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

@@ -50,6 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
             }
         }
         UIApplication.shared.applicationIconBadgeNumber = 0
+        UserDefaults(suiteName: "group.myktgg")!.set(0, forKey: "badges")
     }
     
     func showModalAuth(){

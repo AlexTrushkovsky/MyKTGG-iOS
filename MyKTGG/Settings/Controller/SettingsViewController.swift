@@ -13,6 +13,8 @@ import StoreKit
 class SettingsViewController: UITableViewController {
     var budyaMode = false
     var budyaOpened = false
+    var group = [String]()
+    var currentGroup = String()
     
     @IBAction func autoProm(_ sender: UISwitch) {
         UserDefaults.standard.set(autoPromoutionSwitch.isOn, forKey: "AutoPromStatus")
@@ -27,13 +29,17 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var subGroupLabel: UILabel!
     @IBOutlet weak var UserNameLabel: UILabel!
     @IBOutlet weak var autoPromoutionSwitch: UISwitch!
+    @IBOutlet weak var userEditActivityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var userEditArrow: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorStyle = .none
+        userEditActivityIndicator.hidesWhenStopped = true
         let avatarMethods = AvatarMethods()
         avatarMethods.setupUserImageView(imageView: avatar)
-        updateLabels()
+        setUserLabels()
+        getUserInfo()
         avatarMethods.getAvatarFromUserDefaults(forKey: "avatar", imageView: avatar)
         NotificationCenter.default.addObserver(self, selector: #selector(updateAvatar), name:NSNotification.Name(rawValue: "updateAvatar"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateLabels), name:NSNotification.Name(rawValue: "updateLabels"), object: nil)
@@ -50,7 +56,7 @@ class SettingsViewController: UITableViewController {
     @objc func budyaTapped() {
         self.budyaMode = true
         tableView.reloadData()
-
+        
     }
     
     @objc func updateAvatar() {
@@ -60,6 +66,12 @@ class SettingsViewController: UITableViewController {
     @objc func updateLabels() {
         print("updating user labels...")
         getUserInfo()
+    }
+    
+    func showAlert(title: String, message: String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК",style: .default))
+        present(alert, animated: true, completion: nil)
     }
     
     func clearUserDefaults() {
@@ -95,7 +107,12 @@ class SettingsViewController: UITableViewController {
             
             if group != "" {
                 UserDefaults.standard.set(group, forKey: "group")
+                self.postAboutGroupChangeIfNeeded(group: group)
                 print("getUserDefaults group:",group)
+                let transliterated = self.transliterate(nonLatin: group)
+                Messaging.messaging().subscribe(toTopic: transliterated) { error in
+                    print("Subscribed to \(transliterated) pushes")
+                }
             }
             
             UserDefaults.standard.set(subGroup, forKey: "subGroup")
@@ -107,19 +124,35 @@ class SettingsViewController: UITableViewController {
         }
     }
     
+    func transliterate(nonLatin: String) -> String {
+        return nonLatin
+            .applyingTransform(.toLatin, reverse: false)?
+            .applyingTransform(.stripDiacritics, reverse: false)?
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "") ?? nonLatin
+    }
+    
+    func postAboutGroupChangeIfNeeded(group: String) {
+        if self.currentGroup != group {
+            NotificationCenter.default.post(name: NSNotification.Name("groupChanged"), object: nil)
+        }
+    }
+    
     @objc func setUserLabels() {
         if let name = UserDefaults.standard.object(forKey: "name"),
-            let text = name as? String {
+           let text = name as? String {
             UserNameLabel.text = text
-            print("new name:", name)
+            print("Defaults name:", name)
         }
         if let group = UserDefaults.standard.object(forKey: "group"),
-            let text = group as? String {
+           let text = group as? String {
             groupLabel.text = text
-            print("new group:", group)
+            print("Defaults group:", group)
+            self.currentGroup = text
         }
         if let subGroup = UserDefaults.standard.object(forKey: "subGroup") {
             subGroupLabel.text = "\(subGroup as! Int + 1) підгрупа"
+            print("Defaults subgroup: \(subGroup as! Int + 1)")
         }
     }
     private func budyaShouldBeHidden(_ section: Int) -> Bool {
@@ -165,41 +198,59 @@ class SettingsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "UserEditor") as? UserEditorTableViewController
-                self.navigationController?.pushViewController(vc!, animated: true)
-            }
-        }
-        if indexPath.section == 3 {
-            if indexPath.row == 0 {
-                if let url = URL(string: "https://next.privat24.ua/payments/form/%7B%22token%22:%22e287b0fa-9f54-487f-9ed3-cb4f67e9a2cb%22%7D") {
-                    UIApplication.shared.open(url)
+                userEditActivityIndicator.startAnimating()
+                userEditArrow.isHidden = true
+                DispatchQueue.global().async {
+                    let groupCheck = GroupNetworkController()
+                    self.group = groupCheck.fetchData()
+                    DispatchQueue.main.async {
+                        if self.group.isEmpty {
+                            //throw error
+                            self.showAlert(title: "Помилка", message: "Немає зв'язку з мережею. \n Перевірте з`єднання або спробуйте пізніше.")
+                            self.userEditActivityIndicator.stopAnimating()
+                            self.userEditArrow.isHidden = false
+                        } else {
+                            let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "UserEditor") as? UserEditorTableViewController
+                            vc?.group = self.group
+                            self.navigationController?.pushViewController(vc!, animated: true)
+                            self.userEditActivityIndicator.stopAnimating()
+                            self.userEditArrow.isHidden = false
+                        }
+                    }
                 }
             }
-            if indexPath.row == 1 {
-                if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
-                    UIApplication.shared.open(url)
+        }
+            if indexPath.section == 3 {
+                if indexPath.row == 0 {
+                    if let url = URL(string: "https://next.privat24.ua/payments/form/%7B%22token%22:%22e287b0fa-9f54-487f-9ed3-cb4f67e9a2cb%22%7D") {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                if indexPath.row == 1 {
+                    if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
+                        UIApplication.shared.open(url)
+                    }
                 }
             }
-        }
-        if indexPath.section == 4 {
-            if indexPath.row == 0 {
-                if let url = URL(string: "https://t.me/esen1n25") {
-                    UIApplication.shared.open(url)
+            if indexPath.section == 4 {
+                if indexPath.row == 0 {
+                    if let url = URL(string: "https://t.me/esen1n25") {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                if indexPath.row == 1 {
+                    SKStoreReviewController.requestReview()
                 }
             }
-            if indexPath.row == 1 {
-                SKStoreReviewController.requestReview()
+            if indexPath.section == 6 {
+                if indexPath.row == 0 {
+                    budyaOpened = !budyaOpened
+                    tableView.reloadData()
+                }
+                if indexPath.row == 1 {
+                    showClearUserDefaultsAlert()
+                }
             }
+            tableView.deselectRow(at: indexPath, animated: true)
         }
-        if indexPath.section == 6 {
-            if indexPath.row == 0 {
-                budyaOpened = !budyaOpened
-                tableView.reloadData()
-            }
-            if indexPath.row == 1 {
-                showClearUserDefaultsAlert()
-            }
-        }
-        tableView.deselectRow(at: indexPath, animated: true)
     }
-}

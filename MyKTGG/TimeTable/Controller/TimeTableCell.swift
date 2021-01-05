@@ -24,4 +24,12 @@ class TimeTableCell: UITableViewCell {
     
     @IBOutlet weak var noteText: UILabel!
     @IBOutlet weak var noteImage: UIImageView!
+    
+    override func awakeFromNib() {
+        self.lessonView.layer.cornerRadius = 15
+        self.makeNote.layer.cornerRadius = 15
+        self.turnAlarm.layer.cornerRadius = 15
+        self.selectionStyle = .none
+    }
 }
+

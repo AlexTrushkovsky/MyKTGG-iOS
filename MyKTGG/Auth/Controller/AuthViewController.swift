@@ -492,7 +492,7 @@ extension AuthErrorCode {
         case .invalidEmail, .invalidSender, .invalidRecipientEmail:
             return "Будь-ласка, введіть правильну електронну адресу!"
         case .networkError:
-            return "Немає зв'язку з сервером. \nСпробуйте будь-ласка пізніше."
+            return "Немає зв'язку з мережею. \n Перевірте з`єднання або спробуйте пізніше."
         case .weakPassword:
             return "Ваш пароль закороткий. \nВкажіть пароль, що містить більше 6 символів."
         case .wrongPassword:

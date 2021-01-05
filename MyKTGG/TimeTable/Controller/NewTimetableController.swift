@@ -3,19 +3,17 @@ import Alamofire
 
 class NewTimetableController {
     
-    
     var timeTableRoot = TimetableRoot()
     var newVar = TimetableRoot()
     var lessonCount = 0
     var item = [Item]()
     
-    public func fetchData(tableView: UITableView, pickedDate: Date){
+    public func fetchData(pickedDate: Date, group: String){
         let semaphore = DispatchSemaphore (value: 0)
         let stringPickedDate = pickedDate.toString(dateFormat: "dd.MM.yyyy")
         let parameters = "{\n    \"to\":\"eRVs75zrFUw-kl6gzqszEK:APA91bH4WbX_KzcMdRBXvCk9W8iAizSO60fxfGHW0It_t2HDpd1J4pJth3_GQ-apHVNhUW0mwDsfNzti12Da6vj1kWWEeKYgILLmHRh0caxu-6B4m7XXN16-J8v7iQXkrv2WN9DKL3x2\",\n    \"notification\": {\n        \"body\":\"Test\",\n        \"title\":\"Test\"\n    }\n}"
         let postData = parameters.data(using: .windowsCP1251)
-        
-        guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
+    
         guard let encodedGroup = (group as NSString).addingPercentEscapes(using: String.Encoding.windowsCP1251.rawValue) else { return }
         
         var request = URLRequest(url: URL(string: "http://217.76.201.218/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=group&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)")!,timeoutInterval: Double.infinity)
@@ -27,7 +25,9 @@ class NewTimetableController {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data else {
-                print(String(describing: error))
+                print("Failed to get JSON: \(String(describing: error))")
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showNoConnectionWithServer"), object: nil)
+                self.deinitModel()
                 return
             }
             let dataString = String(data: data, encoding: .windowsCP1251)!
@@ -43,7 +43,6 @@ class NewTimetableController {
             }catch{
                 print("TimeTable: Failed to convert Data!")
                 self.deinitModel()
-                tableView.reloadData()
             }
             semaphore.signal()
         }
@@ -200,87 +199,126 @@ class NewTimetableController {
     
     func formatCellToChange(cell: TimeTableCell) {
         cell.lessonView.backgroundColor = UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00)
-        cell.lessonRoom.isHidden = true
-        cell.roomImage.isHidden = true
     }
     func formatCellToLesson(cell: TimeTableCell) {
         cell.lessonView.backgroundColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00)
-        cell.lessonRoom.isHidden = false
-        cell.roomImage.isHidden = false
     }
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date) {
         print("TT: config cell")
+        cell.roomImage.isHidden = false
+        cell.lessonRoom.isHidden = false
+        cell.teacher.isHidden = false
+        cell.teacherImage.isHidden = false
         lessonCount = 0
-        formatCellToLesson(cell: cell)
         if let stringDate = item[indexPath.row].date {
             let newDate = stringDate.toDate(withFormat: "dd.MM.yyyy")
             if date.ignoringTime == newDate!.ignoringTime {
-                if var lesson = item[indexPath.row].lessonDescription{
-                    lesson = lesson.replacingOccurrences(of: "<br>", with: "&")
-                    print("Main: \(lesson)")
-                    let countofOpenBrackets = lesson.filter { $0 == "(" }.count
-                    // Without subgroup
-                    if countofOpenBrackets == 1 {
-                        
-                        if let whitespaceAfterRoom = lesson.firstIndex(of: "&") {
-                            let room = String(lesson.prefix(upTo: whitespaceAfterRoom)) // Room founded
+                if var lesson = item[indexPath.row].lessonDescription {
+                    
+                    if isTZ(lesson: lesson) {
+                        formatCellToChange(cell: cell)
+                        lesson = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "")
+                        var newLesson = lesson.components(separatedBy: "замість:")[0]
+                        var oldLesson = lesson.components(separatedBy: "замість:")[1]
+                        print("NL: \(newLesson)")
+                        print("OLDL: \(oldLesson)")
+                        if isT3(lesson: newLesson) {
+                            
+                        } else if isT2(lesson: newLesson) {
+                            let room = newLesson.components(separatedBy: "<br>")[0]
+                            newLesson = newLesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            let teacher = "\(newLesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                            newLesson = newLesson.replacingOccurrences(of: teacher, with: "")
+                            let subgroup = newLesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                            newLesson = newLesson.components(separatedBy: "<br>")[1]
+                            let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            print("subgroup:\(subgroup)")
+                            print("lesson:\(lesson)")
+                            cell.lessonName.text = lesson
+                            print("teacher:\(teacher)")
+                            cell.teacher.text = teacher
+                            print("room:\(room)")
                             cell.lessonRoom.text = room
-                            print("room\(room)")
-                            let teacherAndLessonDesk = String(lesson.suffix(from: lesson.index(whitespaceAfterRoom, offsetBy: 1))).replacingOccurrences(of: "  ", with: "|")
-                            print("numOfOpenBrackets: \(countofOpenBrackets)")
-                            if let stickAfterTeacher = teacherAndLessonDesk.firstIndex(of: "|") {
-                                let teacher = teacherAndLessonDesk.prefix(upTo: stickAfterTeacher) // Teacher founded
-                                cell.teacher.text = String(teacher)
-                                print("teacher\(teacher)")
-                                
-                                let subGroupAndLesson = String(teacherAndLessonDesk.suffix(from: teacherAndLessonDesk.index(stickAfterTeacher, offsetBy: 1)))
-                                print("subGroupAndLesson: \(subGroupAndLesson)")
-                                if let symbolAfterSubgroup = subGroupAndLesson.firstIndex(of: "&") {
-                                    let lesson = String(subGroupAndLesson.prefix(upTo: symbolAfterSubgroup)) // Subgroup founded
-                                    print("lesson: \(lesson)")
-                                    cell.lessonName.text = String(lesson)
-                                }
-                            }
+                        } else if isT1(lesson: newLesson) {
+                            let room = newLesson.components(separatedBy: "<br>")[0]
+                            newLesson = newLesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            let teacher = "\(newLesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                            newLesson = newLesson.replacingOccurrences(of: teacher, with: "")
+                            let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            print("lesson:\(lesson)")
+                            cell.lessonName.text = lesson
+                            print("teacher:\(teacher)")
+                            cell.teacher.text = teacher
+                            print("room:\(room)")
+                            cell.lessonRoom.text = room
+                        } else {
+                            cell.lessonName.text = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            cell.roomImage.isHidden = true
+                            cell.lessonRoom.isHidden = true
+                            cell.teacher.isHidden = true
+                            cell.teacherImage.isHidden = true
                         }
-                    } else if countofOpenBrackets == 2 {
-                        print("With subgroup but 1 lesson")
                         
-                    } else if countofOpenBrackets == 4 {
-                        
-                        if let whitespaceAfterRoom = lesson.firstIndex(of: "&") {
-                            let room = String(lesson.prefix(upTo: whitespaceAfterRoom)) // Room founded
-                            cell.lessonRoom.text = room
-                            print("room\(room)")
-                            let teacherAndLessonDesk = String(lesson.suffix(from: lesson.index(whitespaceAfterRoom, offsetBy: 1))).replacingOccurrences(of: "  ", with: "|")
-                            let countofOpenBrackets = teacherAndLessonDesk.filter { $0 == "(" }.count
-                            print("numOfOpenBrackets: \(countofOpenBrackets)")
-                            if let stickAfterTeacher = teacherAndLessonDesk.firstIndex(of: "|") {
-                                let teacher = teacherAndLessonDesk.prefix(upTo: stickAfterTeacher) // Teacher founded
-                                cell.teacher.text = String(teacher)
-                                print("teacher\(teacher)")
-                                
-                                let subGroupAndLesson = String(teacherAndLessonDesk.suffix(from: teacherAndLessonDesk.index(stickAfterTeacher, offsetBy: 1)))
-                                print(subGroupAndLesson)
-                                if let symbolAfterSubgroup = subGroupAndLesson.firstIndex(of: "&") {
-                                    let subgroup = String(subGroupAndLesson.prefix(upTo: symbolAfterSubgroup)) // Subgroup founded
-                                    print("subgroup\(subgroup)")
-                                    let lessonAndNextLesson = String(subGroupAndLesson.suffix(from: subGroupAndLesson.index(symbolAfterSubgroup, offsetBy: 1)))
-                                    print("lessonAndNextLesson\(lessonAndNextLesson)")
-                                    if let symbolAfterLesson = lessonAndNextLesson.firstIndex(of: "&") {
-                                        if lessonAndNextLesson.contains("&") {
-                                            let lesson = String(lessonAndNextLesson.prefix(upTo: symbolAfterLesson))
-                                            print("lesson: \(lesson)")
-                                            cell.lessonName.text = String(lesson)
-                                        } else {
-                                            print("no next lesson")
-                                            cell.lessonName.text = String(lessonAndNextLesson.replacingOccurrences(of: "&", with: ""))
-                                        }
-                                    }
-                                }
+                    } else {
+                        formatCellToLesson(cell: cell)
+                        if isT3(lesson: lesson) {
+                            var firstPart = lesson.components(separatedBy: "<br> <br>")[0]
+                            let secondPart = lesson.components(separatedBy: "<br> <br>")[1]
+                            print("firstPart of t3:\(firstPart)")
+                            print("secondPart of t3:\(secondPart)")
+                            if isT2(lesson: "\(firstPart)<br>") {
+                                let room = firstPart.components(separatedBy: "<br>")[0]
+                                firstPart = firstPart.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let teacher = "\(firstPart.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                                firstPart = firstPart.replacingOccurrences(of: teacher, with: "")
+                                let subgroup = firstPart.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                                firstPart = firstPart.components(separatedBy: "<br>")[1]
+                                let lesson = firstPart.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                print("subgroup:\(subgroup)")
+                                print("lesson:\(lesson)")
+                                cell.lessonName.text = lesson
+                                print("teacher:\(teacher)")
+                                cell.teacher.text = teacher
+                                print("room:\(room)")
+                                cell.lessonRoom.text = room
                             }
+                        } else if isT2(lesson: lesson) {
+                            let room = lesson.components(separatedBy: "<br>")[0]
+                            lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                            lesson = lesson.replacingOccurrences(of: teacher, with: "")
+                            let subgroup = lesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                            lesson = lesson.components(separatedBy: "<br>")[1]
+                            let lesson = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            print("subgroup:\(subgroup)")
+                            print("lesson:\(lesson)")
+                            cell.lessonName.text = lesson
+                            print("teacher:\(teacher)")
+                            cell.teacher.text = teacher
+                            print("room:\(room)")
+                            cell.lessonRoom.text = room
+                        } else if isT1(lesson: lesson) {
+                            let room = lesson.components(separatedBy: "<br>")[0]
+                            lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                            lesson = lesson.replacingOccurrences(of: teacher, with: "")
+                            let lesson = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            print("lesson:\(lesson)")
+                            cell.lessonName.text = lesson
+                            print("teacher:\(teacher)")
+                            cell.teacher.text = teacher
+                            print("room:\(room)")
+                            cell.lessonRoom.text = room
+                        } else {
+                            cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                            cell.roomImage.isHidden = true
+                            cell.lessonRoom.isHidden = true
+                            cell.teacher.isHidden = true
+                            cell.teacherImage.isHidden = true
                         }
                     }
+                    
                     if let lessontime = item[indexPath.row].lessonTime {
                         if let index = lessontime.firstIndex(of: "-") {
                             let firstPart = lessontime.prefix(upTo: index)
@@ -294,26 +332,42 @@ class NewTimetableController {
                     print("new data: \(newDate)")
                 }
             }
-            //        if date.ignoringTime == change.day.ignoringTime {
-            //            if let lesson = change.change.para {
-            //                if indexPath.row >= 0 && indexPath.row < lessonCount {
-            //                    for item in 0..<lesson.count {
-            //                        let changeNum = lesson[item].trimmingCharacters(in: CharacterSet(charactersIn: "0123456789").inverted)
-            //                        if fri[indexPath.row].lessonNum! == changeNum {
-            //                            formatCellToChange(cell: cell)
-            //                            if let lesson = change.change.disChange?[item]{
-            //                                cell.lessonName.text = lesson
-            //                            }
-            //                            if let teacher = change.change.teacherChange?[item] {
-            //                                cell.teacher.text = teacher
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            
         }
-        
+    }
+    
+    func isT1(lesson: String) -> Bool {
+        if lesson.components(separatedBy: "<br>").count-1 == 2 && !lesson.contains("підгр.") {
+            print("t1")
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isT2(lesson: String) -> Bool {
+        if lesson.components(separatedBy: "<br>").count-1 == 3 && lesson.components(separatedBy: "підгр.").count-1 == 1 {
+            print("t2")
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isT3(lesson: String) -> Bool {
+        if (lesson.components(separatedBy: "<br>").count-1) == 7 && (lesson.components(separatedBy: "підгр.").count-1) == 2 {
+            print("t3")
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isTZ(lesson: String) -> Bool {
+        if (lesson.components(separatedBy: "Увага! Заміна!").count-1) == 1 {
+            print("tz")
+            return true
+        } else {
+            return false
+        }
     }
 }

@@ -35,7 +35,7 @@ public protocol UBottomSheetCoordinatorDataSource: class {
 ///Default data source implementation
 extension UBottomSheetCoordinatorDataSource{
     public func sheetPositions(_ availableHeight: CGFloat) -> [CGFloat]{
-        return [0.04, 0.455].map{$0*availableHeight}
+        return [0.05, 0.440].map{$0*availableHeight}
     }
     
     public var animator: Animatable?{
@@ -43,7 +43,7 @@ extension UBottomSheetCoordinatorDataSource{
     }
     
     public func initialPosition(_ availableHeight: CGFloat) -> CGFloat{
-        return availableHeight*0.455
+        return availableHeight*0.440
     }
     
     public func rubberBandLogicTop(_ total: CGFloat, _ limit: CGFloat) -> CGFloat{

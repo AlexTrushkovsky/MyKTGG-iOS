@@ -8,13 +8,12 @@
 
 import Foundation
 
-class BottomSheetNetworkController {
+class BottomSheetContentController {
     var sheetModel = BottomSheetModel()
     var itemArray = [BottomSheetModelItem]()
-    func addItem(title: String, subtitle: String, image: String, date: Date) {
-        let newItem = BottomSheetModelItem(title: title, subtitle: subtitle, image: image, date: date)
+    func addItem(title: String, subtitle: String, image: String) {
+        let newItem = BottomSheetModelItem(title: title, subtitle: subtitle, image: image)
         itemArray.append(newItem)
         sheetModel.items = itemArray
-        print(sheetModel.items!.count)
     }
 }

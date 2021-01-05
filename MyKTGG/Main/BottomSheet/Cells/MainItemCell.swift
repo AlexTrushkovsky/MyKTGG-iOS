@@ -8,13 +8,13 @@
 
 import UIKit
 
-struct MapItemCellViewModel {
+struct MainItemCellViewModel {
     let image: UIImage?
     let title: String
     let subtitle: String
 }
 
-class MapItemCell: UITableViewCell {
+class MainItemCell: UITableViewCell {
 
     @IBOutlet weak var leftImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
@@ -25,11 +25,10 @@ class MapItemCell: UITableViewCell {
         selectionStyle = .none
     }
     
-    func configure(model: MapItemCellViewModel){
+    func configure(model: MainItemCellViewModel){
         nameLabel.text = model.title
         descriptionLabel.text = model.subtitle
-//        leftImageView.image = model.image
+        leftImageView.image = model.image
     }
-
-
+    
 }

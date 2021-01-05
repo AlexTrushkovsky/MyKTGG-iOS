@@ -18,6 +18,8 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     var alertStatus = AlertStatus.alert
     var animationDuration = 0.3
     let refControl = UIRefreshControl()
+    var currentGroup = String()
+    var lessonCount = 0
     
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
     private lazy var alertView: CustomAlert = {
@@ -42,7 +44,6 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         self.animateIn(animationDuration: self.animationDuration)
     }
     @IBOutlet weak var background: UIView!
-    @IBOutlet weak var weekEndImage: UIImageView!
     @IBOutlet weak var timeTableSeparator: UIView!
     @IBOutlet weak var timeTableView: UITableView!
     @IBOutlet weak var dayLabel: UILabel!
@@ -52,16 +53,11 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
     @IBOutlet weak var todayButtonOutlet: UIButton!
     @IBAction func todayButtonAction(_ sender: UIButton) {
         scrollToday()
-        timeTableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        setupDateScroll()
         scrollToday()
-        refetchData()
-        timeTableView.reloadData()
         timeTableView.allowsSelection = true
-        
     }
 
     override func viewDidLoad() {
@@ -69,24 +65,41 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         setUpGestures()
         setUpMainView()
         settings.getUserInfo()
-        refetchData()
+        getCurrentGroup()
         setupVisualEffectView()
+        setupDateScroll()
         NotificationCenter.default.addObserver(self, selector: #selector(showNoConnectAlert), name:NSNotification.Name(rawValue: "showNoConnectionWithServer"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getCurrentGroup), name:NSNotification.Name(rawValue: "groupChanged"), object: nil)
     }
     
+    @objc func getCurrentGroup() {
+        guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
+        self.currentGroup = group
+    }
+
     @objc func showNoConnectAlert(){
-        self.setAlert(type: .alert)
-        self.alertView.setText(title: "Помилка", subTitle: "Bідсутнє з'єднання з сервером", body: "cпробуйте будь ласка пізніше")
-        self.animateIn(animationDuration: self.animationDuration)
+        print("show no connection error")
+        DispatchQueue.main.async {
+            self.refControl.endRefreshing()
+            self.setAlert(type: .alert)
+            self.alertView.setText(title: "Помилка", subTitle: "Немає зв'язку з мережею", body: "перевірте з'єднання, або cпробуйте будь ласка пізніше")
+            self.animateIn(animationDuration: self.animationDuration)
+        }
     }
     
-   @objc func refetchData() {
+    @objc func refetchData() {
         print("Updating TableView")
-        deselectRows()
-        network.fetchData(tableView: timeTableView, pickedDate: pickedDate)
-        refControl.endRefreshing()
-        checkNotes()
-        timeTableView.reloadData()
+        self.refControl.beginRefreshing()
+        timeTableView.setContentOffset(CGPoint(x: 0, y: timeTableView.contentOffset.y - (self.refControl.frame.size.height)), animated: true)
+        DispatchQueue.global().async {
+            self.network.fetchData(pickedDate: self.pickedDate, group: self.currentGroup)
+            DispatchQueue.main.async {
+                self.deselectRows()
+                self.checkNotes()
+                self.refControl.endRefreshing()
+                self.timeTableView.reloadData()
+            }
+        }
     }
     
     func turnGestures(bool: Bool) {
@@ -208,7 +221,6 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
             todayButtonOutlet.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
         }
         if let index = timeTableView.indexPathForSelectedRow {
-            print("indexPath: ", index)
             timeTableView.deselectRow(at: index, animated: true)
             CellIsHighlighted = false
             self.makeButtonsVisible(bool: false, cell: timeTableView.cellForRow(at: index) as! TimeTableCell)
@@ -245,8 +257,8 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
         format.dayBackgroundColor = UIColor.clear
         format.dayBackgroundSelectedColor = UIColor(red: 1.00, green: 0.46, blue: 0.28, alpha: 1.00)
         format.animatedSelection = true
-        format.separatorEnabled = false
-        format.fadeEnabled = false
+        format.separatorEnabled = true
+        format.fadeEnabled = true
         format.animationScaleFactor = 1.1
         format.dayPadding = 5
         format.topMarginData = 10
@@ -424,25 +436,27 @@ class TimeTableViewController: UIViewController, DateScrollPickerDelegate, DateS
 extension TimeTableViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         network.getInfo(date: pickedDate)
-        if network.lessonCount == 0 {
-            timeTableSeparator.isHidden = true
-            weekEndImage.isHidden = false
-        } else {
-            timeTableSeparator.isHidden = false
-            weekEndImage.isHidden = true
+        self.lessonCount = network.lessonCount
+        print("table created, lesson count =", self.lessonCount)
+        if self.lessonCount == 0 {
+            return 1
         }
-        print("table created, lesson count =", network.lessonCount)
-        return network.lessonCount
+        return self.lessonCount
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
-        cell.lessonView.layer.cornerRadius = 15
-        cell.makeNote.layer.cornerRadius = 15
-        cell.turnAlarm.layer.cornerRadius = 15
-        network.configureCell(cell: cell, for: indexPath, date: pickedDate)
-        cell.selectionStyle = .none
-        return cell
+        if self.lessonCount == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "WeekendTableCell") as! WeekendCell
+            tableView.allowsSelection = false
+            timeTableSeparator.isHidden = true
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
+            tableView.allowsSelection = true
+            network.configureCell(cell: cell, for: indexPath, date: pickedDate)
+            timeTableSeparator.isHidden = false
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

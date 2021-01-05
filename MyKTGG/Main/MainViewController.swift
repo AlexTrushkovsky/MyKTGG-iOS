@@ -36,6 +36,7 @@ class MainViewController: UIViewController {
         self.navigationController?.pushViewController(vc!, animated: true)
     }
     @IBOutlet weak var chatButton: UIButton!
+    @IBOutlet weak var weatherHeightConstraint: NSLayoutConstraint!
     
     
     override func viewDidLoad() {
@@ -49,7 +50,15 @@ class MainViewController: UIViewController {
         search.layer.cornerRadius = 15
         chat.layer.cornerRadius = 15
         weatherBackgroundView.layer.cornerRadius = 15
+        let height = view.frame.height
+        if height == 568 {
+            weatherDescription.isHidden = true
+            weatherHeightConstraint.constant = 38
+            
+        }
+        print("Available height = \(height)")
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         UIView.animate(withDuration: 1) {
             self.search.imageView?.transform = CGAffineTransform(rotationAngle: .pi)
@@ -134,11 +143,13 @@ class MainViewController: UIViewController {
             weatherIcon.alpha = 0
             weatherTempLabel.alpha = 0
             weatherDescription.alpha = 0
+            weatherBackgroundView.alpha = 0
         } else {
             UIImageView.animate(withDuration: 0.3) {
                 self.weatherIcon.alpha = 1
                 self.weatherTempLabel.alpha = 1
                 self.weatherDescription.alpha = 1
+                self.weatherBackgroundView.alpha = 1
             }
         }
     }

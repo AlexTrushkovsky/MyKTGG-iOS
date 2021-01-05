@@ -20,6 +20,14 @@ class GroupChooseViewController: UIViewController {
     let user = Auth.auth().currentUser
     lazy var groupNumChoosen = group[0]
     
+    func transliterate(nonLatin: String) -> String {
+        return nonLatin
+            .applyingTransform(.toLatin, reverse: false)?
+            .applyingTransform(.stripDiacritics, reverse: false)?
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "") ?? nonLatin
+    }
+    
     @IBAction func doneButtonAction(_ sender: UIButton) {
         if !group.isEmpty{
             let groupName = "\(groupNumChoosen)"
@@ -32,6 +40,16 @@ class GroupChooseViewController: UIViewController {
                     print("Data saved succesfully!")
                     print(groupName)
                     UserDefaults.standard.set(groupName, forKey: "group")
+                    let transliterated = self.transliterate(nonLatin: groupName)
+                    Messaging.messaging().subscribe(toTopic: transliterated) { error in
+                        if let oldTopic = UserDefaults.standard.object(forKey: "subsctibedTopic") as? String {
+                            Messaging.messaging().unsubscribe(fromTopic: oldTopic) { error in
+                                print("Unsubscribed from \(oldTopic)")
+                            }
+                        }
+                        UserDefaults.standard.set(transliterated, forKey: "subsctibedTopic")
+                        print("Subscribed to \(transliterated) pushes")
+                    }
                     self.dismiss(animated: true, completion: nil)
                 }
             }
@@ -59,8 +77,6 @@ class GroupChooseViewController: UIViewController {
         super.viewDidLoad()
         doneButton.layer.cornerRadius = doneButton.bounds.height/2
         groupPicker.delegate = self
-        let groupCheck = GroupNetworkController()
-        group = groupCheck.fetchData()
         selectCurrentGroupOnPicker()
     }
     
