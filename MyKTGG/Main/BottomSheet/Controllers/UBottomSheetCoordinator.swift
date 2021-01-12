@@ -66,7 +66,7 @@ public class UBottomSheetCoordinator {
      */
     public init(parent: UIViewController, delegate: UBottomSheetCoordinatorDelegate? = nil) {
         self.parent = parent
-        self.dataSource = parent
+        self.dataSource = parent as? UBottomSheetCoordinatorDataSource
         self.delegate = delegate
         
         minSheetPosition = dataSource.sheetPositions(availableHeight).min()

@@ -11,64 +11,103 @@ import AVFoundation
 import StoreKit
 
 class MainViewController: UIViewController {
-    let weather = weatherController()
     
+    let weather = weatherController()
     var sheetCoordinator: UBottomSheetCoordinator!
     var sheetVC = ListViewController()
     var dataSource: UBottomSheetCoordinatorDataSource?
+    var alertStatus = AlertStatus.alert
     
+    @IBOutlet weak var whitePlaceholder: UIView!
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var weatherTempLabel: UILabel!
     @IBOutlet weak var weatherDescription: UILabel!
     @IBOutlet weak var mainImage: UIImageView!
-    @IBOutlet weak var search: UIButton!
+    @IBOutlet weak var websiteButton: UIButton!
     @IBOutlet weak var weatherBackgroundView: UIView!
-    @IBOutlet weak var chat: UIButton!
-    
-    //MARK: - Search Button
-    @IBAction func searchButton(_ sender: UIButton) {
+    @IBOutlet weak var chatButton: UIButton!
+    @IBOutlet weak var weatherHeightConstraint: NSLayoutConstraint!
+
+    @IBAction func websiteButton(_ sender: UIButton) {
         if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
             UIApplication.shared.open(url)
         }
     }
     @IBAction func chatButton(_ sender: Any) {
-        let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "chat") as? ChatVC
-        self.navigationController?.pushViewController(vc!, animated: true)
+        self.setAlert(type: .alert)
+        self.alertView.setText(title: "Працюємо", subTitle: "Наразі чат в розробці", body: "очікуйте в настпних версіях")
+        self.animateIn()
+//        let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "chat") as? ChatVC
+//        self.navigationController?.pushViewController(vc!, animated: true)
     }
-    @IBOutlet weak var chatButton: UIButton!
-    @IBOutlet weak var weatherHeightConstraint: NSLayoutConstraint!
     
+    private lazy var alertView: CustomAlert = {
+            let alertView: CustomAlert = CustomAlert.loadFromNib()
+            alertView.delegate = self
+            return alertView
+        }()
+        
+        let visualEffectView: UIVisualEffectView = {
+            let blurEffect = UIBlurEffect(style: .dark)
+            let view = UIVisualEffectView(effect: blurEffect)
+            view.translatesAutoresizingMaskIntoConstraints = false
+            return view
+        }()
+    
+    func turnGestures(bool: Bool) {
+        guard let gestures = view.gestureRecognizers else { return }
+        for gesture in gestures {
+            gesture.isEnabled = bool
+        }
+    }
+    
+    func setupVisualEffectView() {
+        view.addSubview(visualEffectView)
+        visualEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        visualEffectView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        visualEffectView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        visualEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        visualEffectView.alpha = 0
+    }
+    
+    func setAlert(type: AlertStatus) {
+        self.tabBarController?.setTabBarVisible(visible: false, animated: true)
+        alertView = CustomAlert.loadFromNib()
+        alertView.delegate = self
+        self.alertStatus = type
+        view.addSubview(alertView)
+        alertView.center = view.center
+        alertView.setStyle(type: type)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
+        setupVisualEffectView()
         addWeatherUpdateObserver()
         makeElementsTransparent(bool: true)
         makeWeatherTransparent(bool: true)
-        getAutoPromotionInfo()
         EnterCount()
-        search.layer.cornerRadius = 15
-        chat.layer.cornerRadius = 15
+        websiteButton.layer.cornerRadius = 15
+        chatButton.layer.cornerRadius = 15
         weatherBackgroundView.layer.cornerRadius = 15
         let height = view.frame.height
-        if height == 568 {
+        if height <= 568 {
             weatherDescription.isHidden = true
             weatherHeightConstraint.constant = 38
             
         }
-        print("Available height = \(height)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
         UIView.animate(withDuration: 1) {
-            self.search.imageView?.transform = CGAffineTransform(rotationAngle: .pi)
-            self.search.imageView?.transform = CGAffineTransform(rotationAngle: .pi * 2)
+            self.websiteButton.imageView?.transform = CGAffineTransform(rotationAngle: .pi)
+            self.websiteButton.imageView?.transform = CGAffineTransform(rotationAngle: .pi * 2)
         }
         makeElementsTransparent(bool: false)
-        weather.fetchData()
-    }
-    override func viewWillLayoutSubviews() {
         setupBottomSheet()
+        weather.fetchData()
+        whitePlaceholder.isHidden = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -93,6 +132,8 @@ class MainViewController: UIViewController {
         sheetCoordinator.addSheet(vc, to: self, didContainerCreate: { container in
             let f = self.view.frame
             let rect = CGRect(x: f.minX, y: f.minY, width: f.width, height: f.height)
+            print("height: \(f.height)")
+            print("width: \(f.width)")
             container.roundCorners(corners: [.topLeft, .topRight], radius: 30, rect: rect)
         })
     }
@@ -128,12 +169,14 @@ class MainViewController: UIViewController {
     //MARK: - Make elements transparent before view appear
     func makeElementsTransparent(bool: Bool) {
         if bool {
+            chatButton.alpha = 0
             mainImage.alpha = 0
-            search.alpha = 0
+            websiteButton.alpha = 0
         } else {
             UIView.animate(withDuration: 0.2) {
                 self.mainImage.alpha = 1
-                self.search.alpha = 1
+                self.websiteButton.alpha = 1
+                self.chatButton.alpha = 1
             }
         }
     }
@@ -165,37 +208,44 @@ class MainViewController: UIViewController {
             UserDefaults.standard.set(1, forKey: "EnterCount")
         }
     }
-    //MARK: - Get promotion info BETA
-    func getAutoPromotionInfo() {
-        guard let status = Bool(UserDefaults.standard.object(forKey: "AutoPromStatus") as? String ?? "") else { return }
-        if status {
-            let today = Date()
-            let year = Calendar.current.component(.year, from: Date())
-            guard let firstOfSepCurrentYear = Calendar.current.date(from: DateComponents(year: year, month: 9, day: 1)) else { return }
-            if today == firstOfSepCurrentYear {
-                guard let group = UserDefaults.standard.object(forKey: "group") as? String else { return }
-                guard let groupNum = Int(group.numbersOnly) else { return }
-                guard let groupLetters = Int(group.trimmingCharacters(in: .decimalDigits)) else { return }
-                if groupNum/10<=5{
-                    let newGroup = groupNum*10+groupLetters
-                    print(newGroup)
-                    UserDefaults.standard.set(newGroup, forKey: "group")
-                }
-                print("user got promoted!")
+}
+extension MainViewController: CustomAlertDelegate {
+    func cancelAction() {
+        animateOut()
+    }
+    
+    func okAction() {
+        animateOut()
+    }
+    
+    func animateIn() {
+            
+            turnGestures(bool: false)
+            alertView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
+            alertView.alpha = 0
+            
+            UIView.animate(withDuration: 0.3) {
+                self.sheetVC.view.alpha = 0
+                self.whitePlaceholder.alpha = 0
+                self.visualEffectView.alpha = 1
+                self.alertView.alpha = 1
+                self.alertView.transform = CGAffineTransform.identity
+                
             }
         }
-    }
-    //MARK: - Setup bottom view
-}
-extension String {
-    
-    var numbersOnly: String {
         
-        let numbers = self.replacingOccurrences(
-            of: "[^0-9]",
-            with: "",
-            options: .regularExpression,
-            range:nil)
-        return numbers
-    }
+        func animateOut() {
+            
+            turnGestures(bool: true)
+            UIView.animate(withDuration: 0.3, animations: {
+                self.sheetVC.view.alpha = 1
+                self.whitePlaceholder.alpha = 1
+                self.visualEffectView.alpha = 0
+                self.alertView.alpha = 0
+                self.alertView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
+                self.tabBarController?.setTabBarVisible(visible: true, animated: false)
+            }) { (_) in
+                self.alertView.removeFromSuperview()
+            }
+        }
 }

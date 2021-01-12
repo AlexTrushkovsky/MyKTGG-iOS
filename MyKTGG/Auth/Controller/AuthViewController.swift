@@ -11,7 +11,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         return self.view.window!
     }
     
-    @IBOutlet weak var AuthLabel: UIImageView!
+    @IBOutlet weak var AuthLabel: UIView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var nameTextFieldView: UIView!
     @IBOutlet weak var emailTextField: UITextField!
@@ -24,21 +24,18 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     @IBOutlet weak var signInWithGoogleButton: GIDSignInButton!
     @IBOutlet weak var RegisterButton: UIButton!
     @IBOutlet weak var LoginSubButton: UIButton!
-    @IBOutlet weak var ActivityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var darkView: UIView!
+    @IBOutlet weak var shadowView: UIView!
     
     // Sign/Log in Switch
     var signup:Bool = true{
         willSet{
             if newValue{
-                AuthLabel.image = UIImage(named: "createAccountTitle")
-                RegisterButton.setImage(UIImage(named: "registerButton"), for: .normal)
+                RegisterButton.setTitle("ЗАРЕЄСТРУВАТИ", for: .normal)
                 nameTextFieldView.isHidden=false
                 LoginSubButton.setTitle("Увійти", for: .normal)
             }else{
-                AuthLabel.image = UIImage(named: "logInTitle")
                 nameTextFieldView.isHidden=true
-                RegisterButton.setImage(UIImage(named: "loginButton"), for: .normal)
+                RegisterButton.setTitle("УВІЙТИ", for: .normal)
                 LoginSubButton.setTitle("Зареєструватися", for: .normal)
             }
         }
@@ -52,9 +49,39 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     
     fileprivate var currentNonce: String?
     
+    func setLabel(view: UIView, text: String) {
+        let gradient = CAGradientLayer()
+        gradient.colors = [UIColor(red: 0.07, green: 0.57, blue: 0.67, alpha: 1.00).cgColor, UIColor(red: 0.29, green: 0.69, blue: 0.47, alpha: 1.00).cgColor]
+        gradient.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1.0, y: 0.5)
+        gradient.frame = view.bounds
+        view.layer.addSublayer(gradient)
+        let label = UILabel(frame: view.bounds)
+        label.text = text
+        label.font = UIFont(name: "SourceSansPro-Bold", size: 30)
+        label.textAlignment = .center
+        label.layer.shadowOffset = .zero
+        label.layer.shadowRadius = 3
+        label.layer.shadowOpacity = 0.3
+        label.layer.masksToBounds = false
+        label.layer.shouldRasterize = true
+        label.layer.shadowColor = UIColor(red: 0.02, green: 0.58, blue: 0.26, alpha: 1).cgColor
+        view.addSubview(label)
+        view.mask = label
+    }
+    
     func makeUpdateNotifications() {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        shadowView.layer.cornerRadius = 36
+        shadowView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        shadowView.layer.shadowColor = UIColor.black.cgColor
+        shadowView.layer.shadowOffset = .zero
+        shadowView.layer.shadowRadius = 20
+        shadowView.layer.shadowOpacity = 0.2
     }
     
     override func viewDidLoad() {
@@ -70,7 +97,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         emailTextFieldView.layer.cornerRadius = 15
         passwordTextField.delegate = self
         passwordTextFieldView.layer.cornerRadius = 15
-        
+        RegisterButton.applyGradient(colors: [CustomButton.UIColorFromRGB(0x4BB179).cgColor,CustomButton.UIColorFromRGB(0x1291AB).cgColor])
         nameTextField.attributedPlaceholder = NSAttributedString(string: "ім'я та призвіще",
                                                                  attributes: [NSAttributedString.Key.foregroundColor: UIColor (red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)])
         emailTextField.attributedPlaceholder = NSAttributedString(string: "email",
@@ -81,25 +108,22 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance()?.presentingViewController = self
         hideKeyboardWhenTappedAround()
-        darkView.isHidden=true
-        ActivityIndicator.isHidden=true
         self.microsoftProvider = OAuthProvider(providerID: "microsoft.com")
     }
+    
+    override func viewWillLayoutSubviews() {
+        if signup {
+            setLabel(view: AuthLabel, text: "Зареєструватися")
+        } else {
+            setLabel(view: AuthLabel, text: "Увійти")
+        }
+        
+    }
+    
     func showAlert(title: String, message: String){
-        stopWaitingAnimation()
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "ОК",style: .default))
         present(alert, animated: true, completion: nil)
-    }
-    func startWaitingAnimation(){
-        darkView.isHidden=false
-        ActivityIndicator.startAnimating()
-        ActivityIndicator.isHidden = false
-    }
-    func stopWaitingAnimation(){
-        darkView.isHidden=true
-        ActivityIndicator.stopAnimating()
-        ActivityIndicator.isHidden = true
     }
     
     @IBAction func forgotPasswordAction(_ sender: UIButton) {
@@ -121,7 +145,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 print("isCanceled")
             }else{
                 if error == nil{
-                    self.startWaitingAnimation()
                     GraphRequest(graphPath: "me", parameters: ["fields":"email,name"], tokenString: AccessToken.current?.tokenString, version: nil, httpMethod: HTTPMethod(rawValue: "GET")).start(completionHandler: {
                         (nil, result, error) in
                         if error == nil{
@@ -132,7 +155,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                                     print(result?.user.uid as Any)
                                     let avatarMethods = AvatarMethods()
                                     avatarMethods.getAvatarFromFacebookAcc()
-                                    self.stopWaitingAnimation()
                                     self.makeUpdateNotifications()
                                     self.checkGroupInfoFromFirebase()
                                     self.dismiss(animated: true, completion: nil)
@@ -193,7 +215,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
             
             let userID = Auth.auth().currentUser?.uid
             let db = Database.database().reference().child("users")
-            db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+            db.child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
                 let value = snapshot.value as? NSDictionary
                 let name = value?["name"] as? String ?? ""
                 
@@ -201,7 +223,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     UserDefaults.standard.set(name, forKey: "name")
                     print("Teams name:",name)
                 } else {
-                    db.child(userID!).updateChildValues(["name":userName]) {
+                    db.child(userID!).child("public").updateChildValues(["name":userName]) {
                         (error: Error?, ref:DatabaseReference) in
                         if let error = error {
                             print("Data could not be saved: \(error).")
@@ -229,7 +251,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
             
             let userID = Auth.auth().currentUser?.uid
             let db = Database.database().reference()
-            db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+            db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
                 let value = snapshot.value as? NSDictionary
                 let group = value?["group"] as? String ?? ""
                 let subGroup = value?["subgroup"] as? Int ?? 0
@@ -242,7 +264,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     print("setUserDefaults group:",groupName)
                     let ref = Database.database().reference().child("users")
                     let user = Auth.auth().currentUser
-                    ref.child(user!.uid).updateChildValues(["group":groupName]) {
+                    ref.child(user!.uid).child("public").updateChildValues(["group":groupName]) {
                         (error: Error?, ref:DatabaseReference) in
                         if let error = error {
                             print("Data could not be saved: \(error).")
@@ -258,7 +280,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 
                 UserDefaults.standard.set(subGroup, forKey: "subGroup")
                 print("getUserDefaults subGroup:",subGroup)
-                NotificationCenter.default.post(name: NSNotification.Name("setUserLabels"), object: nil)
             }) { (error) in
                 print(error.localizedDescription)
             }
@@ -284,7 +305,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     case .success(let url):
                         let ref = Database.database().reference().child("users")
                         let user = Auth.auth().currentUser
-                        ref.child(user!.uid).updateChildValues(["avatarUrl":"\(url)"]) {
+                        ref.child(user!.uid).child("public").updateChildValues(["avatarUrl":"\(url)"]) {
                             (error: Error?, ref:DatabaseReference) in
                             if let error = error {
                                 print("Data could not be saved: \(error).")
@@ -298,6 +319,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 }
             } else {
                 print("Failed to get avatar from teams")
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateAvatar"), object: nil)
             }
         }.resume()
     }
@@ -306,11 +328,10 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     func checkGroupInfoFromFirebase() {
         let userID = Auth.auth().currentUser?.uid
         let db = Database.database().reference()
-        db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             
-            if value?["group"] as? String != nil {
-                let group = value!["group"] as! String
+            if let group = value?["group"] as? String {
                 UserDefaults.standard.set(group, forKey: "group")
                 print("set group from firebase:",group)
             } else {
@@ -319,10 +340,9 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 return
             }
             
-            if value?["subgroup"] as? Int != nil {
-                let subGroup = value!["subgroup"] as! Int
-                UserDefaults.standard.set(subGroup, forKey: "subGroup")
-                print("set subgroup from firebase:",subGroup)
+            if let userType = value?["isStudent"] as? Int {
+                UserDefaults.standard.set(userType, forKey: "isStudent")
+                print("set userType from firebase:",userType)
             } else {
                 print("goto groupChooseVC")
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
@@ -336,7 +356,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     
     
     @IBAction func regOrLogButton(_ sender: UIButton) {
-        startWaitingAnimation()
         if (signup){
             guard !nameTextField.text!.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
@@ -368,8 +387,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                         changeRequest?.displayName = self.name
                         changeRequest?.commitChanges { (error) in }
-                        ref.child(result.user.uid).updateChildValues(["name":self.name,"email":self.email,"perm":0])
-                        self.stopWaitingAnimation()
+                        ref.child(result.user.uid).child("public").updateChildValues(["name":self.name,"email":self.email,"perm":0])
                         self.checkGroupInfoFromFirebase()
                         self.makeUpdateNotifications()
                         self.dismiss(animated: true, completion: nil)
@@ -379,7 +397,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 }else{
                     print(error!._code)
                     self.handleError(error!)
-                    self.stopWaitingAnimation()
                 }
             }
         }else{
@@ -401,10 +418,8 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     let user = Auth.auth().currentUser
                     self.name = user?.displayName ?? "Невідомий"
                     self.email = user?.email ?? "no email"
-                    self.stopWaitingAnimation()
                     self.dismiss(animated: true, completion: nil)
                 }else{
-                    self.stopWaitingAnimation()
                     print(error!._code)
                     self.handleError(error!)
                     
@@ -444,10 +459,8 @@ extension AuthViewController:UITextFieldDelegate{
 //  Google SignIn
 extension AuthViewController: GIDSignInDelegate{
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        startWaitingAnimation()
         if let error = error {
             print("Failed to log into Google: ", error)
-            stopWaitingAnimation()
             return
         }
         print("Succesfuly logged into Google")
@@ -463,7 +476,6 @@ extension AuthViewController: GIDSignInDelegate{
             avatarMethods.getAvatarFromGoogleAcc()
             print("Successfully logged into Firebase with Google")
             self.getGoogleAccName(user: user)
-            self.stopWaitingAnimation()
             self.checkGroupInfoFromFirebase()
             self.makeUpdateNotifications()
             self.dismiss(animated: true, completion: nil)

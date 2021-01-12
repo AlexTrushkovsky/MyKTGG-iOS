@@ -29,7 +29,7 @@ class NewsTableViewController: UITableViewController {
     func setupTableView() {
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         tableView.refreshControl = refControl
-        refControl.addTarget(self, action: #selector(refreshNews(_:)), for: .valueChanged)
+        refControl.addTarget(self, action: #selector(refreshNews), for: .valueChanged)
         //refControl.attributedTitle = NSAttributedString(string: "Потягніть для оновлення")
         let spinner = UIActivityIndicatorView()
         spinner.startAnimating()
@@ -40,7 +40,7 @@ class NewsTableViewController: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
     }
     
-    @objc private func refreshNews(_ sender: Any) {
+    @objc private func refreshNews() {
         limit = 15
         countOfNews = 0
         fetchData(limit: limit)

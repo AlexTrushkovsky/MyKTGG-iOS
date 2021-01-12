@@ -18,7 +18,6 @@
 		6E1600D924ED3E2D001DE4B1 /* UBottomSheetCoordinatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600C824ED3E28001DE4B1 /* UBottomSheetCoordinatorDelegate.swift */; };
 		6E1600DA24ED3E2D001DE4B1 /* Animatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600C924ED3E29001DE4B1 /* Animatable.swift */; };
 		6E1600DB24ED3E2D001DE4B1 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600CA24ED3E29001DE4B1 /* ListViewController.swift */; };
-		6E1600DC24ED3E2D001DE4B1 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600CB24ED3E2A001DE4B1 /* Extensions.swift */; };
 		6E1600DD24ED3E2D001DE4B1 /* DefaultSheetAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600CC24ED3E2B001DE4B1 /* DefaultSheetAnimator.swift */; };
 		6E1600DE24ED3E2D001DE4B1 /* ListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6E1600CD24ED3E2B001DE4B1 /* ListViewController.xib */; };
 		6E1600DF24ED3E2D001DE4B1 /* PassThroughView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600CE24ED3E2C001DE4B1 /* PassThroughView.swift */; };
@@ -26,21 +25,16 @@
 		6E1600E124ED3E2D001DE4B1 /* UBottomSheetCoordinatorDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600D024ED3E2D001DE4B1 /* UBottomSheetCoordinatorDataSource.swift */; };
 		6E1600E724EE50E6001DE4B1 /* BottomSheetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600E624EE50E6001DE4B1 /* BottomSheetModel.swift */; };
 		6E1600E924EE53A0001DE4B1 /* BottomSheetContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1600E824EE53A0001DE4B1 /* BottomSheetContentController.swift */; };
-		6E1726DD24FE228A003F317D /* TimeTableExtentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1726DC24FE228A003F317D /* TimeTableExtentions.swift */; };
 		6E28154D24D9482E00389F90 /* CustomAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6E28154C24D9482E00389F90 /* CustomAlert.xib */; };
 		6E28154F24D9523700389F90 /* CustomAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E28154E24D9523700389F90 /* CustomAlert.swift */; };
 		6E28155124D9548800389F90 /* nib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E28155024D9548800389F90 /* nib.swift */; };
 		6E3633312447602300918364 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3633302447602300918364 /* SettingsViewController.swift */; };
 		6E363334244A474700918364 /* NewsWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E363333244A474700918364 /* NewsWebView.swift */; };
 		6E457B3E2588DFFB00148EFE /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E457B3D2588DFFB00148EFE /* ChatVC.swift */; };
-		6E4A4503246FD48000E5D573 /* ChangeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4A4502246FD48000E5D573 /* ChangeController.swift */; };
 		6E5AB9882596063B0042F877 /* NewTimetableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5AB9872596063B0042F877 /* NewTimetableModel.swift */; };
-		6E5AB98C25960A770042F877 /* NewTimetableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5AB98B25960A770042F877 /* NewTimetableController.swift */; };
-		6E624AA524EC799600CFE205 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 6E624AA424EC799600CFE205 /* FacebookLogin */; };
-		6E624AA724EC799600CFE205 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6E624AA624EC799600CFE205 /* FacebookCore */; };
+		6E5AB98C25960A770042F877 /* TimetableNetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5AB98B25960A770042F877 /* TimetableNetworkController.swift */; };
 		6E624AAA24EC79B500CFE205 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 6E624AA924EC79B500CFE205 /* Alamofire */; };
 		6E624AAD24EC79CF00CFE205 /* AlamofireImage in Frameworks */ = {isa = PBXBuildFile; productRef = 6E624AAC24EC79CF00CFE205 /* AlamofireImage */; };
-		6E624AAE24EC7A7900CFE205 /* TimeTableNetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EABD26F24656DBC009CE27F /* TimeTableNetworkController.swift */; };
 		6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E76256D2403F6C100C68C7F /* AppDelegate.swift */; };
 		6E7625722403F6C100C68C7F /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7625712403F6C100C68C7F /* MainViewController.swift */; };
 		6E76257A2403F6C200C68C7F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E7625782403F6C200C68C7F /* LaunchScreen.storyboard */; };
@@ -62,7 +56,6 @@
 		6E9E2C762468781700AFC756 /* UIView+Nib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C6A2468781700AFC756 /* UIView+Nib.swift */; };
 		6E9E2C772468781700AFC756 /* DateScrollItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C6B2468781700AFC756 /* DateScrollItem.swift */; };
 		6E9E2C782468781700AFC756 /* UICollectionView+Fade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C6C2468781700AFC756 /* UICollectionView+Fade.swift */; };
-		6E9E2C792468781700AFC756 /* Date+Days.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C6D2468781700AFC756 /* Date+Days.swift */; };
 		6E9E2C7A2468781700AFC756 /* DateScrollPickerFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C6E2468781700AFC756 /* DateScrollPickerFormat.swift */; };
 		6E9E2C7C2468781700AFC756 /* DateScrollPicker+Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C702468781700AFC756 /* DateScrollPicker+Protocols.swift */; };
 		6E9E2C7D2468781700AFC756 /* DateScrollPicker.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6E9E2C712468781700AFC756 /* DateScrollPicker.xib */; };
@@ -75,8 +68,10 @@
 		6EABFF0725A0C1C80021AF06 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDF7B0F25A0BF2100B14F61 /* NotificationService.swift */; };
 		6EB7D9BC25928DBD004BEFEB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6EB7D9BB25928DBD004BEFEB /* GoogleService-Info.plist */; };
 		6EC3369B259C6ED30014C993 /* WeekendCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC3369A259C6ED30014C993 /* WeekendCell.swift */; };
+		6ECC1E4625A6552D007624BC /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECC1E4525A6552D007624BC /* CustomButton.swift */; };
+		6ECC1E5425A73274007624BC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ECC1E5325A73274007624BC /* Extensions.swift */; };
 		6ECC5AEA243E3728006E456A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6ECC5AE9243E3728006E456A /* Main.storyboard */; };
-		6ED9F420245C401100417F69 /* TimeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED9F41F245C401100417F69 /* TimeTableViewController.swift */; };
+		6ED9F420245C401100417F69 /* TimetableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED9F41F245C401100417F69 /* TimetableViewController.swift */; };
 		6EDF7B1025A0BF2100B14F61 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDF7B0F25A0BF2100B14F61 /* NotificationService.swift */; };
 		6EDF7B1425A0BF2100B14F61 /* NotificationService.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 6EDF7B0D25A0BF2100B14F61 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6EF0F5DA25954A6200D6020E /* GroupNetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF0F5D925954A6200D6020E /* GroupNetworkController.swift */; };
@@ -121,7 +116,6 @@
 		6E1600C824ED3E28001DE4B1 /* UBottomSheetCoordinatorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UBottomSheetCoordinatorDelegate.swift; sourceTree = "<group>"; };
 		6E1600C924ED3E29001DE4B1 /* Animatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animatable.swift; sourceTree = "<group>"; };
 		6E1600CA24ED3E29001DE4B1 /* ListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
-		6E1600CB24ED3E2A001DE4B1 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		6E1600CC24ED3E2B001DE4B1 /* DefaultSheetAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSheetAnimator.swift; sourceTree = "<group>"; };
 		6E1600CD24ED3E2B001DE4B1 /* ListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ListViewController.xib; sourceTree = "<group>"; };
 		6E1600CE24ED3E2C001DE4B1 /* PassThroughView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassThroughView.swift; sourceTree = "<group>"; };
@@ -129,17 +123,15 @@
 		6E1600D024ED3E2D001DE4B1 /* UBottomSheetCoordinatorDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UBottomSheetCoordinatorDataSource.swift; sourceTree = "<group>"; };
 		6E1600E624EE50E6001DE4B1 /* BottomSheetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetModel.swift; sourceTree = "<group>"; };
 		6E1600E824EE53A0001DE4B1 /* BottomSheetContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetContentController.swift; sourceTree = "<group>"; };
-		6E1726DC24FE228A003F317D /* TimeTableExtentions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableExtentions.swift; sourceTree = "<group>"; };
 		6E28154C24D9482E00389F90 /* CustomAlert.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomAlert.xib; sourceTree = "<group>"; };
 		6E28154E24D9523700389F90 /* CustomAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlert.swift; sourceTree = "<group>"; };
 		6E28155024D9548800389F90 /* nib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nib.swift; sourceTree = "<group>"; };
 		6E3633302447602300918364 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		6E363333244A474700918364 /* NewsWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsWebView.swift; sourceTree = "<group>"; };
 		6E457B3D2588DFFB00148EFE /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
-		6E4A4502246FD48000E5D573 /* ChangeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeController.swift; sourceTree = "<group>"; };
 		6E51B04B258B3F5B00A57B60 /* Мій КТГГDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Мій КТГГDebug.entitlements"; sourceTree = "<group>"; };
 		6E5AB9872596063B0042F877 /* NewTimetableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTimetableModel.swift; sourceTree = "<group>"; };
-		6E5AB98B25960A770042F877 /* NewTimetableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTimetableController.swift; sourceTree = "<group>"; };
+		6E5AB98B25960A770042F877 /* TimetableNetworkController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimetableNetworkController.swift; sourceTree = "<group>"; };
 		6E76256A2403F6C100C68C7F /* Мій КТГГ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Мій КТГГ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E76256D2403F6C100C68C7F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6E7625712403F6C100C68C7F /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -162,7 +154,6 @@
 		6E9E2C6A2468781700AFC756 /* UIView+Nib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Nib.swift"; sourceTree = "<group>"; };
 		6E9E2C6B2468781700AFC756 /* DateScrollItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateScrollItem.swift; sourceTree = "<group>"; };
 		6E9E2C6C2468781700AFC756 /* UICollectionView+Fade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Fade.swift"; sourceTree = "<group>"; };
-		6E9E2C6D2468781700AFC756 /* Date+Days.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Days.swift"; sourceTree = "<group>"; };
 		6E9E2C6E2468781700AFC756 /* DateScrollPickerFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateScrollPickerFormat.swift; sourceTree = "<group>"; };
 		6E9E2C702468781700AFC756 /* DateScrollPicker+Protocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DateScrollPicker+Protocols.swift"; sourceTree = "<group>"; };
 		6E9E2C712468781700AFC756 /* DateScrollPicker.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DateScrollPicker.xib; sourceTree = "<group>"; };
@@ -174,12 +165,13 @@
 		6EA55BEB24EC7D8D00937B03 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6EABD26B2464D142009CE27F /* UserEditorTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEditorTableViewController.swift; sourceTree = "<group>"; };
 		6EABD26D2464E78D009CE27F /* AvatarMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarMethods.swift; sourceTree = "<group>"; };
-		6EABD26F24656DBC009CE27F /* TimeTableNetworkController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableNetworkController.swift; sourceTree = "<group>"; };
 		6EABFF0A25A0C2000021AF06 /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		6EB7D9BB25928DBD004BEFEB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6EC3369A259C6ED30014C993 /* WeekendCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekendCell.swift; sourceTree = "<group>"; };
+		6ECC1E4525A6552D007624BC /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		6ECC1E5325A73274007624BC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		6ECC5AE9243E3728006E456A /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		6ED9F41F245C401100417F69 /* TimeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableViewController.swift; sourceTree = "<group>"; };
+		6ED9F41F245C401100417F69 /* TimetableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimetableViewController.swift; sourceTree = "<group>"; };
 		6EDF7B0D25A0BF2100B14F61 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EDF7B0F25A0BF2100B14F61 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		6EDF7B1125A0BF2100B14F61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -192,10 +184,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E624AA524EC799600CFE205 /* FacebookLogin in Frameworks */,
 				6E624AAA24EC79B500CFE205 /* Alamofire in Frameworks */,
 				6E624AAD24EC79CF00CFE205 /* AlamofireImage in Frameworks */,
-				6E624AA724EC799600CFE205 /* FacebookCore in Frameworks */,
 				FE9C2AC18D39F2AA60535605 /* libPods-MyKTGG.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -239,6 +229,7 @@
 		6E1600BE24ED3DF6001DE4B1 /* BottomSheet */ = {
 			isa = PBXGroup;
 			children = (
+				6E1600E524EE5096001DE4B1 /* Model */,
 				6E1600E424ED4BFB001DE4B1 /* Controllers */,
 				6E1600E324ED4BC4001DE4B1 /* Helpers */,
 				6E1600E224ED4B96001DE4B1 /* View */,
@@ -270,7 +261,6 @@
 			children = (
 				6E1600CC24ED3E2B001DE4B1 /* DefaultSheetAnimator.swift */,
 				6E1600CF24ED3E2C001DE4B1 /* Draggable.swift */,
-				6E1600CB24ED3E2A001DE4B1 /* Extensions.swift */,
 				6E1600CE24ED3E2C001DE4B1 /* PassThroughView.swift */,
 				6E1600C924ED3E29001DE4B1 /* Animatable.swift */,
 			);
@@ -287,21 +277,13 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		6E1600E524EE5096001DE4B1 /* BottomSheetModel */ = {
+		6E1600E524EE5096001DE4B1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				6E1600E624EE50E6001DE4B1 /* BottomSheetModel.swift */,
 				6E1600E824EE53A0001DE4B1 /* BottomSheetContentController.swift */,
 			);
-			path = BottomSheetModel;
-			sourceTree = "<group>";
-		};
-		6E1726DB24FE226C003F317D /* Extentions */ = {
-			isa = PBXGroup;
-			children = (
-				6E1726DC24FE228A003F317D /* TimeTableExtentions.swift */,
-			);
-			path = Extentions;
+			path = Model;
 			sourceTree = "<group>";
 		};
 		6E28154B24D947FD00389F90 /* CustomAlert */ = {
@@ -329,7 +311,6 @@
 				6E457B3C2588DFD900148EFE /* Chat */,
 				6E114AFE24C19B0B00CC78FB /* Weather */,
 				6E1600BE24ED3DF6001DE4B1 /* BottomSheet */,
-				6E1600E524EE5096001DE4B1 /* BottomSheetModel */,
 				6E7625712403F6C100C68C7F /* MainViewController.swift */,
 			);
 			path = Main;
@@ -356,7 +337,7 @@
 		6E3CD3A9245E37EC0028A340 /* TimeTable */ = {
 			isa = PBXGroup;
 			children = (
-				6E1726DB24FE226C003F317D /* Extentions */,
+				6ECC1E4D25A731AA007624BC /* Cell */,
 				6E9E2C672468778700AFC756 /* DatePicker */,
 				6EABD2622464AC75009CE27F /* Model */,
 				6EABD25E2464AC17009CE27F /* Controller */,
@@ -378,15 +359,6 @@
 				6E457B3D2588DFFB00148EFE /* ChatVC.swift */,
 			);
 			path = Chat;
-			sourceTree = "<group>";
-		};
-		6E64ACFA259D218500ED95B3 /* old */ = {
-			isa = PBXGroup;
-			children = (
-				6E4A4502246FD48000E5D573 /* ChangeController.swift */,
-				6EABD26F24656DBC009CE27F /* TimeTableNetworkController.swift */,
-			);
-			path = old;
 			sourceTree = "<group>";
 		};
 		6E7625612403F6C100C68C7F = {
@@ -412,9 +384,9 @@
 		6E76256C2403F6C100C68C7F /* MyKTGG */ = {
 			isa = PBXGroup;
 			children = (
-				6EA16BDC25920594002530B4 /* Мій КТГГ.entitlements */,
-				6E51B04B258B3F5B00A57B60 /* Мій КТГГDebug.entitlements */,
+				6ECC1E5225A7325F007624BC /* Extensions */,
 				6E28154B24D947FD00389F90 /* CustomAlert */,
+				6ECC1E4425A6550F007624BC /* CustomButton */,
 				6E3633322447604E00918364 /* Helpers */,
 				6E7625912403F99E00C68C7F /* Assets */,
 				6EABD2592464AA73009CE27F /* Application */,
@@ -424,6 +396,8 @@
 				6E3CD3A7245E37D50028A340 /* Auth */,
 				6E3CD3A6245E37CA0028A340 /* Main */,
 				6EB7A523245F7423004EF027 /* CommonView */,
+				6EA16BDC25920594002530B4 /* Мій КТГГ.entitlements */,
+				6E51B04B258B3F5B00A57B60 /* Мій КТГГDebug.entitlements */,
 			);
 			path = MyKTGG;
 			sourceTree = "<group>";
@@ -453,19 +427,10 @@
 		6E9E2C672468778700AFC756 /* DatePicker */ = {
 			isa = PBXGroup;
 			children = (
-				6E9E2C882468793600AFC756 /* Extentions */,
 				6EA2CBCF246884D5009F0FE2 /* Cell */,
 				6EA2CBCE246884BF009F0FE2 /* Classes */,
 			);
 			path = DatePicker;
-			sourceTree = "<group>";
-		};
-		6E9E2C882468793600AFC756 /* Extentions */ = {
-			isa = PBXGroup;
-			children = (
-				6E9E2C6D2468781700AFC756 /* Date+Days.swift */,
-			);
-			path = Extentions;
 			sourceTree = "<group>";
 		};
 		6EA2CBCE246884BF009F0FE2 /* Classes */ = {
@@ -533,11 +498,8 @@
 		6EABD25E2464AC17009CE27F /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				6E64ACFA259D218500ED95B3 /* old */,
-				6E8D58852460643A00384ADC /* TimeTableCell.swift */,
-				6ED9F41F245C401100417F69 /* TimeTableViewController.swift */,
-				6E5AB98B25960A770042F877 /* NewTimetableController.swift */,
-				6EC3369A259C6ED30014C993 /* WeekendCell.swift */,
+				6ED9F41F245C401100417F69 /* TimetableViewController.swift */,
+				6E5AB98B25960A770042F877 /* TimetableNetworkController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -595,6 +557,31 @@
 			path = CommonView;
 			sourceTree = "<group>";
 		};
+		6ECC1E4425A6550F007624BC /* CustomButton */ = {
+			isa = PBXGroup;
+			children = (
+				6ECC1E4525A6552D007624BC /* CustomButton.swift */,
+			);
+			path = CustomButton;
+			sourceTree = "<group>";
+		};
+		6ECC1E4D25A731AA007624BC /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				6E8D58852460643A00384ADC /* TimeTableCell.swift */,
+				6EC3369A259C6ED30014C993 /* WeekendCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		6ECC1E5225A7325F007624BC /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6ECC1E5325A73274007624BC /* Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		6EDF7B0E25A0BF2100B14F61 /* NotificationService */ = {
 			isa = PBXGroup;
 			children = (
@@ -616,8 +603,8 @@
 				6E7625662403F6C100C68C7F /* Sources */,
 				6E7625672403F6C100C68C7F /* Frameworks */,
 				6E7625682403F6C100C68C7F /* Resources */,
-				529013AF2551D27AD4352679 /* [CP] Copy Pods Resources */,
 				6EDF7AD125A09FD800B14F61 /* Embed App Extensions */,
+				C38F6910BC1C90DF0D9FC114 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -626,8 +613,6 @@
 			);
 			name = MyKTGG;
 			packageProductDependencies = (
-				6E624AA424EC799600CFE205 /* FacebookLogin */,
-				6E624AA624EC799600CFE205 /* FacebookCore */,
 				6E624AA924EC79B500CFE205 /* Alamofire */,
 				6E624AAC24EC79CF00CFE205 /* AlamofireImage */,
 			);
@@ -680,7 +665,6 @@
 			);
 			mainGroup = 6E7625612403F6C100C68C7F;
 			packageReferences = (
-				6E624AA324EC799600CFE205 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 				6E624AA824EC79B500CFE205 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				6E624AAB24EC79CF00CFE205 /* XCRemoteSwiftPackageReference "AlamofireImage" */,
 			);
@@ -749,7 +733,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		529013AF2551D27AD4352679 /* [CP] Copy Pods Resources */ = {
+		C38F6910BC1C90DF0D9FC114 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -781,6 +765,7 @@
 				6E114B0024C19B1E00CC78FB /* weatherModel.swift in Sources */,
 				6E28155124D9548800389F90 /* nib.swift in Sources */,
 				6E1600D924ED3E2D001DE4B1 /* UBottomSheetCoordinatorDelegate.swift in Sources */,
+				6ECC1E5425A73274007624BC /* Extensions.swift in Sources */,
 				6E9E2C872468787600AFC756 /* DateViewCell.swift in Sources */,
 				6E9E2C752468781700AFC756 /* DateScrollManager.swift in Sources */,
 				6E7625722403F6C100C68C7F /* MainViewController.swift in Sources */,
@@ -793,38 +778,34 @@
 				6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */,
 				6EF0F5DA25954A6200D6020E /* GroupNetworkController.swift in Sources */,
 				6E9E2C7E2468781700AFC756 /* UICollectionViewCell+Fade.swift in Sources */,
-				6E5AB98C25960A770042F877 /* NewTimetableController.swift in Sources */,
+				6E5AB98C25960A770042F877 /* TimetableNetworkController.swift in Sources */,
 				6E114B0224C19B7900CC78FB /* weatherController.swift in Sources */,
 				6E1600E124ED3E2D001DE4B1 /* UBottomSheetCoordinatorDataSource.swift in Sources */,
 				6E0679942443625B001FAE67 /* NewsCell.swift in Sources */,
 				6E9E2C7F2468781700AFC756 /* DateScrollPicker.swift in Sources */,
-				6E1726DD24FE228A003F317D /* TimeTableExtentions.swift in Sources */,
 				6E9E2C782468781700AFC756 /* UICollectionView+Fade.swift in Sources */,
 				6EC3369B259C6ED30014C993 /* WeekendCell.swift in Sources */,
 				6EABFF0725A0C1C80021AF06 /* NotificationService.swift in Sources */,
 				6E363334244A474700918364 /* NewsWebView.swift in Sources */,
-				6E1600DC24ED3E2D001DE4B1 /* Extensions.swift in Sources */,
 				6E77742B25934AA800658CA6 /* GroupChooseViewController.swift in Sources */,
 				6E1600D824ED3E2D001DE4B1 /* UBottomSheetCoordinator.swift in Sources */,
 				6E1600E024ED3E2D001DE4B1 /* Draggable.swift in Sources */,
 				6E1600E724EE50E6001DE4B1 /* BottomSheetModel.swift in Sources */,
+				6ECC1E4625A6552D007624BC /* CustomButton.swift in Sources */,
 				6E1600DD24ED3E2D001DE4B1 /* DefaultSheetAnimator.swift in Sources */,
 				6E06799824436565001FAE67 /* NewsModel.swift in Sources */,
 				6E067996244362E8001FAE67 /* NewsTableViewController.swift in Sources */,
 				6E9E2C7C2468781700AFC756 /* DateScrollPicker+Protocols.swift in Sources */,
 				6E457B3E2588DFFB00148EFE /* ChatVC.swift in Sources */,
-				6ED9F420245C401100417F69 /* TimeTableViewController.swift in Sources */,
+				6ED9F420245C401100417F69 /* TimetableViewController.swift in Sources */,
 				6E9E2C762468781700AFC756 /* UIView+Nib.swift in Sources */,
 				6E3633312447602300918364 /* SettingsViewController.swift in Sources */,
 				6EABD26E2464E78D009CE27F /* AvatarMethods.swift in Sources */,
 				6E5AB9882596063B0042F877 /* NewTimetableModel.swift in Sources */,
 				6E1600D324ED3E2D001DE4B1 /* MainItemCell.swift in Sources */,
 				6E9E2C7A2468781700AFC756 /* DateScrollPickerFormat.swift in Sources */,
-				6E624AAE24EC7A7900CFE205 /* TimeTableNetworkController.swift in Sources */,
 				6E8D5888246074F100384ADC /* TimeTableModel.swift in Sources */,
-				6E4A4503246FD48000E5D573 /* ChangeController.swift in Sources */,
 				6E1600DB24ED3E2D001DE4B1 /* ListViewController.swift in Sources */,
-				6E9E2C792468781700AFC756 /* Date+Days.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1039,6 +1020,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1047,6 +1029,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1061,6 +1044,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1069,6 +1053,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1110,14 +1095,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6E624AA324EC799600CFE205 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.1.1;
-			};
-		};
 		6E624AA824EC79B500CFE205 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -1137,16 +1114,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6E624AA424EC799600CFE205 /* FacebookLogin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6E624AA324EC799600CFE205 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
-			productName = FacebookLogin;
-		};
-		6E624AA624EC799600CFE205 /* FacebookCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6E624AA324EC799600CFE205 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
-			productName = FacebookCore;
-		};
 		6E624AA924EC79B500CFE205 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6E624AA824EC79B500CFE205 /* XCRemoteSwiftPackageReference "Alamofire" */;

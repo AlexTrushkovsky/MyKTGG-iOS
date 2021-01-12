@@ -22,16 +22,23 @@ class NotificationService: UNNotificationServiceExtension {
             
             // Modify the notification content here...
             let title = bestAttemptContent.title
-            if let superTitle = title.components(separatedBy: "<in>").first {
-                push.append(superTitle)
-            }
-            push.append(bestAttemptContent.body)
-            
-            if let imageName = bestAttemptContent.title.components(separatedBy: "<in>").last?.components(separatedBy: "</in>").first {
-                push.append(imageName)
+            if title.contains("<in>") && title.contains("</in>") {
+                if let superTitle = title.components(separatedBy: "<in>").first {
+                    push.append(superTitle)
+                }
+                push.append(bestAttemptContent.body)
+                
+                if let imageName = bestAttemptContent.title.components(separatedBy: "<in>").last?.components(separatedBy: "</in>").first {
+                    push.append(imageName)
+                } else {
+                    push.append("default")
+                }
             } else {
+                push.append(bestAttemptContent.title)
+                push.append(bestAttemptContent.body)
                 push.append("default")
             }
+            
             
             let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
             if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{

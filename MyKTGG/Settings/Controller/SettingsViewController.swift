@@ -11,61 +11,164 @@ import StoreKit
 
 
 class SettingsViewController: UITableViewController {
-    var budyaMode = false
-    var budyaOpened = false
     var group = [String]()
     var currentGroup = String()
-    
-    @IBAction func autoProm(_ sender: UISwitch) {
-        UserDefaults.standard.set(autoPromoutionSwitch.isOn, forKey: "AutoPromStatus")
-        if autoPromoutionSwitch.isOn {
-            print("AutoProm is turned on")
-        } else {
-            print("AutoProm is turned off")
-        }
-    }
+    let avatarMethods = AvatarMethods()
+    var isStudent = true
+    var isVerified = false
+
+    @IBOutlet weak var verifiedImage: UIImageView!
     @IBOutlet weak var avatar: UIImageView!
+    @IBOutlet weak var avatarContainer: UIView!
     @IBOutlet weak var groupLabel: UILabel!
     @IBOutlet weak var subGroupLabel: UILabel!
     @IBOutlet weak var UserNameLabel: UILabel!
-    @IBOutlet weak var autoPromoutionSwitch: UISwitch!
     @IBOutlet weak var userEditActivityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var userEditArrow: UIImageView!
+    @IBOutlet weak var turnNotificationButton: UIButton!
+    @IBAction func changeNotificationSettings(_ sender: UIButton) {
+        if let appSettings = NSURL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(appSettings as URL, options: [:], completionHandler: nil)
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorStyle = .none
         userEditActivityIndicator.hidesWhenStopped = true
-        let avatarMethods = AvatarMethods()
-        avatarMethods.setupUserImageView(imageView: avatar)
+        if #available(iOS 13, *) {
+            userEditActivityIndicator.style = .medium
+        } else {
+            userEditActivityIndicator.style = .gray
+        }
+        checkNotificationSettings()
+        avatarMethods.setupUserImageView(avatarContainer: avatarContainer, imageView: avatar)
         setUserLabels()
         getUserInfo()
-        avatarMethods.getAvatarFromUserDefaults(forKey: "avatar", imageView: avatar)
+        getCurrentUserType()
+        updateAvatar()
+        UserDefaults.standard.addObserver(self, forKeyPath: "group", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "name", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "subGroup", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "isStudent", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "verified", options: NSKeyValueObservingOptions.new, context: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateAvatar), name:NSNotification.Name(rawValue: "updateAvatar"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateLabels), name:NSNotification.Name(rawValue: "updateLabels"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(setUserLabels), name: NSNotification.Name(rawValue: "setUserLabels"), object: nil)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(budyaTapped))
-        tap.numberOfTapsRequired = 13
-        view.addGestureRecognizer(tap)
+        NotificationCenter.default.addObserver(self, selector: #selector(getUserInfo), name:NSNotification.Name(rawValue: "updateLabels"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkNotificationStatus), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
-    @objc func reloadView() {
-        viewDidLoad()
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "group" {
+            setGroupLabelfromDefaults()
+        } else if keyPath == "name" {
+            setNameLabelFromDefaults()
+        } else if keyPath == "subGroup"{
+            setSubGroupLabelFromUserDefaults()
+        }else if keyPath == "isStudent" {
+            getCurrentUserType()
+        }else if keyPath == "verified" {
+            getCurrentUserType()
+        }
     }
     
-    @objc func budyaTapped() {
-        self.budyaMode = true
-        tableView.reloadData()
-        
+    func setUserLabels() {
+        setNameLabelFromDefaults()
+        setGroupLabelfromDefaults()
+        setSubGroupLabelFromUserDefaults()
+        getCurrentUserType()
+    }
+    
+    func checkNotificationSettings() {
+        UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+            DispatchQueue.main.sync {
+                if settings.authorizationStatus == .authorized {
+                    self.turnNotificationButton.setTitle("Вимкнути сповіщення", for: .normal)
+                    self.turnNotificationButton.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
+                    self.turnNotificationButton.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
+                    self.turnNotificationButton.isHidden = false
+                } else {
+                    self.turnNotificationButton.setTitle("Увімкнути сповіщення", for: .normal)
+                    self.turnNotificationButton.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
+                    self.turnNotificationButton.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
+                    self.turnNotificationButton.isHidden = false
+                }
+            }
+        }
+    }
+    
+    @objc private func checkNotificationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+            switch settings.authorizationStatus {
+            case .authorized, .denied, .provisional, .notDetermined,  .ephemeral:
+                print("Do something according to status")
+                self.checkNotificationSettings()
+            @unknown default:
+                self.checkNotificationSettings()
+            }
+        }
+    }
+    
+    @objc func getCurrentUserType() {
+        guard let isStudent = UserDefaults.standard.object(forKey: "isStudent") as? Bool else { return }
+        self.isStudent = isStudent
+        if !isStudent{
+            subGroupLabel.text = "Викладач"
+            if let verified = UserDefaults.standard.object(forKey: "verified") as? String{
+                guard let group =  UserDefaults.standard.object(forKey: "group") as? String else {
+                    return
+                }
+                print("verified account of: \(verified)")
+                if verified == group {
+                    self.isVerified = true
+                    self.verifiedImage.image = UIImage(named: "checkmark.shield")
+                    self.verifiedImage.isHidden = false
+                    self.verifiedImage.tintColor = UIColor(red: 0.28, green: 0.78, blue: 0.56, alpha: 1.00)
+                } else {
+                    self.isVerified = false
+                    self.verifiedImage.image = UIImage(named: "shield.slash")
+                    self.verifiedImage.tintColor = UIColor(red: 0.78, green: 0.28, blue: 0.28, alpha: 1.00)
+                    self.verifiedImage.isHidden = false
+                }
+            } else {
+                self.isVerified = false
+                self.verifiedImage.image = UIImage(named: "shield.slash")
+                self.verifiedImage.tintColor = UIColor(red: 0.78, green: 0.28, blue: 0.28, alpha: 1.00)
+                self.verifiedImage.isHidden = false
+            }
+        } else {
+            self.verifiedImage.isHidden = true
+            setSubGroupLabelFromUserDefaults()
+        }
+        UIView.transition(with: tableView, duration: 0.3, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
+    }
+    
+    func setGroupLabelfromDefaults() {
+        if let group = UserDefaults.standard.object(forKey: "group"),
+           let text = group as? String {
+            groupLabel.text = text
+            print("Defaults group:", group)
+            self.currentGroup = text
+            getCurrentUserType()
+        }
+    }
+    
+    func setNameLabelFromDefaults() {
+        if let name = UserDefaults.standard.object(forKey: "name"),
+           let text = name as? String {
+            UserNameLabel.text = text
+            print("Defaults name:", name)
+        }
+    }
+    
+    func setSubGroupLabelFromUserDefaults() {
+        if let subGroup = UserDefaults.standard.object(forKey: "subGroup") {
+            subGroupLabel.text = "\(subGroup as! Int + 1) підгрупа"
+            print("Defaults subgroup: \(subGroup as! Int + 1)")
+        }
     }
     
     @objc func updateAvatar() {
-        let avatarMethods = AvatarMethods()
         avatarMethods.getAvatarFromUserDefaults(forKey: "avatar", imageView: avatar)
-    }
-    @objc func updateLabels() {
-        print("updating user labels...")
-        getUserInfo()
     }
     
     func showAlert(title: String, message: String){
@@ -74,51 +177,46 @@ class SettingsViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func clearUserDefaults() {
-        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
-        UserDefaults.standard.synchronize()
-        do{
-            try Auth.auth().signOut()
-        }catch{
-            print(error)
-        }
-    }
-    
-    func showClearUserDefaultsAlert(){
-        let alert = UIAlertController(title: "Скинути налаштування", message: "Ви впевнені, що ви бажаєте скинути налаштування?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Так", style: .destructive, handler: {(action: UIAlertAction!) in self.clearUserDefaults()}))
-        alert.addAction(UIAlertAction(title: "Відмінити", style: .cancel, handler: nil))
-        present(alert, animated: true, completion: nil)
-    }
-    
-    func getUserInfo(){
+    @objc func getUserInfo(){
+        print("Updating user info...")
         let userID = Auth.auth().currentUser?.uid
         let db = Database.database().reference()
-        db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
-            let name = value?["name"] as? String ?? ""
-            let group = value?["group"] as? String ?? ""
-            let subGroup = value?["subgroup"] as? Int ?? 0
             
-            if name != "" {
+            if let name = value?["name"] as? String {
                 UserDefaults.standard.set(name, forKey: "name")
                 print("getUserDefaults name:",name)
             }
             
-            if group != "" {
+            if let group = value?["group"] as? String {
                 UserDefaults.standard.set(group, forKey: "group")
-                self.postAboutGroupChangeIfNeeded(group: group)
                 print("getUserDefaults group:",group)
                 let transliterated = self.transliterate(nonLatin: group)
                 Messaging.messaging().subscribe(toTopic: transliterated) { error in
                     print("Subscribed to \(transliterated) pushes")
+                    UserDefaults.standard.set(transliterated,forKey: "subsctibedTopic")
                 }
             }
             
-            UserDefaults.standard.set(subGroup, forKey: "subGroup")
-            print("getUserDefaults subGroup:",subGroup)
-            NotificationCenter.default.post(name: NSNotification.Name("setUserLabels"), object: nil)
+            if let subGroup = value?["subgroup"] as? Int {
+                UserDefaults.standard.set(subGroup, forKey: "subGroup")
+                print("getUserDefaults subGroup:",subGroup)
+            }
             
+            if let isStudent = value?["isStudent"] as? Bool {
+                UserDefaults.standard.set(isStudent, forKey: "isStudent")
+            }
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+        
+        db.child("users").child(userID!).child("secure").observeSingleEvent(of: .value, with: { (snapshot) in
+            let value = snapshot.value as? NSDictionary
+            if let verified = value?["verified"] as? String {
+                print("verified account of: \(verified)")
+                UserDefaults.standard.set(verified, forKey: "verified")
+            }
         }) { (error) in
             print(error.localizedDescription)
         }
@@ -131,78 +229,47 @@ class SettingsViewController: UITableViewController {
             .lowercased()
             .replacingOccurrences(of: " ", with: "") ?? nonLatin
     }
-    
-    func postAboutGroupChangeIfNeeded(group: String) {
-        if self.currentGroup != group {
-            NotificationCenter.default.post(name: NSNotification.Name("groupChanged"), object: nil)
-        }
-    }
-    
-    @objc func setUserLabels() {
-        if let name = UserDefaults.standard.object(forKey: "name"),
-           let text = name as? String {
-            UserNameLabel.text = text
-            print("Defaults name:", name)
-        }
-        if let group = UserDefaults.standard.object(forKey: "group"),
-           let text = group as? String {
-            groupLabel.text = text
-            print("Defaults group:", group)
-            self.currentGroup = text
-        }
-        if let subGroup = UserDefaults.standard.object(forKey: "subGroup") {
-            subGroupLabel.text = "\(subGroup as! Int + 1) підгрупа"
-            print("Defaults subgroup: \(subGroup as! Int + 1)")
-        }
-    }
-    private func budyaShouldBeHidden(_ section: Int) -> Bool {
-        if self.budyaMode {
-            switch section {
-            case 6: return false
-            default: return false
-            }
-        } else {
-            switch section {
-            case 6: return true
-            default: return false
-            }
-        }
-    }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 6 {
-            if budyaShouldBeHidden(section) {
-                return 0 // Don't show any rows for hidden sections
+        if section == 0 {
+            if isStudent {
+                return 0
             } else {
-                if budyaOpened {
-                    return super.tableView(tableView, numberOfRowsInSection: section) // Use the default number of rows for other sections
+                if isVerified {
+                    return 0
                 } else {
-                    return 1
+                    return super.tableView(tableView, numberOfRowsInSection: section)
                 }
             }
-        } else {
-            return super.tableView(tableView, numberOfRowsInSection: section) // Use the default number of rows for other sections
         }
+        return super.tableView(tableView, numberOfRowsInSection: section)
     }
     
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        switch (section) {
-        case 2:
-            return "Переводити на наступний курс щороку"
-        case 5:
-            return "Розробка: Трушковський Олексій\nДизайн: Федюк Денис"
-        default:
-            return nil
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            if isStudent {
+                return nil
+            } else {
+                if isVerified {
+                    return nil
+                } else {
+                    return super.tableView(tableView, titleForHeaderInSection: section)
+                }
+            }
         }
+        return super.tableView(tableView, titleForHeaderInSection: section)
     }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 0 {
+        if indexPath.section == 1 {
             if indexPath.row == 0 {
                 userEditActivityIndicator.startAnimating()
+                let cell = super.tableView.cellForRow(at: indexPath)
+                cell?.isUserInteractionEnabled = false
                 userEditArrow.isHidden = true
                 DispatchQueue.global().async {
                     let groupCheck = GroupNetworkController()
-                    self.group = groupCheck.fetchData()
+                    self.group = groupCheck.fetchData(isStudent: self.isStudent)
                     DispatchQueue.main.async {
                         if self.group.isEmpty {
                             //throw error
@@ -212,45 +279,45 @@ class SettingsViewController: UITableViewController {
                         } else {
                             let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "UserEditor") as? UserEditorTableViewController
                             vc?.group = self.group
+                            vc?.isStudent = self.isStudent
                             self.navigationController?.pushViewController(vc!, animated: true)
                             self.userEditActivityIndicator.stopAnimating()
+                            cell?.isUserInteractionEnabled = true
                             self.userEditArrow.isHidden = false
                         }
                     }
                 }
             }
         }
-            if indexPath.section == 3 {
-                if indexPath.row == 0 {
-                    if let url = URL(string: "https://next.privat24.ua/payments/form/%7B%22token%22:%22e287b0fa-9f54-487f-9ed3-cb4f67e9a2cb%22%7D") {
-                        UIApplication.shared.open(url)
-                    }
-                }
-                if indexPath.row == 1 {
-                    if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
-                        UIApplication.shared.open(url)
-                    }
+        if indexPath.section == 3 {
+            if indexPath.row == 0 {
+                if let url = URL(string: "https://next.privat24.ua/payments/form/%7B%22token%22:%22e287b0fa-9f54-487f-9ed3-cb4f67e9a2cb%22%7D") {
+                    UIApplication.shared.open(url)
                 }
             }
-            if indexPath.section == 4 {
-                if indexPath.row == 0 {
-                    if let url = URL(string: "https://t.me/esen1n25") {
-                        UIApplication.shared.open(url)
-                    }
-                }
-                if indexPath.row == 1 {
-                    SKStoreReviewController.requestReview()
+            if indexPath.row == 1 {
+                if let url = URL(string: "https://ktgg.kiev.ua/uk/") {
+                    UIApplication.shared.open(url)
                 }
             }
-            if indexPath.section == 6 {
-                if indexPath.row == 0 {
-                    budyaOpened = !budyaOpened
-                    tableView.reloadData()
-                }
-                if indexPath.row == 1 {
-                    showClearUserDefaultsAlert()
-                }
-            }
-            tableView.deselectRow(at: indexPath, animated: true)
         }
+        if indexPath.section == 4 {
+            if indexPath.row == 0 {
+                if let url = URL(string: "https://t.me/esen1n25") {
+                    UIApplication.shared.open(url)
+                }
+            }
+            if indexPath.row == 1 {
+                SKStoreReviewController.requestReview()
+            }
+        }
+        if indexPath.section == 5 {
+            if indexPath.row == 0 {
+                if let url = URL(string: "https://t.me/esen1n25") {
+                    UIApplication.shared.open(url)
+                }
+            }
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
+}

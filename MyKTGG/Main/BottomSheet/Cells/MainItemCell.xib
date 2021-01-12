@@ -26,7 +26,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="551" height="83"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flame" translatesAutoresizingMaskIntoConstraints="NO" id="HBa-k3-PRe">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="deafult" translatesAutoresizingMaskIntoConstraints="NO" id="HBa-k3-PRe">
                         <rect key="frame" x="15" y="24" width="50" height="50"/>
                         <color key="tintColor" red="0.0073049049819999996" green="0.40609508750000001" blue="0.30939430000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -71,7 +71,7 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="flame" width="11" height="14"/>
+        <image name="deafult" width="13" height="13"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

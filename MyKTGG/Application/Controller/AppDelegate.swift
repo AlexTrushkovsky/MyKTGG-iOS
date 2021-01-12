@@ -104,10 +104,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
         content.title = notificationType
         content.body = body
         content.sound = .default
-        content.badge = 1
+        if let badgeNum = UserDefaults(suiteName: "group.myktgg")!.object(forKey: "badges") as? Int {
+            content.badge = NSNumber(value: badgeNum+1)
+            UserDefaults(suiteName: "group.myktgg")!.set(badgeNum+1, forKey: "badges")
+        }
         let timeInterval = date.timeIntervalSinceNow
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
-        let identifier = "Change Notification"
+        let identifier = notificationType
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         notificationCenter.add(request) { (error) in
             if let error = error {
@@ -117,8 +120,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .sound])
-    }
-}

@@ -120,29 +120,3 @@ class ListViewController: UIViewController {
         }
     }
 }
-
-extension ListViewController: Draggable{
-    func draggableView() -> UIScrollView? {
-        return tableView
-    }
-}
-
-extension ListViewController: UITableViewDelegate, UITableViewDataSource{
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let model = sheetContentController.sheetModel
-        self.itemsCount = model.items?.count ?? 0
-        return self.itemsCount
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.register(UINib(nibName: "MainItemCell", bundle: nil), forCellReuseIdentifier: "MainItemCell")
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MainItemCell", for: indexPath) as! MainItemCell
-        configureCell(cell: cell, indexPath: indexPath)
-        return cell
-    }
-}
-

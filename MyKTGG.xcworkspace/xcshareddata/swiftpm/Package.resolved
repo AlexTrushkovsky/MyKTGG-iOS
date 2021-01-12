@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "becd9a729a37bdbef5bc39dc3c702b99f9e3d046",
-          "version": "5.2.2"
+          "revision": "eaf6e622dd41b07b251d8f01752eab31bc811493",
+          "version": "5.4.1"
         }
       },
       {
@@ -17,15 +17,6 @@
           "branch": null,
           "revision": "3e8edbeb75227f8542aa87f90240cf0424d6362f",
           "version": "4.1.0"
-        }
-      },
-      {
-        "package": "Facebook",
-        "repositoryURL": "https://github.com/facebook/facebook-ios-sdk",
-        "state": {
-          "branch": null,
-          "revision": "a3ef4451928249e18bb3ae5b7cb906134ed63b26",
-          "version": "7.1.1"
         }
       }
     ]

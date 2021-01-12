@@ -33,19 +33,60 @@ public protocol UBottomSheetCoordinatorDataSource: class {
 }
 
 ///Default data source implementation
-extension UBottomSheetCoordinatorDataSource{
+//extension UBottomSheetCoordinatorDataSource{
+//    public func sheetPositions(_ availableHeight: CGFloat) -> [CGFloat]{
+//        return [0.05, 0.440].map{$0*availableHeight}
+//    }
+//
+//    public var animator: Animatable?{
+//        return DefaultSheetAnimator()
+//    }
+//
+//    public func initialPosition(_ availableHeight: CGFloat) -> CGFloat{
+//        return availableHeight*0.440
+//    }
+//
+//    public func rubberBandLogicTop(_ total: CGFloat, _ limit: CGFloat) -> CGFloat{
+//        let value = limit * (1 - log10(total/limit))
+//        guard !value.isNaN, value.isFinite else {
+//            return total
+//        }
+//        return value
+//    }
+//
+//    public func rubberBandLogicBottom(_ total: CGFloat, _ limit: CGFloat) -> CGFloat {
+//        let value = limit * (1 + log10(total/limit))
+//        guard !value.isNaN, value.isFinite else {
+//            return total
+//        }
+//        return value
+//    }
+//
+//}
+//
+///By default make all the view controller conforms to the UBottomSheetCoordinatorDataSource.
+extension MainViewController: UBottomSheetCoordinatorDataSource{
     public func sheetPositions(_ availableHeight: CGFloat) -> [CGFloat]{
-        return [0.05, 0.440].map{$0*availableHeight}
+        // 22 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
+        var height = 22 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
+        height = height - mainImage.frame.height * 0.1
+        print("available position: \(height)")
+        return [UIApplication.shared.statusBarFrame.height, height]
     }
-    
+
     public var animator: Animatable?{
         return DefaultSheetAnimator()
     }
-    
+
     public func initialPosition(_ availableHeight: CGFloat) -> CGFloat{
-        return availableHeight*0.440
+        print(availableHeight)
+        // 22 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
+        var height = 22 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
+        height = height - mainImage.frame.height * 0.1
+        print("available position: \(height)")
+        return height
     }
-    
+
     public func rubberBandLogicTop(_ total: CGFloat, _ limit: CGFloat) -> CGFloat{
         let value = limit * (1 - log10(total/limit))
         guard !value.isNaN, value.isFinite else {
@@ -53,7 +94,7 @@ extension UBottomSheetCoordinatorDataSource{
         }
         return value
     }
-    
+
     public func rubberBandLogicBottom(_ total: CGFloat, _ limit: CGFloat) -> CGFloat {
         let value = limit * (1 + log10(total/limit))
         guard !value.isNaN, value.isFinite else {
@@ -61,9 +102,5 @@ extension UBottomSheetCoordinatorDataSource{
         }
         return value
     }
-    
 }
-
-///By default make all the view controller conforms to the UBottomSheetCoordinatorDataSource.
-extension UIViewController: UBottomSheetCoordinatorDataSource{}
 

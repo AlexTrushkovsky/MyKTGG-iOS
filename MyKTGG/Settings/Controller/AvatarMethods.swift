@@ -14,6 +14,7 @@ import GoogleSignIn
 class AvatarMethods {
     
     func uploadAvatar(photo: UIImage, completion: @escaping (Result<URL, Error>) -> Void){
+        guard !photo.isEqualToImage(UIImage(named: "AvatarPlaceholder")!) else { return }
         guard let userID = Auth.auth().currentUser?.uid else { return }
         let storageRef = Storage.storage().reference().child("avatars").child(userID)
         let metadata = StorageMetadata()
@@ -35,10 +36,11 @@ class AvatarMethods {
             }
         }
     }
+    
     func setAccName(setName: String) {
         let userID = Auth.auth().currentUser?.uid
         let db = Database.database().reference().child("users")
-        db.child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             let name = value?["name"] as? String ?? ""
             
@@ -46,7 +48,7 @@ class AvatarMethods {
                 UserDefaults.standard.set(name, forKey: "name")
                 print("Updated name:",name)
             } else {
-                db.child(userID!).updateChildValues(["name":setName]) {
+                db.child(userID!).child("public").updateChildValues(["name":setName]) {
                     (error: Error?, ref:DatabaseReference) in
                     if let error = error {
                         print("Data could not be saved: \(error).")
@@ -72,7 +74,7 @@ class AvatarMethods {
         let storageRef = Storage.storage().reference().child("avatars").child(userID)
         
         let db = Database.database().reference()
-        db.child("users").child(userID).observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             
             let value = snapshot.value as? NSDictionary
             let url = value?["avatarUrl"] as? String ?? ""
@@ -105,7 +107,7 @@ class AvatarMethods {
                                     guard let photo = UIImage(data: data! as Data) else { return }
                                     self.saveAvatarToUserDefaults(image: photo, forKey: "avatar")
                                     
-                                    ref.child(user!.uid).updateChildValues(["avatarUrl":"\(url!)"]) {
+                                    ref.child(user!.uid).child("public").updateChildValues(["avatarUrl":"\(url!)"]) {
                                         (error: Error?, ref:DatabaseReference) in
                                         if let error = error {
                                             print("Data could not be saved: \(error).")
@@ -138,7 +140,7 @@ class AvatarMethods {
             let user = Auth.auth().currentUser
             
             let db = Database.database().reference()
-            db.child("users").child(userID).observeSingleEvent(of: .value, with: { (snapshot) in
+            db.child("users").child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
                 
                 let value = snapshot.value as? NSDictionary
                 let url = value?["avatarUrl"] as? String ?? ""
@@ -173,9 +175,10 @@ class AvatarMethods {
     }
     
     func downloadAvatar(avatarView: UIImageView){
+        print("downloading avatar...")
         let userID = Auth.auth().currentUser?.uid
         let db = Database.database().reference()
-        db.child("users").child(userID!).observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             let url = value?["avatarUrl"] as? String ?? ""
             guard url != "" else { return }
@@ -188,32 +191,65 @@ class AvatarMethods {
                 self.saveAvatarToUserDefaults(image: image, forKey: "avatar")
             }
         }) { (error) in
+            if let placeholder = UIImage(named: "AvatarPlaceholder") {
+                print("setting standart avatar")
+                avatarView.image = placeholder
+            }
             print(error.localizedDescription)
         }
     }
     
     func saveAvatarToUserDefaults(image: UIImage, forKey key: String) {
+        print("Saving avatar to userDefaults")
         if let pngRepresentation = image.pngData() {
             UserDefaults.standard.set(pngRepresentation, forKey: key)
         }
     }
     
     func getAvatarFromUserDefaults(forKey key: String, imageView: UIImageView){
+        print("Get avatar from userDefaults")
         if let imageData = UserDefaults.standard.object(forKey: key) as? Data,
             let image = UIImage(data: imageData) {
             imageView.image = image
             downloadAvatar(avatarView: imageView)
         } else {
             print("avatar not fount in user defaults")
+            if let placeholder = UIImage(named: "AvatarPlaceholder") {
+                print("setting standart avatar")
+                DispatchQueue.main.async {
+                    imageView.image = placeholder
+                }
+            }
             downloadAvatar(avatarView: imageView)
         }
     }
     
-    func setupUserImageView(imageView: UIImageView) {
-        imageView.layer.borderWidth = 1
-        imageView.layer.masksToBounds = false
-//        imageView.layer.borderColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00).cgColor
-        imageView.layer.cornerRadius = imageView.frame.height/2
+    func setupUserImageView(avatarContainer: UIView, imageView: UIImageView) {
         imageView.clipsToBounds = true
+        imageView.applyshadowWithCorner(containerView: avatarContainer, cornerRadious: imageView.frame.height/2)
+    }
+}
+
+extension UIImage {
+
+    func isEqualToImage(_ image: UIImage) -> Bool {
+        let data1 = self.pngData()
+        let data2 = image.pngData()
+        return data1 == data2
+    }
+
+}
+
+extension UIImageView {
+    func applyshadowWithCorner(containerView : UIView, cornerRadious : CGFloat){
+        containerView.clipsToBounds = false
+        containerView.layer.shadowColor = UIColor.black.cgColor
+        containerView.layer.shadowOpacity = 0.2
+        containerView.layer.shadowOffset = CGSize.zero
+        containerView.layer.shadowRadius = 3
+        containerView.layer.cornerRadius = cornerRadious
+        containerView.layer.shadowPath = UIBezierPath(roundedRect: containerView.bounds, cornerRadius: cornerRadious).cgPath
+        self.clipsToBounds = true
+        self.layer.cornerRadius = cornerRadious
     }
 }
