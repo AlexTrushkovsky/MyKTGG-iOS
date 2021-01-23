@@ -41,7 +41,8 @@ class GroupChooseViewController: UIViewController {
             .applyingTransform(.toLatin, reverse: false)?
             .applyingTransform(.stripDiacritics, reverse: false)?
             .lowercased()
-            .replacingOccurrences(of: " ", with: "") ?? nonLatin
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "`", with: "") ?? nonLatin
     }
     @IBAction func userTypeButton(_ sender: UIButton) {
         isStudent = !isStudent
@@ -69,6 +70,17 @@ class GroupChooseViewController: UIViewController {
                             Messaging.messaging().subscribe(toTopic: transliterated) { error in
                                 print("Subscribed to \(transliterated) pushes")
                                 UserDefaults.standard.set(transliterated, forKey: "subsctibedTopic")
+                            }
+                        }
+                    }
+                    if let oldChangesTopic = UserDefaults.standard.object(forKey: "groupOfChangeSubscription") as? String {
+                        Messaging.messaging().unsubscribe(fromTopic: "/topics/changesOf\(oldChangesTopic)") { error in
+                            print("Unsubscribed from \(oldChangesTopic) changes")
+                            UserDefaults.standard.set(nil,forKey: "groupOfChangeSubscription")
+                            let group = self.transliterate(nonLatin: groupName)
+                            Messaging.messaging().subscribe(toTopic: "/topics/changesOf\(group)") { error in
+                                print("Subscribed to \(group) changes")
+                                UserDefaults.standard.set(group,forKey: "groupOfChangeSubscription")
                             }
                         }
                     }

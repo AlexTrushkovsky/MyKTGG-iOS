@@ -16,7 +16,10 @@ class SettingsViewController: UITableViewController {
     let avatarMethods = AvatarMethods()
     var isStudent = true
     var isVerified = false
+    var isNotificationsAllowed = false
 
+    @IBOutlet weak var newsSwitch: UISwitch!
+    @IBOutlet weak var changesSwitch: UISwitch!
     @IBOutlet weak var verifiedImage: UIImageView!
     @IBOutlet weak var avatar: UIImageView!
     @IBOutlet weak var avatarContainer: UIView!
@@ -29,6 +32,52 @@ class SettingsViewController: UITableViewController {
     @IBAction func changeNotificationSettings(_ sender: UIButton) {
         if let appSettings = NSURL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(appSettings as URL, options: [:], completionHandler: nil)
+        }
+    }
+    
+    @IBAction func changesSwitch(_ sender: UISwitch) {
+        let group = transliterate(nonLatin: self.currentGroup)
+        if sender.isOn {
+            Messaging.messaging().subscribe(toTopic: "/topics/changesOf\(group)") { error in
+                print("Subscribed to \(group) changes")
+                UserDefaults.standard.set(group,forKey: "groupOfChangeSubscription")
+            }
+        } else {
+            Messaging.messaging().unsubscribe(fromTopic: "/topics/changesOf\(group)") { error in
+                print("Unsubscribed from \(group) changes")
+                UserDefaults.standard.set(nil,forKey: "groupOfChangeSubscription")
+            }
+        }
+    }
+    @IBAction func newsSwitch(_ sender: UISwitch) {
+        if sender.isOn {
+            Messaging.messaging().subscribe(toTopic: "news") { error in
+                print("Subscribed to news")
+                UserDefaults.standard.set(true,forKey: "isSubscribedForNews")
+            }
+        } else {
+            Messaging.messaging().unsubscribe(fromTopic: "news") { error in
+                print("Unsubscribed from news")
+                UserDefaults.standard.set(false,forKey: "isSubscribedForNews")
+            }
+        }
+    }
+    
+    func checkNewsSubscription() {
+        guard let isSubscribedForNews =  UserDefaults.standard.object(forKey: "isSubscribedForNews") as? Bool else { return }
+        if isSubscribedForNews {
+            newsSwitch.isOn = true
+        } else {
+            newsSwitch.isOn = false
+        }
+    }
+    
+    func checkChangesSubscription() {
+        if let changesGroup = UserDefaults.standard.object(forKey: "groupOfChangeSubscription") as? String {
+            print("user is already subscribed to \(changesGroup)")
+            changesSwitch.isOn = true
+        } else {
+            changesSwitch.isOn = false
         }
     }
     
@@ -47,11 +96,14 @@ class SettingsViewController: UITableViewController {
         getUserInfo()
         getCurrentUserType()
         updateAvatar()
+        checkNewsSubscription()
+        checkChangesSubscription()
         UserDefaults.standard.addObserver(self, forKeyPath: "group", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "name", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "subGroup", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "isStudent", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "verified", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "groupOfChangeSubscription", options: NSKeyValueObservingOptions.new, context: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateAvatar), name:NSNotification.Name(rawValue: "updateAvatar"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(getUserInfo), name:NSNotification.Name(rawValue: "updateLabels"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkNotificationStatus), name: UIApplication.didBecomeActiveNotification, object: nil)
@@ -68,6 +120,8 @@ class SettingsViewController: UITableViewController {
             getCurrentUserType()
         }else if keyPath == "verified" {
             getCurrentUserType()
+        }else if keyPath == "groupOfChangeSubscription" {
+            checkChangesSubscription()
         }
     }
     
@@ -82,16 +136,19 @@ class SettingsViewController: UITableViewController {
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             DispatchQueue.main.sync {
                 if settings.authorizationStatus == .authorized {
+                    self.isNotificationsAllowed = true
                     self.turnNotificationButton.setTitle("Вимкнути сповіщення", for: .normal)
-                    self.turnNotificationButton.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
-                    self.turnNotificationButton.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
-                    self.turnNotificationButton.isHidden = false
-                } else {
-                    self.turnNotificationButton.setTitle("Увімкнути сповіщення", for: .normal)
                     self.turnNotificationButton.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
                     self.turnNotificationButton.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
                     self.turnNotificationButton.isHidden = false
+                } else {
+                    self.isNotificationsAllowed = false
+                    self.turnNotificationButton.setTitle("Увімкнути сповіщення", for: .normal)
+                    self.turnNotificationButton.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
+                    self.turnNotificationButton.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
+                    self.turnNotificationButton.isHidden = false
                 }
+                UIView.transition(with: self.tableView, duration: 0.3, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
             }
         }
     }
@@ -100,7 +157,6 @@ class SettingsViewController: UITableViewController {
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             switch settings.authorizationStatus {
             case .authorized, .denied, .provisional, .notDetermined,  .ephemeral:
-                print("Do something according to status")
                 self.checkNotificationSettings()
             @unknown default:
                 self.checkNotificationSettings()
@@ -227,7 +283,8 @@ class SettingsViewController: UITableViewController {
             .applyingTransform(.toLatin, reverse: false)?
             .applyingTransform(.stripDiacritics, reverse: false)?
             .lowercased()
-            .replacingOccurrences(of: " ", with: "") ?? nonLatin
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "ʹ", with: "") ?? nonLatin
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -240,6 +297,13 @@ class SettingsViewController: UITableViewController {
                 } else {
                     return super.tableView(tableView, numberOfRowsInSection: section)
                 }
+            }
+        }
+        if section == 2 {
+            if self.isNotificationsAllowed {
+                return super.tableView(tableView, numberOfRowsInSection: section)
+            } else {
+                return 1
             }
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
@@ -275,6 +339,7 @@ class SettingsViewController: UITableViewController {
                             //throw error
                             self.showAlert(title: "Помилка", message: "Немає зв'язку з мережею. \n Перевірте з`єднання або спробуйте пізніше.")
                             self.userEditActivityIndicator.stopAnimating()
+                            cell?.isUserInteractionEnabled = true
                             self.userEditArrow.isHidden = false
                         } else {
                             let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "UserEditor") as? UserEditorTableViewController

@@ -27,6 +27,7 @@ class NewsCell: UITableViewCell {
         cellBackground.layer.shadowOffset = .init(width: 0, height: 0)
         cellBackground.layer.shadowRadius = 4
         NewsImage.layer.cornerRadius = 15
+        selectionStyle = .none
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = CGRect(
             x: self.NewsImage.bounds.minX,

@@ -889,7 +889,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   void (^localCompletionHandler)(UIBackgroundFetchResult) =
       ^void(UIBackgroundFetchResult fetchResult) {
         [fetchResults addObject:[NSNumber numberWithInt:(int)fetchResult]];
-        dispatch_group_leave(callbackGroup);
+          dispatch_group_leave(callbackGroup);
       };
 
   // Notify interceptors.

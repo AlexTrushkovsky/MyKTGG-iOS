@@ -41,9 +41,14 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         showNoteAlert()
     }
     @IBAction func turnAlarmAction(_ sender: UIButton) {
-        self.setAlert(type: .alarmRequest)
-        alertView.setText(title: "Будильник", subTitle: "буде заведено за 1 годину до пари", body: "Цей час завжди можна змінити в налаштуваннях")
-        self.animateIn()
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
+        if cell.alarmImage.isHidden {
+            self.setAlert(type: .alarmRequest)
+            self.animateIn()
+        } else {
+            showAlarmTurned(cell: cell)
+        }
     }
     @IBOutlet weak var background: UIView!
     @IBOutlet weak var timeTableSeparator: UIView!
@@ -64,6 +69,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupDateScroll()
         setUpGestures()
         setUpMainView()
         settings.getUserInfo()
@@ -71,7 +77,6 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         getCurrentSubGroup()
         getCurrentUserType()
         setupVisualEffectView()
-        setupDateScroll()
         NotificationCenter.default.addObserver(self, selector: #selector(showNoConnectAlert), name:NSNotification.Name(rawValue: "showNoConnectionWithServer"), object: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "group", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "subGroup", options: NSKeyValueObservingOptions.new, context: nil)
@@ -115,8 +120,8 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     
     @objc func refetchData() {
         print("Updating TableView")
-        //        guard !isRefreshing else { return }
         isRefreshing = true
+        
         DispatchQueue.global().async {
             self.network.fetchData(pickedDate: self.pickedDate, group: self.currentGroup, isStudent: self.isStudent)
             DispatchQueue.main.async {
@@ -132,15 +137,17 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         if sender.state == .ended {
             switch sender.direction {
             case .right:
-                let swipeToDate = pickedDate.addDays(-1)
-                datePicker.selectDate(swipeToDate!)
-                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
-                print("right")
+                if let swipeToDate = pickedDate.addDays(-1) {
+                    datePicker.selectDate(swipeToDate)
+                    dateScrollPicker(datePicker, didSelectDate: swipeToDate)
+                    print("right")
+                }
             case .left:
-                let swipeToDate = pickedDate.addDays(1)
-                datePicker.selectDate(swipeToDate!)
-                dateScrollPicker(datePicker, didSelectDate: swipeToDate!)
-                print("left")
+                if let swipeToDate = pickedDate.addDays(1) {
+                    datePicker.selectDate(swipeToDate)
+                    dateScrollPicker(datePicker, didSelectDate: swipeToDate)
+                    print("left")
+                }
             default:
                 break
             }
@@ -150,14 +157,44 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     func deselectRows() {
         if let index = timeTableView.indexPathForSelectedRow {
             print("indexPath: ", index)
+            checkAction(timeTableView, cellForRowAt: index, status: false)
             timeTableView.deselectRow(at: index, animated: true)
             CellIsHighlighted = false
         }
     }
     
+    func deselectRows(index: IndexPath) {
+        print("indexPath: ", index)
+        checkAction(timeTableView, cellForRowAt: index, status: false)
+        timeTableView.deselectRow(at: index, animated: true)
+        CellIsHighlighted = false
+    }
+    
+    func reloadRows() {
+        if let index = timeTableView.indexPathForSelectedRow {
+            CellIsHighlighted = false
+            timeTableView.reloadRows(at: [index], with: .automatic)
+        }
+    }
+    
+    func reloadRows(index: IndexPath) {
+            CellIsHighlighted = false
+            timeTableView.reloadRows(at: [index], with: .automatic)
+    }
+    
     func makeButtonsVisible(bool: Bool, cell: TimeTableCell) {
         switch bool {
         case true:
+            if cell.noteText.isHidden == false {
+                cell.makeNote.setTitle("Редагувати замітку", for: .normal)
+            } else {
+                cell.makeNote.setTitle("Створити замітку", for: .normal)
+            }
+            if cell.alarmText.isHidden == false {
+                cell.turnAlarm.setTitle("Редагувати будильник", for: .normal)
+            } else {
+                cell.turnAlarm.setTitle("Увімкнути будильник", for: .normal)
+            }
             UIView.animate(withDuration: 0.3) {
                 cell.makeNote.alpha = 1
                 cell.turnAlarm.alpha = 1
@@ -171,6 +208,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
                 cell.alarmImage.alpha = 0
                 cell.alarmText.alpha = 0
             }
+            checkAlarmAvailability(cell: cell)
         default:
             UIView.animate(withDuration: 0.3) {
                 cell.makeNote.alpha = 0
@@ -192,12 +230,21 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         guard let selectedCell = tableView.cellForRow(at: indexPath) as? TimeTableCell else { return }
         switch status {
         case true:
-            self.cellInitColor = selectedCell.lessonView.backgroundColor!
+            guard let color = selectedCell.lessonView.backgroundColor else { return }
+            self.cellInitColor = color
             UIView.animate(withDuration: 0.3, animations: {
                 if self.cellInitColor == UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00) {
                     selectedCell.lessonView.backgroundColor = UIColor(red: 0.09, green: 0.40, blue: 0.31, alpha: 1.00)
+                    selectedCell.turnAlarm.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
+                    selectedCell.turnAlarm.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
+                    selectedCell.makeNote.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
+                    selectedCell.makeNote.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
                 } else if self.cellInitColor == UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00) {
                     selectedCell.lessonView.backgroundColor = UIColor(red: 0.98, green: 0.46, blue: 0.28, alpha: 1.00)
+                    selectedCell.turnAlarm.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
+                    selectedCell.turnAlarm.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
+                    selectedCell.makeNote.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
+                    selectedCell.makeNote.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
                 }
             }, completion: nil)
             self.makeButtonsVisible(bool: status, cell: selectedCell)
@@ -225,9 +272,10 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
             todayButtonOutlet.isEnabled = true
         }
         if let index = timeTableView.indexPathForSelectedRow {
-            timeTableView.deselectRow(at: index, animated: true)
-            CellIsHighlighted = false
-            self.makeButtonsVisible(bool: false, cell: timeTableView.cellForRow(at: index) as! TimeTableCell)
+            deselectRows(index: index)
+            if let cell = timeTableView.cellForRow(at: index) as? TimeTableCell {
+                self.makeButtonsVisible(bool: false, cell: cell)
+            }
         }
         refetchData()
     }
@@ -318,6 +366,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     }
     
     func animateIn() {
+        print("animated in")
         turnGestures(bool: false)
         alertView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
         alertView.alpha = 0
@@ -331,8 +380,10 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     }
     
     func animateOut() {
+        print("animated out")
         turnGestures(bool: true)
         UIView.animate(withDuration: 0.3, animations: {
+            print("animation")
             self.visualEffectView.alpha = 0
             self.alertView.alpha = 0
             self.alertView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
@@ -342,13 +393,46 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         }
     }
     
+    func checkAlarmAvailability(cell: TimeTableCell) {
+        let cellStartTime = cell.startTime.text
+        let date = self.pickedDate
+        let stringDateWOTime = date.toString(dateFormat: "dd-MM-yyyy")
+        let stringDateWithTime = "\(stringDateWOTime) \(cellStartTime ?? "")"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd-MM-yyyy HH:mm"
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Kiev")
+        dateFormatter.locale = Locale(identifier: "uk_UA")
+        dateFormatter.calendar = Calendar(identifier: .gregorian)
+        guard let convertedDate = dateFormatter.date(from: stringDateWithTime) else { return }
+        let convertedDateWithReserve = Calendar.current.date(
+            byAdding: .hour,
+            value: -1,
+            to: convertedDate)!
+        print(convertedDateWithReserve)
+        print(Date())
+        if (convertedDateWithReserve) > Date() {
+            cell.turnAlarm.isEnabled = true
+            cell.turnAlarm.alpha = 1
+        } else {
+            cell.turnAlarm.isEnabled = false
+            cell.turnAlarm.alpha = 0.5
+        }
+    }
+    
     //MARK: Alarm methods
     func addAlarm() {
         //User reserve got from settings
-        let alertReserve = 1
+        self.alertView.alpha = 0
+        var alertReserve = 60
+        if alertView.alarmSegment.selectedSegmentIndex == 1{
+            alertReserve = 90
+        } else if alertView.alarmSegment.selectedSegmentIndex == 2{
+            alertReserve = 120
+        }
+        
         //getting cell
-        let cellIndex = timeTableView.indexPathForSelectedRow
-        let cell = timeTableView.cellForRow(at: cellIndex!) as! TimeTableCell
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
         //getting time
         let cellStartTime = cell.startTime.text
         let date = self.pickedDate
@@ -360,10 +444,10 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         dateFormatter.locale = Locale(identifier: "uk_UA")
         dateFormatter.calendar = Calendar(identifier: .gregorian)
         //time without user reserve
-        let convertedDate = dateFormatter.date(from: stringDateWithTime)!
+        guard let convertedDate = dateFormatter.date(from: stringDateWithTime) else { return }
         //time with user reserve
         let convertedDateWithReserve = Calendar.current.date(
-            byAdding: .hour,
+            byAdding: .minute,
             value: -alertReserve,
             to: convertedDate)!
         
@@ -377,140 +461,332 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
             self.animateIn()
             return }
         
-        let body = "\(cell.lessonName!.text!) на \(cell.startTime!.text!)"
+        guard let lessonName = cell.lessonName.text, let startTime = cell.startTime.text else { return }
+        let body = "\(lessonName) на \(startTime)"
         
         let dateDiff = Calendar.current.dateComponents([.day, .hour, .minute], from: Date(), to: convertedDateWithReserve)
-        var alertText = dateDiff.day == 0 ? "" : "\(dateDiff.day!) днів"
-        alertText += dateDiff.hour == 0 ? "" : " \(dateDiff.hour!) годин"
-        alertText += dateDiff.minute == 0 ? "" : " \(dateDiff.minute!) хвилин"
+        
+        guard let dayDiff = dateDiff.day,
+              let hourDiff = dateDiff.hour,
+              let minuteDiff = dateDiff.minute else { return }
+        
+        var alertText = dayDiff == 0 ? "" : "\(dayDiff) днів"
+        alertText += hourDiff == 0 ? "" : " \(hourDiff) годин"
+        alertText += minuteDiff == 0 ? "" : " \(minuteDiff) хвилин"
         self.setAlert(type: .alarmTurned)
-        alertView.setText(title: "Будильник", subTitle: "cпрацює через \(alertText)", body: "*цей час завжди можна змінити в налаштуваннях.")
+        alertView.setText(title: "Будильник", subTitle: "cпрацює через \(alertText)", body: "*ви можете видалити будильник натиснувши кнопку нижче, або з головного меню.")
         self.animateIn()
-        self.appDelegate?.scheduleNotification(notificationType: "Будильник", body: body, date: convertedDateWithReserve)
+        addAlarmToPushArray(date: convertedDateWithReserve, lessonName: cell.lessonName.text ?? "")
+        self.appDelegate?.scheduleNotification(title: "Будильник", notificationType: "\(convertedDateWithReserve)", body: body, date: convertedDateWithReserve)
+        
+    }
+    
+    func addAlarmToPushArray(date: Date, lessonName: String) {
+        let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
+        let hoursOfUserDate = String(Calendar.current.component(.hour, from: date)).count == 1 ? "0\(Calendar.current.component(.hour, from: date))" : String(Calendar.current.component(.hour, from: date))
+        let minutesOfUserDate = String(Calendar.current.component(.minute, from: date)).count == 1 ? "0\(Calendar.current.component(.minute, from: date))" : String(Calendar.current.component(.minute, from: date))
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "uk_UA")
+        formatter.dateFormat = lessonName != "" ? "d MMM на \(hoursOfUserDate):\(minutesOfUserDate), \(lessonName)" : "d MMM на \(hoursOfUserDate):\(minutesOfUserDate)"
+        let body = formatter.string(from: date)
+        let push = ["Будильник", body, "alarm", "\(date)"]
+        if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]] {
+            arrayOfPushes.insert(push, at: 0)
+            sharedDefault.set(arrayOfPushes, forKey: "pushes")
+        } else {
+            sharedDefault.set([push], forKey: "pushes")
+        }
+    }
+    
+    func deleteAlarmFromPushArray(date: Date) {
+        let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
+        let hoursOfUserDate = String(Calendar.current.component(.hour, from: date)).count == 1 ? "0\(Calendar.current.component(.hour, from: date))" : String(Calendar.current.component(.hour, from: date))
+        let minutesOfUserDate = String(Calendar.current.component(.minute, from: date)).count == 1 ? "0\(Calendar.current.component(.minute, from: date))" : String(Calendar.current.component(.minute, from: date))
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM на \(hoursOfUserDate):\(minutesOfUserDate)"
+        let body = formatter.string(from: date)
+        let push = ["Будильник", body, "alarm"]
+        if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{
+            for (index, array) in arrayOfPushes.enumerated() {
+                if array == push {
+                    arrayOfPushes.remove(at: index)
+                    break
+                }
+            }
+            sharedDefault.set(arrayOfPushes, forKey: "pushes")
+        }
+    }
+    
+    func showAlarmTurned(cell: TimeTableCell) {
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests(completionHandler: { requests in
+            for request in requests {
+                guard let userInfo = request.content.userInfo as? [String:Date] else { return }
+                guard let userInfoDate = userInfo["date"] else { return }
+                let hoursOfUserDate = Calendar.current.component(.hour, from: userInfoDate)
+                let minutesOfUserDate = Calendar.current.component(.minute, from: userInfoDate)
+                DispatchQueue.main.async {
+                    guard let timeOfCell = cell.startTime.text?.components(separatedBy: ":") else { return }
+                    guard let hoursOfCell = Int(timeOfCell[0]) else { return }
+                    guard let minutesOfCell = Int(timeOfCell[1]) else { return }
+                    guard userInfoDate.ignoringTime == self.pickedDate.ignoringTime else { return }
+                    var alarmDate = Date()
+                    let userTimeMin = hoursOfUserDate * 60 + minutesOfUserDate
+                    let cellTimeMin = hoursOfCell * 60 + minutesOfCell
+                    if  (cellTimeMin-60 == userTimeMin) ||
+                        (cellTimeMin-90 == userTimeMin) ||
+                        (cellTimeMin-120 == userTimeMin) {
+                            alarmDate = userInfoDate
+                    }
+                    
+                    let dateDiff = Calendar.current.dateComponents([.day, .hour, .minute], from: Date(), to: alarmDate)
+                    guard let dayDiff = dateDiff.day,
+                          let hourDiff = dateDiff.hour,
+                          let minuteDiff = dateDiff.minute else { return }
+                    
+                    var alertText = dayDiff == 0 ? "" : "\(dayDiff) днів"
+                    alertText += hourDiff == 0 ? "" : " \(hourDiff) годин"
+                    alertText += minuteDiff == 0 ? "" : " \(minuteDiff) хвилин"
+                    self.alertView.setText(title: "Будильник", subTitle: "cпрацює через \(alertText)", body: "*ви можете видалити будильник натиснувши кнопку нижче, або з головного меню.")
+                }
+            }
+        })
+        self.setAlert(type: .alarmTurned)
+        self.animateIn()
+    }
+    
+    func deleteAlarm() {
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests(completionHandler: { requests in
+            for request in requests {
+                guard let userInfo = request.content.userInfo as? [String:Date] else { return }
+                guard let userInfoDate = userInfo["date"] else { return }
+                let hoursOfUserDate = Calendar.current.component(.hour, from: userInfoDate)
+                let minutesOfUserDate = Calendar.current.component(.minute, from: userInfoDate)
+                DispatchQueue.main.sync {
+                    guard let timeOfCell = cell.startTime.text?.components(separatedBy: ":") else { return }
+                    guard let hoursOfCell = Int(timeOfCell[0]) else { return }
+                    guard let minutesOfCell = Int(timeOfCell[1]) else { return }
+                    guard userInfoDate.ignoringTime == self.pickedDate.ignoringTime else { return }
+                    var identifiers: [String] = []
+                    let userTimeMin = hoursOfUserDate * 60 + minutesOfUserDate
+                    let cellTimeMin = hoursOfCell * 60 + minutesOfCell
+                    if  (cellTimeMin-60 == userTimeMin) ||
+                        (cellTimeMin-90 == userTimeMin) ||
+                        (cellTimeMin-120 == userTimeMin) {
+                            identifiers.append(request.identifier)
+                    }
+                    self.deleteAlarmFromPushArray(date: userInfoDate)
+                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+                    self.reloadRows(index: cellIndex)
+                }
+            }
+        })
     }
     
     func checkAlarms(cell: TimeTableCell, date: Date) {
         print("checking alarms")
-        
+        cell.alarmImage.isHidden = true
+        cell.alarmText.isHidden = true
         let center = UNUserNotificationCenter.current()
         center.getPendingNotificationRequests(completionHandler: { requests in
             for request in requests {
-                if request.identifier == "Будильник" {
-                    guard let trigger = request.trigger as? UNTimeIntervalNotificationTrigger else { return }
-                    guard let dateOfAlarmInterval = trigger.nextTriggerDate() else { return }
-                    print("alarm timeinterval: \(dateOfAlarmInterval)")
-                    let dateOfAlarm = dateOfAlarmInterval
-                    DispatchQueue.main.async {
-                        print("Picked dateNTime \(date)")
-                        print("dateNTime of alarm \(dateOfAlarm)")
-                        if dateOfAlarm.ignoringTime == date.ignoringTime {
-                            cell.alarmText.text = dateOfAlarm.description
-                            cell.alarmImage.isHidden = false
-                            cell.alarmImage.isHidden = false
-                        } else {
-                            cell.alarmImage.isHidden = true
-                            cell.alarmImage.isHidden = true
-                        }
+                guard let userInfo = request.content.userInfo as? [String:Date] else { return }
+                guard let userInfoDate = userInfo["date"] else { return }
+                let hoursOfUserDate = Calendar.current.component(.hour, from: userInfoDate)
+                let minutesOfUserDate = Calendar.current.component(.minute, from: userInfoDate)
+                DispatchQueue.main.sync {
+                    guard let timeOfCell = cell.startTime.text?.components(separatedBy: ":") else { return }
+                    guard let hoursOfCell = Int(timeOfCell[0]) else { return }
+                    guard let minutesOfCell = Int(timeOfCell[1]) else { return }
+                    guard userInfoDate.ignoringTime == date.ignoringTime else { return }
+                    let userTimeMin = hoursOfUserDate * 60 + minutesOfUserDate
+                    let cellTimeMin = hoursOfCell * 60 + minutesOfCell
+                    if  (cellTimeMin-60 == userTimeMin) ||
+                        (cellTimeMin-90 == userTimeMin) ||
+                        (cellTimeMin-120 == userTimeMin) {
+                        let hoursString = String(Calendar.current.component(.hour, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.hour, from: userInfoDate))" : String(Calendar.current.component(.hour, from: userInfoDate))
+                        let minutesString = String(Calendar.current.component(.minute, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.minute, from: userInfoDate))" : String(Calendar.current.component(.minute, from: userInfoDate))
+                        cell.alarmImage.isHidden = false
+                        cell.alarmText.isHidden = false
+                        cell.alarmText.text = "\(hoursString):\(minutesString)"
                     }
                 }
             }
         })
     }
     
-    
     func okAction(type: AlertStatus) {
         switch type {
         case .note:
-            self.addNote(text: alertView.textField.text ?? "")
+            self.addNote()
             self.animateOut()
         case .lateAlarm, .alert:
             self.animateOut()
         case .alarmTurned:
+            self.reloadRows()
             self.animateOut()
         case .alarmRequest:
-            self.alertView.alpha = 0
             self.addAlarm()
+        }
+    }
+    
+    func cancelAction(type: AlertStatus) {
+        switch type {
+        case .note:
+            self.noteCancel()
+            self.animateOut()
+        case .lateAlarm, .alert:
+            self.animateOut()
+        case .alarmTurned:
+            self.deleteAlarm()
+            self.animateOut()
+        case .alarmRequest:
+            self.deleteAlarm()
+            self.animateOut()
         }
     }
     
     //MARK: Note methods
     func showNoteAlert(){
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
         self.setAlert(type: .note)
         alertView.textField.becomeFirstResponder()
         alertView.frame.origin.y -= 129
         alertView.layoutIfNeeded()
-        alertView.setText(title: "Замітки", subTitle: "нова замітка", body: "")
+        if !cell.noteText.isHidden {
+            alertView.textField.text = cell.noteText.text
+            alertView.setText(title: "Замітки", subTitle: "редагування замітки", body: "")
+            alertView.cancelOutlet.setTitle("Видалити", for: .normal)
+        } else {
+            alertView.setText(title: "Замітки", subTitle: "нова замітки", body: "")
+            alertView.cancelOutlet.setTitle("Відміна", for: .normal)
+        }
         self.animateIn()
     }
-    func addNote(text: String) {
-        if text != "" {
-            let cellIndex = timeTableView.indexPathForSelectedRow
-            let cell = timeTableView.cellForRow(at: cellIndex!) as! TimeTableCell
-            cell.noteImage.isHidden = false
-            cell.noteText.isHidden = false
-            cell.noteText.text = text
-            let pickedDate = self.pickedDate.ignoringTime!
-            print("added note with: \(text)")
-            
-            if let dataOfArrayOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data{
-                print("notes founded")
-                if let startTime = cell.startTime.text {
-                    let noteDict = ["date": pickedDate,"cellStartTime":startTime,"text":text] as [String : Any]
-                    print("set note on \(pickedDate) at \(startTime)")
-                    do {
-                        guard var arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(dataOfArrayOfNotes as Data) as? [[String : Any]] else { return }
-                        arrayOfNotes.append(noteDict)
-                        do {
-                            let noteData = try NSKeyedArchiver.archivedData(withRootObject: arrayOfNotes, requiringSecureCoding: false)
-                            UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
-                        } catch {
-                            print(error.localizedDescription)
-                        }
-                    } catch {
-                        print(error.localizedDescription)
+    
+    func noteCancel() {
+        print("note cancel...")
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
+        guard let arrayOfDataOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data else {return}
+        do {
+            guard let arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(arrayOfDataOfNotes as Data) as? [[String : Any]] else { return }
+            var newArrayOfNotes = arrayOfNotes
+            for (index, item) in arrayOfNotes.enumerated() {
+                guard let arrDate = item["date"] as? Date else { return }
+                guard let startTime = item["cellStartTime"] as? String else { return }
+                guard let text = item["text"] as? String else { return }
+                if cell.startTime.text == startTime && cell.noteText.text == text && pickedDate.ignoringTime == arrDate{
+                    print("deleted note at \(startTime)")
+                    if index >= newArrayOfNotes.startIndex && index < newArrayOfNotes.endIndex {
+                        print(newArrayOfNotes[index])
+                        newArrayOfNotes.remove(at: index)
                     }
+                    
                 }
-            } else {
-                print("notes not found, creating new defaults")
-                if let startTime = cell.startTime.text {
-                    let noteDict = [["date": pickedDate,"cellStartTime":startTime,"text":text]] as [[String : Any]]
+            }
+            do {
+                let DataOfNotes = try NSKeyedArchiver.archivedData(withRootObject: newArrayOfNotes, requiringSecureCoding: false)
+                UserDefaults.standard.set(DataOfNotes, forKey: "arrayOfNotes")
+            } catch {
+                print(error.localizedDescription)
+            }
+            timeTableView.reloadRows(at: [cellIndex], with: .automatic)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func addNote() {
+        guard let text = alertView.textField.text else { return }
+        guard text != "" else { return }
+        guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
+        guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
+        
+        cell.noteImage.isHidden = false
+        cell.noteText.isHidden = false
+        cell.noteText.text = text
+        guard let pickedDate = self.pickedDate.ignoringTime else { return }
+        print("added note with: \(text)")
+        
+        if let dataOfArrayOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data{
+            print("notes founded")
+            if let startTime = cell.startTime.text {
+                let noteDict = ["date": pickedDate,"cellStartTime":startTime,"text":text] as [String : Any]
+                print("set note on \(pickedDate) at \(startTime)")
+//MARK: if the same array is founded, just edit value
+                do {
+                    guard var arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(dataOfArrayOfNotes as Data) as? [[String : Any]] else { return }
+                    for var item in arrayOfNotes {
+                        guard let arrDate = item["date"] as? Date else { return }
+                        guard let startTime = item["cellStartTime"] as? String else { return }
+                        guard let text = item["text"] as? String else { return }
+                        if cell.startTime.text == startTime && pickedDate == arrDate {
+                            print("deleted note at \(startTime)")
+                            item["text"] = text
+                            do {
+                                let noteData = try NSKeyedArchiver.archivedData(withRootObject: arrayOfNotes, requiringSecureCoding: false)
+                                UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                            return
+                        }
+                    }
+                    arrayOfNotes.append(noteDict)
                     do {
-                        let noteData = try NSKeyedArchiver.archivedData(withRootObject: noteDict, requiringSecureCoding: false)
+                        let noteData = try NSKeyedArchiver.archivedData(withRootObject: arrayOfNotes, requiringSecureCoding: false)
                         UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
                     } catch {
                         print(error.localizedDescription)
                     }
+                } catch {
+                    print(error.localizedDescription)
                 }
             }
-            self.CellIsHighlighted = false
-            checkAction(timeTableView, cellForRowAt: cellIndex!, status: false)
-            //            timeTableView.reloadRows(at: [cellIndex!], with: .automatic)
+        } else {
+            print("notes not found, creating new defaults")
+            if let startTime = cell.startTime.text {
+                let noteDict = [["date": pickedDate,"cellStartTime":startTime,"text":text]] as [[String : Any]]
+                do {
+                    let noteData = try NSKeyedArchiver.archivedData(withRootObject: noteDict, requiringSecureCoding: false)
+                    UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
         }
+        deselectRows(index: cellIndex)
+        checkAction(timeTableView, cellForRowAt: cellIndex, status: false)
+        timeTableView.reloadRows(at: [cellIndex], with: .automatic)
     }
     
     func checkNotes(cell: TimeTableCell, date: Date) {
         print("checking notes")
-        if let arrayOfDataOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data{
-            do {
-                guard let arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(arrayOfDataOfNotes as Data) as? [[String : Any]] else { return }
-                let pickedDate = date.ignoringTime!
-                for date in arrayOfNotes {
-                    if pickedDate == date["date"] as! Date{
-                        guard let startTime = date["cellStartTime"] as? String else { return }
-                        if cell.startTime.text == startTime {
-                            print("founed note at \(startTime)")
-                            cell.noteImage.isHidden = false
-                            cell.noteText.isHidden = false
-                            cell.noteText.text = date["text"] as? String
-                        } else {
-                            cell.noteImage.isHidden = true
-                            cell.noteText.isHidden = true
-                        }
+        cell.noteText.isHidden = true
+        cell.noteImage.isHidden = true
+        guard let arrayOfDataOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data else {return}
+        do {
+            guard let arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(arrayOfDataOfNotes as Data) as? [[String : Any]] else { return }
+            guard let pickedDate = date.ignoringTime else { return }
+            for item in arrayOfNotes {
+                guard let arrDate = item["date"] as? Date else { return }
+                if pickedDate == arrDate{
+                    guard let startTime = item["cellStartTime"] as? String else { return }
+                    if cell.startTime.text == startTime {
+                        print("founed note at \(startTime)")
+                        cell.noteImage.isHidden = false
+                        cell.noteText.isHidden = false
+                        cell.noteText.text = item["text"] as? String
                     }
                 }
-            } catch {
-                print(error.localizedDescription)
             }
+        } catch {
+            print(error.localizedDescription)
         }
     }
     
@@ -535,10 +811,10 @@ extension TimetableViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
-            tableView.allowsSelection = true
             network.configureCell(cell: cell, for: indexPath, date: pickedDate, isStudent: isStudent, subGroup: currentSubGroup)
             self.checkNotes(cell: cell, date: pickedDate)
             self.checkAlarms(cell: cell, date: pickedDate)
+            timeTableView.allowsSelection = true
             timeTableSeparator.isHidden = false
             return cell
         }
@@ -565,5 +841,15 @@ extension TimetableViewController: UITableViewDataSource, UITableViewDelegate {
         if let cell = cell as? TimeTableCell {
             self.makeButtonsVisible(bool: false, cell: cell)
         }
+    }
+}
+
+extension TimetableViewController: CustomAlertDelegate {
+    func cancelAction() {
+        self.cancelAction(type: self.alertStatus)
+    }
+    
+    func okAction() {
+        self.okAction(type: self.alertStatus)
     }
 }

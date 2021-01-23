@@ -60,15 +60,6 @@ extension Date {
         return Calendar.current.date(from: dateComponents)
     }
 }
-extension TimetableViewController: CustomAlertDelegate {
-    func cancelAction() {
-        self.animateOut()
-    }
-    
-    func okAction() {
-        self.okAction(type: self.alertStatus)
-    }
-}
 extension UITabBarController {
 
     private struct AssociatedKeys {
@@ -149,12 +140,6 @@ extension UIViewController {
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .sound])
-    }
-}
-
 extension Date {
     
     static func today() -> Date {
@@ -217,25 +202,6 @@ extension ListViewController: Draggable{
     }
 }
 
-extension ListViewController: UITableViewDelegate, UITableViewDataSource{
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let model = sheetContentController.sheetModel
-        self.itemsCount = model.items?.count ?? 0
-        return self.itemsCount
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.register(UINib(nibName: "MainItemCell", bundle: nil), forCellReuseIdentifier: "MainItemCell")
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MainItemCell", for: indexPath) as! MainItemCell
-        configureCell(cell: cell, indexPath: indexPath)
-        return cell
-    }
-}
-
 extension UIViewController {
     func ub_add(_ child: UIViewController, in container: UIView, animated: Bool = true, topInset: CGFloat, completion: (()->Void)? = nil) {
         addChild(child)
@@ -293,4 +259,23 @@ extension Array where Element == CGFloat{
     func nearest(to x: CGFloat) -> CGFloat{
         return self.reduce(self.first!) { abs($1 - x) < abs($0 - x) ? $1 : $0 }
     }
+}
+
+extension Date {
+    func dateAt(hours: Int, minutes: Int) -> Date {
+    let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+
+    var date_components = calendar.components(
+      [NSCalendar.Unit.year,
+       NSCalendar.Unit.month,
+       NSCalendar.Unit.day],
+      from: self)
+
+    date_components.hour = hours
+    date_components.minute = minutes
+    date_components.second = 0
+
+    let newDate = calendar.date(from: date_components)!
+    return newDate
+  }
 }

@@ -33,8 +33,6 @@ class TimeTableCell: UITableViewCell {
         self.turnAlarm.alpha = 0
         self.makeNote.alpha = 0
         self.turnAlarm.alpha = 0
-        self.alarmText.alpha = 0
-        self.alarmImage.alpha = 0
         self.lessonView.layer.cornerRadius = 15
         self.makeNote.layer.cornerRadius = 13
         self.turnAlarm.layer.cornerRadius = 13

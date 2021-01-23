@@ -74,7 +74,8 @@ class UserEditorTableViewController: UITableViewController {
             .applyingTransform(.toLatin, reverse: false)?
             .applyingTransform(.stripDiacritics, reverse: false)?
             .lowercased()
-            .replacingOccurrences(of: " ", with: "") ?? nonLatin
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "`", with: "") ?? nonLatin
     }
     
     @IBAction func DoneButtonAction(_ sender: UIButton) {
@@ -90,7 +91,18 @@ class UserEditorTableViewController: UITableViewController {
                     print(groupName)
                     if let oldTopic = UserDefaults.standard.object(forKey: "subsctibedTopic") as? String {
                         Messaging.messaging().unsubscribe(fromTopic: oldTopic) { error in
-                            print("Unsubscribed from \(oldTopic)")
+                            print("Unsubscribed from \(oldTopic) pushes")
+                        }
+                    }
+                    if let oldChangesTopic = UserDefaults.standard.object(forKey: "groupOfChangeSubscription") as? String {
+                        Messaging.messaging().unsubscribe(fromTopic: "/topics/changesOf\(oldChangesTopic)") { error in
+                            print("Unsubscribed from \(oldChangesTopic) changes")
+                            UserDefaults.standard.set(nil,forKey: "groupOfChangeSubscription")
+                            let group = self.transliterate(nonLatin: groupName)
+                            Messaging.messaging().subscribe(toTopic: "/topics/changesOf\(group)") { error in
+                                print("Subscribed to \(group) changes")
+                                UserDefaults.standard.set(group,forKey: "groupOfChangeSubscription")
+                            }
                         }
                     }
                     self.navigationController?.popViewController(animated: true)
@@ -149,6 +161,7 @@ class UserEditorTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.separatorStyle = .none
         avatarMethods.setupUserImageView(avatarContainer: avatarContainer, imageView: EditorAvatar)
         updateAvatar()
         NotificationCenter.default.addObserver(self, selector: #selector(updateAvatar), name:NSNotification.Name(rawValue: "updateAvatar"), object: nil)
@@ -204,9 +217,16 @@ class UserEditorTableViewController: UITableViewController {
     func logOut(){
         if let oldTopic = UserDefaults.standard.object(forKey: "subsctibedTopic") as? String {
             Messaging.messaging().unsubscribe(fromTopic: oldTopic) { error in
-                print("Unsubscribed from \(oldTopic)")
+                print("Unsubscribed from \(oldTopic) pushes")
             }
         }
+        
+        if let oldChangesTopic = UserDefaults.standard.object(forKey: "groupOfChangeSubscription") as? String {
+            Messaging.messaging().unsubscribe(fromTopic: "/topics/changesOf\(oldChangesTopic)") { error in
+                print("Unsubscribed from \(oldChangesTopic) changes")
+            }
+        }
+        
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         UserDefaults.standard.synchronize()
@@ -264,17 +284,19 @@ class UserEditorTableViewController: UITableViewController {
                 let cameraImage = #imageLiteral(resourceName: "camera")
                 let photoImage = #imageLiteral(resourceName: "photo")
                 let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-                let camera = UIAlertAction(title: "зробити фото", style: .default){_ in
+                actionSheet.view.tintColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00)
+                let camera = UIAlertAction(title: "Зробити фото", style: .default){_ in
                     self.chooseImagePicker(source: .camera)
                 }
                 camera.setValue(cameraImage, forKey: "image")
                 camera.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-                let photo = UIAlertAction(title: "обрати з галереї", style: .default){_ in
+                let photo = UIAlertAction(title: "Обрати з галереї", style: .default){_ in
                     self.chooseImagePicker(source: .photoLibrary)
                 }
                 photo.setValue(photoImage, forKey: "image")
                 photo.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-                let cancel = UIAlertAction(title: "Скасувати", style: .cancel )
+                let cancel = UIAlertAction(title: "Скасувати", style: .cancel)
+                cancel.setValue(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), forKey: "titleTextColor")
                 actionSheet.addAction(camera)
                 actionSheet.addAction(photo)
                 actionSheet.addAction(cancel)
@@ -343,3 +365,49 @@ extension UserEditorTableViewController: UIPickerViewDataSource, UIPickerViewDel
     }
 }
 
+extension UIAlertController {
+
+    //Set background color of UIAlertController
+    func setBackgroundColor(color: UIColor) {
+        if let bgView = self.view.subviews.first, let groupView = bgView.subviews.first, let contentView = groupView.subviews.first {
+            contentView.backgroundColor = color
+        }
+    }
+
+    //Set title font and title color
+    func setTitlet(font: UIFont?, color: UIColor?) {
+        guard let title = self.title else { return }
+        let attributeString = NSMutableAttributedString(string: title)//1
+        if let titleFont = font {
+            attributeString.addAttributes([NSAttributedString.Key.font : titleFont],//2
+                                          range: NSMakeRange(0, title.utf8.count))
+        }
+
+        if let titleColor = color {
+            attributeString.addAttributes([NSAttributedString.Key.foregroundColor : titleColor],//3
+                                          range: NSMakeRange(0, title.utf8.count))
+        }
+        self.setValue(attributeString, forKey: "attributedTitle")//4
+    }
+
+    //Set message font and message color
+    func setMessage(font: UIFont?, color: UIColor?) {
+        guard let message = self.message else { return }
+        let attributeString = NSMutableAttributedString(string: message)
+        if let messageFont = font {
+            attributeString.addAttributes([NSAttributedString.Key.font : messageFont],
+                                          range: NSMakeRange(0, message.utf8.count))
+        }
+
+        if let messageColorColor = color {
+            attributeString.addAttributes([NSAttributedString.Key.foregroundColor : messageColorColor],
+                                          range: NSMakeRange(0, message.utf8.count))
+        }
+        self.setValue(attributeString, forKey: "attributedMessage")
+    }
+
+    //Set tint color of UIAlertController
+    func setTint(color: UIColor) {
+        self.view.tintColor = color
+    }
+}

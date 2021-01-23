@@ -18,6 +18,33 @@ class NotificationService: UNNotificationServiceExtension {
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
         if let bestAttemptContent = bestAttemptContent {
+            
+            func save(_ identifier: String,
+                      data: Data, options: [AnyHashable: Any]?)
+                -> UNNotificationAttachment? {
+                    let directory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
+                    do {
+                        try FileManager.default.createDirectory(at: directory,
+                                                                withIntermediateDirectories: true,
+                                                                attributes: nil)
+                        let fileURL = directory.appendingPathComponent(identifier)
+                        try data.write(to: fileURL, options: [])
+                        return try UNNotificationAttachment.init(identifier: identifier,
+                                                                 url: fileURL,
+                                                                 options: options)
+                    } catch {}
+                    return nil
+            }
+
+            func exitGracefully(_ reason: String = "") {
+                let bca    = request.content.mutableCopy()
+                    as? UNMutableNotificationContent
+                bca!.title = reason
+                contentHandler(bca!)
+            }
+            
+            
+            
             var push = [String]()
             
             // Modify the notification content here...
@@ -54,7 +81,24 @@ class NotificationService: UNNotificationServiceExtension {
                     bestAttemptContent.badge = NSNumber(value: badgeNum+1)
                     UserDefaults(suiteName: "group.myktgg")!.set(badgeNum+1, forKey: "badges")
                 }
-                contentHandler(bestAttemptContent)
+            }
+            
+            DispatchQueue.main.async {
+                guard let content = (request.content.mutableCopy() as? UNMutableNotificationContent) else {
+                    return exitGracefully()
+                }
+                let userInfo : [AnyHashable: Any] = request.content.userInfo
+                guard let attachmentURL = userInfo["image_url"] as? String else {
+                    return exitGracefully()
+                }
+                guard let imageData = try? Data(contentsOf: URL(string: attachmentURL)!) else {
+                    return exitGracefully()
+                }
+                guard let attachment = save("image.png", data: imageData, options: nil) else {
+                    return exitGracefully()
+                }
+                content.attachments = [attachment]
+                contentHandler(content)
             }
         }
     }

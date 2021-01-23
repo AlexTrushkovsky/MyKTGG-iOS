@@ -85,10 +85,10 @@ class GroupNetworkController {
         result = result.replacingOccurrences(of: "[", with: "")
         result = result.replacingOccurrences(of: "\"", with: "")
         result = result.replacingOccurrences(of: "}", with: "")
-        result = result.replacingOccurrences(of: "{:", with: "")
+        result = result.replacingOccurrences(of: "{", with: "")
         var arr = result.components(separatedBy: ",")
         if isStudent {
-            arr.removeAll { $0.count >= 10 }
+            arr.removeAll { $0.contains(":") }
             for i in 0..<arr.count {
                 if arr[i].first == " " {
                     arr[i] = String(arr[i].dropFirst())

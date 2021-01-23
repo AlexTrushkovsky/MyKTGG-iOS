@@ -67,8 +67,8 @@ public protocol UBottomSheetCoordinatorDataSource: class {
 ///By default make all the view controller conforms to the UBottomSheetCoordinatorDataSource.
 extension MainViewController: UBottomSheetCoordinatorDataSource{
     public func sheetPositions(_ availableHeight: CGFloat) -> [CGFloat]{
-        // 22 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
-        var height = 22 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
+        // 10 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
+        var height = 10 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
         height = height - mainImage.frame.height * 0.1
         print("available position: \(height)")
         return [UIApplication.shared.statusBarFrame.height, height]
@@ -80,8 +80,8 @@ extension MainViewController: UBottomSheetCoordinatorDataSource{
 
     public func initialPosition(_ availableHeight: CGFloat) -> CGFloat{
         print(availableHeight)
-        // 22 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
-        var height = 22 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
+        // 10 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
+        var height = 10 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
         height = height - mainImage.frame.height * 0.1
         print("available position: \(height)")
         return height

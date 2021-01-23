@@ -1,11 +1,3 @@
-//
-//  ListViewController.swift
-//  UBottomSheet_Example
-//
-//  Created by ugur on 2.05.2020.
-//  Copyright © 2020 CocoaPods. All rights reserved.
-//
-
 import UIKit
 
 class ListViewController: UIViewController {
@@ -27,26 +19,27 @@ class ListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = .never
-        } else {
-            automaticallyAdjustsScrollViewInsets = false
-        }
+        tableView.contentInsetAdjustmentBehavior = .never
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-//        sheetNetworkController.addItem(title: "Будильник", subtitle: "на 1 вересня спрацює через 52:25", image: "alarm", date: Date())
-//        sheetNetworkController.addItem(title: "Заміна", subtitle: "самостійна робота першою парою у вівторок", image: "change", date: Date())
-//        sheetNetworkController.addItem(title: "День незалежності", subtitle: "нашій вітчизні вже 29", image: "new", date: Date())
-        //        sheetNetworkController.addItem(title: "Увага", subtitle: "всі студенти запрошуються в актову залу о 15:10", image: "alarm", date: Date())
-        
         sharedDefault!.addObserver(self, forKeyPath: "pushes", options: [.new], context: nil)
+        addItemsFromDefaults()
+    }
+    
+    func addItemsFromDefaults() {
         if let arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]{
             for push in arrayOfPushes {
                 let title = push[0]
                 let body = push[1]
                 let image = push[2]
-                sheetContentController.addItem(title: title, subtitle: body, image: image)
+                if push.count > 3 {
+                    let identifier = push[3]
+                    sheetContentController.addItem(title: title, subtitle: body, image: image, identifier: identifier)
+                }else{
+                    sheetContentController.addItem(title: title, subtitle: body, image: image)
+                }
+                print("added \(body) item")
             }
         }
     }
@@ -55,19 +48,12 @@ class ListViewController: UIViewController {
         updateTableView()
     }
     
-   func updateTableView() {
+    func updateTableView() {
         print("Updating bottomSheet")
         sheetContentController.sheetModel = BottomSheetModel()
         sheetContentController.itemArray = [BottomSheetModelItem]()
-    if let arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]{
-                for push in arrayOfPushes {
-                    let title = push[0]
-                    let body = push[1]
-                    let image = push[2]
-                    sheetContentController.addItem(title: title, subtitle: body, image: image)
-                }
-            }
-        tableView.reloadData()
+        addItemsFromDefaults()
+        tableView.reloadSections([0], with: .automatic)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,20 +63,19 @@ class ListViewController: UIViewController {
     
     // this method handles row deletion
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-
+        
         if editingStyle == .delete {
-
-            // remove the item from the data model
-            
+            if let cell = tableView.cellForRow(at: indexPath) as? MainItemCell {
+                if cell.nameLabel.text == "Будильник" {
+                    let identifier = cell.identifier
+                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+                }
+            }
             sheetContentController.sheetModel.items!.remove(at: indexPath.row)
             var arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]
             arrayOfPushes!.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
             sharedDefault!.set(arrayOfPushes, forKey: "pushes")
-            
-
-        } else if editingStyle == .insert {
-            // Not used in our example, but if you were adding a new row, this is where you would do it.
         }
     }
     
@@ -100,7 +85,6 @@ class ListViewController: UIViewController {
             return
         }
         
-//        todayButtonOutlet.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
         deleteButton.backgroundColor = UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00)
         return [deleteButton]
     }
@@ -118,5 +102,37 @@ class ListViewController: UIViewController {
         if let subtitle = item.subtitle {
             cell.descriptionLabel.text = subtitle
         }
+        if let identifier = item.identifier {
+            cell.identifier = identifier
+        }
+    }
+}
+
+extension ListViewController: UITableViewDelegate, UITableViewDataSource{
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let model = sheetContentController.sheetModel
+        self.itemsCount = model.items?.count ?? 0
+        return self.itemsCount
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? MainItemCell else { return }
+        guard let tabBar = tabBarController else { return }
+        if cell.nameLabel.text == "Будильник" || cell.nameLabel.text == "Заміна" {
+//            tabBar.selectedIndex = 2
+        } else {
+            tabBar.selectedIndex = 1
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        tableView.register(UINib(nibName: "MainItemCell", bundle: nil), forCellReuseIdentifier: "MainItemCell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MainItemCell", for: indexPath) as! MainItemCell
+        configureCell(cell: cell, indexPath: indexPath)
+        return cell
     }
 }

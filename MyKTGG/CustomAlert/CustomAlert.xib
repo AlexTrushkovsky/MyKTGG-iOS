@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -17,7 +18,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="iN0-l3-epB" customClass="CustomAlert" customModule="Мій_КТГГ" customModuleProvider="target">
+        <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="iN0-l3-epB" customClass="CustomAlert" customModule="My_KTGG" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="314" height="220"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
             <subviews>
@@ -35,7 +36,7 @@
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
                         </textField>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OLv-ZJ-xMz">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OLv-ZJ-xMz">
                             <rect key="frame" x="209" y="171" width="90" height="33"/>
                             <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
@@ -49,7 +50,7 @@
                                 <action selector="okAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="j7O-J9-QoU"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="401-wi-4UV">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="401-wi-4UV">
                             <rect key="frame" x="109" y="171" width="90" height="33"/>
                             <color key="backgroundColor" red="0.91250371929999996" green="0.95745021100000005" blue="0.93683123589999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <constraints>
@@ -64,7 +65,7 @@
                             </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="буде заведено за 1 годину до пари." lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vW7-KM-dRF">
-                            <rect key="frame" x="15" y="57" width="257.5" height="20.5"/>
+                            <rect key="frame" x="15" y="57" width="284" height="20.5"/>
                             <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="16"/>
                             <color key="textColor" red="0.24910089369999999" green="0.78099983930000005" blue="0.55918037890000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
@@ -75,10 +76,22 @@
                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="eCX-Y0-rBh">
+                            <rect key="frame" x="15" y="95" width="284" height="32"/>
+                            <segments>
+                                <segment title="1 год."/>
+                                <segment title="1,5 год."/>
+                                <segment title="2 год."/>
+                            </segments>
+                            <connections>
+                                <action selector="alarmSegment:" destination="iN0-l3-epB" eventType="valueChanged" id="ec3-4P-Q6U"/>
+                            </connections>
+                        </segmentedControl>
                     </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
                         <constraint firstItem="JDN-fN-KQZ" firstAttribute="top" secondItem="HRn-FN-eeg" secondAttribute="top" id="1Bm-0c-V9T"/>
+                        <constraint firstItem="eCX-Y0-rBh" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="2Dz-vo-oiL"/>
                         <constraint firstItem="Iu0-Tk-x15" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="14" id="7VA-Pu-TKc"/>
                         <constraint firstAttribute="trailing" secondItem="OLv-ZJ-xMz" secondAttribute="trailing" constant="15" id="Dha-hu-Ga3"/>
                         <constraint firstItem="OLv-ZJ-xMz" firstAttribute="leading" secondItem="401-wi-4UV" secondAttribute="trailing" constant="10" id="GpS-2B-i0q"/>
@@ -87,11 +100,14 @@
                         <constraint firstItem="Iu0-Tk-x15" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="15.5" id="VpT-yn-Xkz"/>
                         <constraint firstItem="vW7-KM-dRF" firstAttribute="top" secondItem="JDN-fN-KQZ" secondAttribute="bottom" constant="6.5" id="ZfV-71-7ud"/>
                         <constraint firstItem="401-wi-4UV" firstAttribute="top" secondItem="OLv-ZJ-xMz" secondAttribute="top" id="biJ-BP-3p9"/>
+                        <constraint firstAttribute="trailing" secondItem="eCX-Y0-rBh" secondAttribute="trailing" constant="15" id="cSF-fU-fwz"/>
                         <constraint firstAttribute="bottom" secondItem="OLv-ZJ-xMz" secondAttribute="bottom" constant="16" id="eFQ-2L-pDk"/>
                         <constraint firstAttribute="trailing" secondItem="Iu0-Tk-x15" secondAttribute="trailing" constant="16" id="fSW-wW-Ql2"/>
                         <constraint firstAttribute="trailing" secondItem="oPN-nz-VBb" secondAttribute="trailing" constant="15" id="jU7-Fa-CIK"/>
                         <constraint firstItem="oPN-nz-VBb" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="15" id="lpS-eH-8xb"/>
                         <constraint firstItem="JDN-fN-KQZ" firstAttribute="leading" secondItem="HRn-FN-eeg" secondAttribute="leading" constant="8" id="piI-eK-4ho"/>
+                        <constraint firstAttribute="trailing" secondItem="vW7-KM-dRF" secondAttribute="trailing" constant="15" id="vUy-Zt-3YM"/>
+                        <constraint firstItem="eCX-Y0-rBh" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="17.5" id="vsB-ds-RRx"/>
                         <constraint firstItem="oPN-nz-VBb" firstAttribute="top" secondItem="vW7-KM-dRF" secondAttribute="bottom" constant="13.5" id="xMJ-IY-wX5"/>
                     </constraints>
                 </view>
@@ -104,6 +120,7 @@
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="alarmSegment" destination="eCX-Y0-rBh" id="0GO-oO-tBS"/>
                 <outlet property="backgroundView" destination="HRn-FN-eeg" id="hOB-CJ-xH9"/>
                 <outlet property="cancelOutlet" destination="401-wi-4UV" id="0v0-xg-FUr"/>
                 <outlet property="okOutlet" destination="OLv-ZJ-xMz" id="sYj-Tw-vOk"/>
@@ -115,4 +132,9 @@
             <point key="canvasLocation" x="63.768115942028992" y="-115.17857142857142"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

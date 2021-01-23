@@ -1,5 +1,4 @@
 import UIKit
-import Alamofire
 
 class TimetableNetworkController {
     
@@ -22,12 +21,12 @@ class TimetableNetworkController {
         
         guard let data = group.data(using: .windowsCP1251) else { return }
         let encodedGroup = data.map { String(format: "%%%02hhX", $0) }.joined()
-        
-        var request = URLRequest(url: URL(string: "http://217.76.201.218/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=\(mode)&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)")!,timeoutInterval: Double.infinity)
+        guard let url = URL(string: "http://217.76.201.218/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=\(mode)&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)") else { return }
+        var request = URLRequest(url: url, timeoutInterval: Double.infinity)
         
         let ip = getIPAddress()
         if  ip.contains("192.168.5") {
-            request = URLRequest(url: URL(string: "http://192.168.5.230/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=\(mode)&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)")!,timeoutInterval: Double.infinity)
+            request = URLRequest(url: url, timeoutInterval: Double.infinity)
         }
         
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -43,16 +42,16 @@ class TimetableNetworkController {
                 self.deinitModel()
                 return
             }
-            let dataString = String(data: data, encoding: .windowsCP1251)!
+            guard let dataString = String(data: data, encoding: .windowsCP1251) else { return }
             let formattedJson = self.formatJson(str: dataString)
-            print(String(data: data, encoding: .windowsCP1251)!)
             guard let formattedJsonData = formattedJson.data(using: .utf8) else { return }
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             do {
                 let timeTableRoot = try decoder.decode(TimetableRoot.self, from: formattedJsonData)
                 self.newVar = timeTableRoot
-                self.item = self.newVar.item!
+                guard let item = self.newVar.item else { return }
+                self.item = item
             }catch{
                 print("TimeTable: Failed to convert Data!")
                 self.deinitModel()
@@ -157,13 +156,13 @@ class TimetableNetworkController {
         lessonCount = 0
         if let stringDate = item[indexPath.row].date {
             let newDate = stringDate.toDate(withFormat: "dd.MM.yyyy")
-            if date.ignoringTime == newDate!.ignoringTime {
+            if date.ignoringTime == newDate?.ignoringTime {
                 if var lesson = item[indexPath.row].lessonDescription {
                     if isStudent {
                         if isTZ(lesson: lesson) {
                             formatCellToChange(cell: cell)
                             if isBigChangeForStudent(lesson: lesson) {
-                                var firstSubgroupLesson = lesson.components(separatedBy: "<br> <br>")[0]
+                                let firstSubgroupLesson = lesson.components(separatedBy: "<br> <br>")[0]
                                 print(firstSubgroupLesson)
                                 let secondSubgroupLesson = lesson.components(separatedBy: "<br> <br>")[1]
                                 print(secondSubgroupLesson)
@@ -221,18 +220,23 @@ class TimetableNetworkController {
                         } else {
                             formatCellToLesson(cell: cell)
                             if isT3(lesson: lesson) {
-                                var firstPart = lesson.components(separatedBy: "<br> <br>")[0]
+                                let firstPart = lesson.components(separatedBy: "<br> <br>")[0]
                                 let secondPart = lesson.components(separatedBy: "<br> <br>")[1]
                                 print("firstPart of t3:\(firstPart)")
                                 print("secondPart of t3:\(secondPart)")
-                                if isT2(lesson: "\(firstPart)<br>") {
-                                    let room = firstPart.components(separatedBy: "<br>")[0]
-                                    firstPart = firstPart.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    let teacher = "\(firstPart.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                    firstPart = firstPart.replacingOccurrences(of: teacher, with: "")
-                                    let subgroup = firstPart.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
-                                    firstPart = firstPart.components(separatedBy: "<br>")[1]
-                                    let lesson = firstPart.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                var mainPart = String()
+                                if firstPart.contains("(підгр. \(subGroup+1))") {
+                                    mainPart = firstPart
+                                } else if secondPart.contains("(підгр. \(subGroup+1))") {
+                                    mainPart = secondPart
+                                }
+                                    let room = mainPart.components(separatedBy: "<br>")[0]
+                                    mainPart = mainPart.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                    let teacher = "\(mainPart.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
+                                    mainPart = mainPart.replacingOccurrences(of: teacher, with: "")
+                                    let subgroup = mainPart.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                                    mainPart = mainPart.components(separatedBy: "<br>")[1]
+                                    let lesson = mainPart.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     print("subgroup:\(subgroup)")
                                     print("lesson:\(lesson)")
                                     cell.lessonName.text = lesson
@@ -240,7 +244,6 @@ class TimetableNetworkController {
                                     cell.teacher.text = teacher
                                     print("room:\(room)")
                                     cell.lessonRoom.text = room
-                                }
                             } else if isT2(lesson: lesson) {
                                 let room = lesson.components(separatedBy: "<br>")[0]
                                 lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)

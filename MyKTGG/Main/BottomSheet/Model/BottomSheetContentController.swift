@@ -11,6 +11,11 @@ import Foundation
 class BottomSheetContentController {
     var sheetModel = BottomSheetModel()
     var itemArray = [BottomSheetModelItem]()
+    func addItem(title: String, subtitle: String, image: String, identifier: String) {
+        let newItem = BottomSheetModelItem(title: title, subtitle: subtitle, image: image, identifier: identifier)
+        itemArray.append(newItem)
+        sheetModel.items = itemArray
+    }
     func addItem(title: String, subtitle: String, image: String) {
         let newItem = BottomSheetModelItem(title: title, subtitle: subtitle, image: image)
         itemArray.append(newItem)

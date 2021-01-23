@@ -74,6 +74,7 @@ class NewsTableViewController: UITableViewController {
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 do {
                     self.news = try decoder.decode(Root.self, from: response.data!)
+                    self.clearTags()
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         self.refControl.endRefreshing()
@@ -96,9 +97,23 @@ class NewsTableViewController: UITableViewController {
         isLoading = false
     }
     
+    private func clearTags() {
+        guard let news = self.news.items else { return }
+        for (index, _) in news.enumerated() {
+            if let introtext = self.news.items?[index].introtext {
+                let formattedIntro = introtext.withoutHtml
+                self.news.items?[index].introtext = formattedIntro
+            }
+            if let title = self.news.items?[index].title {
+                let formattedTitle = title.withoutHtml
+                self.news.items?[index].title = formattedTitle
+            }
+        }
+    }
+    
+    
     private func configureCell(cell: NewsCell, for indexPath: IndexPath) {
         new = news.items![indexPath.section]
-        cell.selectionStyle = .none
         
         if let created = new.created{
             cell.date.text = created.toDate()?.toString(dateFormat: "dd'.'MM'.'YYYY")
@@ -107,11 +122,11 @@ class NewsTableViewController: UITableViewController {
             cell.rubric.text = rubric
         }
         
-        if let title = new.title?.withoutHtml{
+        if let title = new.title{
             cell.heading.text = title
         }
         
-        if let introtext = new.introtext?.withoutHtml {
+        if let introtext = new.introtext {
             if !introtext.isEmpty && introtext.count > 3 && cell.rubric.text != "Календар подій" {
                 cell.newsText.text = introtext
             } else {
@@ -150,7 +165,7 @@ class NewsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell") as! NewsCell
-        configureCell(cell: cell, for: indexPath)
+        self.configureCell(cell: cell, for: indexPath)
         return cell
     }
     

@@ -13,6 +13,7 @@ struct BottomSheetModelItem: Decodable {
     var subtitle: String?
     var image: String?
     var date: Date?
+    var identifier: String?
 }
 
 struct BottomSheetModel: Decodable {

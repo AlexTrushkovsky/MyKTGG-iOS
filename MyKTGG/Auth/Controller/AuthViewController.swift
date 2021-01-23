@@ -75,6 +75,14 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
     }
     
+    func subscribeToNewsPushes() {
+        Messaging.messaging().subscribe(toTopic: "news") { error in
+            print("Subscribed to news")
+            UserDefaults.standard.set(true,forKey: "isSubscribedForNews")
+        }
+    }
+    
+    
     override func viewWillAppear(_ animated: Bool) {
         shadowView.layer.cornerRadius = 36
         shadowView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
@@ -88,8 +96,6 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
         super.viewDidLoad()
         if #available(iOS 13.0, *) {
             isModalInPresentation = true
-        } else {
-            signInWithAppleButton.isHidden = true
         }
         nameTextField.delegate = self
         nameTextFieldView.layer.cornerRadius = 15
@@ -113,9 +119,9 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     
     override func viewWillLayoutSubviews() {
         if signup {
-            setLabel(view: AuthLabel, text: "Зареєструватися")
+            setLabel(view: AuthLabel, text: "Реєстрація")
         } else {
-            setLabel(view: AuthLabel, text: "Увійти")
+            setLabel(view: AuthLabel, text: "Вхід")
         }
         
     }
@@ -129,9 +135,12 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     @IBAction func forgotPasswordAction(_ sender: UIButton) {
     }
     //  Apple SignIn
-    @available(iOS 13.0, *)
     @IBAction func signInWithAppleAction(_ sender: UIButton) {
-      startSignInWithAppleFlow()
+        if #available(iOS 13, *) {
+            startSignInWithAppleFlow()
+        } else {
+            showAlert(title: "Потрібне оновлення", message: "Вхід з Apple ID доступний починаючи з iOS 13")
+        }
     }
 
   
@@ -157,6 +166,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                                     avatarMethods.getAvatarFromFacebookAcc()
                                     self.makeUpdateNotifications()
                                     self.checkGroupInfoFromFirebase()
+                                    self.subscribeToNewsPushes()
                                     self.dismiss(animated: true, completion: nil)
                                 }else{
                                     print(error as Any)
@@ -199,6 +209,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     self.getGroupNameFromTeams(accessToken: token)
                     self.getAvatarFromTeams(accessToken: token)
                     self.checkGroupInfoFromFirebase()
+                    self.subscribeToNewsPushes()
                     self.dismiss(animated: true, completion: nil)
                 }
             }
@@ -390,6 +401,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                         ref.child(result.user.uid).child("public").updateChildValues(["name":self.name,"email":self.email,"perm":0])
                         self.checkGroupInfoFromFirebase()
                         self.makeUpdateNotifications()
+                        self.subscribeToNewsPushes()
                         self.dismiss(animated: true, completion: nil)
                         
                         
@@ -418,6 +430,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                     let user = Auth.auth().currentUser
                     self.name = user?.displayName ?? "Невідомий"
                     self.email = user?.email ?? "no email"
+                    self.subscribeToNewsPushes()
                     self.dismiss(animated: true, completion: nil)
                 }else{
                     print(error!._code)
@@ -478,6 +491,7 @@ extension AuthViewController: GIDSignInDelegate{
             self.getGoogleAccName(user: user)
             self.checkGroupInfoFromFirebase()
             self.makeUpdateNotifications()
+            self.subscribeToNewsPushes()
             self.dismiss(animated: true, completion: nil)
         }
         
@@ -587,6 +601,7 @@ extension AuthViewController: ASAuthorizationControllerDelegate {
                 }
                 self.checkGroupInfoFromFirebase()
                 self.makeUpdateNotifications()
+                self.subscribeToNewsPushes()
                 self.dismiss(animated: true, completion: nil)
             }
         }

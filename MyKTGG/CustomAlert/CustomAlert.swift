@@ -27,6 +27,12 @@ class CustomAlert: UIView {
     @IBOutlet weak var subTitleLabel: UILabel!
     @IBOutlet weak var textLabel: UILabel!
     @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var alarmSegment: UISegmentedControl!
+    @IBAction func alarmSegment(_ sender: UISegmentedControl) {
+        guard let text = sender.titleForSegment(at: sender.selectedSegmentIndex) else { return }
+        subTitleLabel.text = "буде заведено за \(text) годину до пари"
+    }
+    
     
     var delegate: CustomAlertDelegate?
     
@@ -52,24 +58,32 @@ class CustomAlert: UIView {
             cancelOutlet.isHidden = false
             okOutlet.isHidden = false
             textField.isHidden = true
+            textLabel.isHidden = true
+            alarmSegment.isHidden = false
             break
         case .alarmTurned:
             print("alarmTurned")
-            cancelOutlet.isHidden = true
+            cancelOutlet.isHidden = false
             okOutlet.isHidden = false
             textField.isHidden = true
+            textLabel.isHidden = false
+            alarmSegment.isHidden = true
             break
         case .alert:
             print("alert")
             cancelOutlet.isHidden = true
             okOutlet.isHidden = false
             textField.isHidden = true
+            textLabel.isHidden = false
+            alarmSegment.isHidden = true
             break
         case .lateAlarm:
             print("lateAlert")
             cancelOutlet.isHidden = true
             okOutlet.isHidden = false
             textField.isHidden = true
+            textLabel.isHidden = false
+            alarmSegment.isHidden = true
             break
         case .note:
             print("note")
@@ -77,6 +91,8 @@ class CustomAlert: UIView {
             okOutlet.isHidden = false
             textLabel.isHidden = true
             textField.isHidden = false
+            textLabel.isHidden = false
+            alarmSegment.isHidden = true
             break
         }
     }

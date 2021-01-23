@@ -11,4 +11,7 @@ import UIKit
 class WeekendCell: UITableViewCell {
     @IBOutlet weak var weekendImage: UIImageView!
     
+    override func awakeFromNib() {
+        self.selectionStyle = .none
+    }
 }

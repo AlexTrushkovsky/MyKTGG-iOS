@@ -12,6 +12,7 @@ struct MainItemCellViewModel {
     let image: UIImage?
     let title: String
     let subtitle: String
+    let identifier: String?
 }
 
 class MainItemCell: UITableViewCell {
@@ -19,16 +20,11 @@ class MainItemCell: UITableViewCell {
     @IBOutlet weak var leftImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
+    var identifier = String()
     
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
-    }
-    
-    func configure(model: MainItemCellViewModel){
-        nameLabel.text = model.title
-        descriptionLabel.text = model.subtitle
-        leftImageView.image = model.image
     }
     
 }
