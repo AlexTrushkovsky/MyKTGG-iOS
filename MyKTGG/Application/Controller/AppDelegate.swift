@@ -38,12 +38,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
 
       let dataDict:[String: String] = ["token": fcmToken ?? ""]
       NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
-      // TODO: If necessary send token to application server.
-        // Note: This callback is fired at each app strtup and whenever a new token is generated.
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         NotificationCenter.default.addObserver(self, selector: #selector(showModalGroupChoose), name:NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showModalAuth), name:NSNotification.Name(rawValue: "showAuthVC"), object: nil)
         Auth.auth().addStateDidChangeListener { (auth, user) in
             if user == nil{
                 self.showModalAuth()
@@ -53,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
         UserDefaults(suiteName: "group.myktgg")!.set(0, forKey: "badges")
     }
     
-    func showModalAuth(){
+    @objc func showModalAuth(){
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let newvc = storyboard.instantiateViewController(withIdentifier: "RegViewController") as! AuthViewController
         self.window?.rootViewController?.present(newvc, animated: true, completion: nil)
@@ -86,11 +85,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        
         let tokenParts = deviceToken.map { data -> String in
             return String(format: "%02.2hhx", data)
         }
-        
         let token = tokenParts.joined()
         print("Device token: \(token)")
     }
@@ -102,9 +99,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo : [AnyHashable: Any] = response.notification.request.content.userInfo
-        if userInfo["image_url"] as? String != nil{
-            if let tabBarController = self.window!.rootViewController as? UITabBarController {
-                    tabBarController.selectedIndex = 1
+        if let tabBarController = self.window!.rootViewController as? UITabBarController {
+            if userInfo["image_url"] as? String != nil{
+                tabBarController.selectedIndex = 1
+            } else {
+                let df = DateFormatter()
+                df.dateFormat = "yyyy-MM-dd HH:mm:ss zzz"
+                if let dateOfCell = df.date(from: response.notification.request.identifier) {
+                    UserDefaults.standard.setValue(dateOfCell, forKey: "selectDate")
+                }
+                tabBarController.selectedIndex = 2
             }
         }
         // tell the app that we have finished processing the user’s action / response

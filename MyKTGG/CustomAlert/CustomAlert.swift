@@ -30,7 +30,7 @@ class CustomAlert: UIView {
     @IBOutlet weak var alarmSegment: UISegmentedControl!
     @IBAction func alarmSegment(_ sender: UISegmentedControl) {
         guard let text = sender.titleForSegment(at: sender.selectedSegmentIndex) else { return }
-        subTitleLabel.text = "буде заведено за \(text) годину до пари"
+        subTitleLabel.text = "буде заведено за \(text) до пари"
     }
     
     

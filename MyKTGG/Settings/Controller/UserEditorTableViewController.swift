@@ -27,7 +27,6 @@ class UserEditorTableViewController: UITableViewController {
     
     var group = [String]()
     let ref = Database.database().reference().child("users")
-    let user = Auth.auth().currentUser
     lazy var groupNumChoosen = group[0]
     let avatarMethods = AvatarMethods()
     let groupCheck = GroupNetworkController()
@@ -79,9 +78,10 @@ class UserEditorTableViewController: UITableViewController {
     }
     
     @IBAction func DoneButtonAction(_ sender: UIButton) {
+        guard let user = Auth.auth().currentUser else { return }
         if !group.isEmpty{
             let groupName = "\(groupNumChoosen)"
-            ref.child(user!.uid).child("public").updateChildValues(["group":groupName]) {
+            ref.child(user.uid).child("public").updateChildValues(["group":groupName]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
                     print("Data could not be saved: \(error).")
@@ -114,7 +114,7 @@ class UserEditorTableViewController: UITableViewController {
         }
         if isStudent {
             let subgroup = subgroupPicker.selectedSegmentIndex
-            ref.child(user!.uid).child("public").updateChildValues(["subgroup":subgroup]) {
+            ref.child(user.uid).child("public").updateChildValues(["subgroup":subgroup]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
                     print("Data could not be saved: \(error).")
@@ -133,7 +133,8 @@ class UserEditorTableViewController: UITableViewController {
     }
     
     func saveIsStudent() {
-        ref.child(user!.uid).child("public").updateChildValues(["isStudent":isStudent]) {
+        guard let user = Auth.auth().currentUser else { return }
+        ref.child(user.uid).child("public").updateChildValues(["isStudent":isStudent]) {
             (error: Error?, ref:DatabaseReference) in
             if let error = error {
                 print("Data could not be saved: \(error).")
@@ -153,9 +154,9 @@ class UserEditorTableViewController: UITableViewController {
     }
     @IBAction func showIdentifier(_ sender: Any) {
         UIView.animate(withDuration: 0.3) {
-            let user = Auth.auth().currentUser
+            guard let user = Auth.auth().currentUser else { return }
             self.showIdentifierButton.alpha = 0
-            self.identifireTextField.text = user!.uid
+            self.identifireTextField.text = user.uid
         }
     }
     
@@ -238,19 +239,18 @@ class UserEditorTableViewController: UITableViewController {
     }
     
     func saveEdited() {
-        
         if FirstLastNameOutlet.text != "" {
-            let name = FirstLastNameOutlet.text
+            guard let name = FirstLastNameOutlet.text else { return }
             UserDefaults.standard.set(name, forKey: "name")
             let ref = Database.database().reference().child("users")
-            let user = Auth.auth().currentUser
-            ref.child(user!.uid).child("public").updateChildValues(["name":name!]) {
+            guard let user = Auth.auth().currentUser else { return }
+            ref.child(user.uid).child("public").updateChildValues(["name":name]) {
                 (error: Error?, ref:DatabaseReference) in
                 if let error = error {
                     print("Data could not be saved: \(error).")
                 } else {
                     print("Name saved succesfully!")
-                    print(name!)
+                    print(name)
                     UserDefaults.standard.set(name, forKey: "name")
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateLabels"), object: nil)
                 }
@@ -258,13 +258,13 @@ class UserEditorTableViewController: UITableViewController {
         }
         
         let avatar = AvatarMethods()
-        avatar.uploadAvatar(photo: EditorAvatar.image!) { (result) in
+        guard let image = EditorAvatar.image else { return }
+        avatar.uploadAvatar(photo: image) { (result) in
             switch result {
-            
             case .success(let url):
                 let ref = Database.database().reference().child("users")
-                let user = Auth.auth().currentUser
-                ref.child(user!.uid).child("public").updateChildValues(["avatarUrl":"\(url)"]) {
+                guard let user = Auth.auth().currentUser else { return }
+                ref.child(user.uid).child("public").updateChildValues(["avatarUrl":"\(url)"]) {
                     (error: Error?, ref:DatabaseReference) in
                     if let error = error {
                         print("Data could not be saved: \(error).")

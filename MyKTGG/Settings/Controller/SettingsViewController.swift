@@ -178,17 +178,14 @@ class SettingsViewController: UITableViewController {
                     self.isVerified = true
                     self.verifiedImage.image = UIImage(named: "checkmark.shield")
                     self.verifiedImage.isHidden = false
-                    self.verifiedImage.tintColor = UIColor(red: 0.28, green: 0.78, blue: 0.56, alpha: 1.00)
                 } else {
                     self.isVerified = false
                     self.verifiedImage.image = UIImage(named: "shield.slash")
-                    self.verifiedImage.tintColor = UIColor(red: 0.78, green: 0.28, blue: 0.28, alpha: 1.00)
                     self.verifiedImage.isHidden = false
                 }
             } else {
                 self.isVerified = false
                 self.verifiedImage.image = UIImage(named: "shield.slash")
-                self.verifiedImage.tintColor = UIColor(red: 0.78, green: 0.28, blue: 0.28, alpha: 1.00)
                 self.verifiedImage.isHidden = false
             }
         } else {
@@ -235,9 +232,9 @@ class SettingsViewController: UITableViewController {
     
     @objc func getUserInfo(){
         print("Updating user info...")
-        let userID = Auth.auth().currentUser?.uid
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         let db = Database.database().reference()
-        db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             
             if let name = value?["name"] as? String {
@@ -267,7 +264,7 @@ class SettingsViewController: UITableViewController {
             print(error.localizedDescription)
         }
         
-        db.child("users").child(userID!).child("secure").observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID).child("secure").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             if let verified = value?["verified"] as? String {
                 print("verified account of: \(verified)")

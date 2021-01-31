@@ -40,13 +40,8 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
             }
         }
     }
-    var name = ""
-    var email = ""
-    var password = ""
     
-    var image = UIImage()
     var microsoftProvider : OAuthProvider?
-    
     fileprivate var currentNonce: String?
     
     func setLabel(view: UIView, text: String) {
@@ -81,8 +76,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
             UserDefaults.standard.set(true,forKey: "isSubscribedForNews")
         }
     }
-    
-    
+
     override func viewWillAppear(_ animated: Bool) {
         shadowView.layer.cornerRadius = 36
         shadowView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
@@ -367,44 +361,43 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
     
     
     @IBAction func regOrLogButton(_ sender: UIButton) {
+        var name = nameTextField.text!
+        var email = emailTextField.text!
+        let password = passwordTextField.text!
         if (signup){
-            guard !nameTextField.text!.isEmpty else{
+            guard !name.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup name check")
                 return
             }
-            guard nameTextField.text!.count<30 else {
+            guard name.count<30 else {
                 showAlert(title: "Помилка", message: "Ім'я користувача повинно містити не більше 30 символів")
                 return
             }
-            guard !emailTextField.text!.isEmpty else{
+            guard !email.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup name check")
                 return
             }
-            guard !passwordTextField.text!.isEmpty else{
+            guard !password.isEmpty else{
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 print ("Error on signup pass check")
                 return
             }
-            name=nameTextField.text!
-            email=emailTextField.text!
-            password=passwordTextField.text!
+            let password = passwordTextField.text!
             Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
                 if error == nil{
                     if let result = result{
                         print(result.user.uid)
                         let ref = Database.database().reference().child("users")
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
-                        changeRequest?.displayName = self.name
+                        changeRequest?.displayName = name
                         changeRequest?.commitChanges { (error) in }
-                        ref.child(result.user.uid).child("public").updateChildValues(["name":self.name,"email":self.email,"perm":0])
+                        ref.child(result.user.uid).child("public").updateChildValues(["name":name,"email":email,"perm":0])
                         self.checkGroupInfoFromFirebase()
                         self.makeUpdateNotifications()
                         self.subscribeToNewsPushes()
                         self.dismiss(animated: true, completion: nil)
-                        
-                        
                     }
                 }else{
                     print(error!._code)
@@ -412,24 +405,20 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                 }
             }
         }else{
-            guard !emailTextField.text!.isEmpty else{
+            guard !email.isEmpty else {
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 return
             }
-            guard !passwordTextField.text!.isEmpty else{
+            guard !password.isEmpty else {
                 showAlert(title: "Помилка", message: "Всі поля обов'язкові до заповнення")
                 return
             }
-            
-            email=emailTextField.text!
-            password=passwordTextField.text!
             
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
                 if error == nil{
-                    
                     let user = Auth.auth().currentUser
-                    self.name = user?.displayName ?? "Невідомий"
-                    self.email = user?.email ?? "no email"
+                    name = user?.displayName ?? "Невідомий"
+                    email = user?.email ?? "no email"
                     self.subscribeToNewsPushes()
                     self.dismiss(animated: true, completion: nil)
                 }else{
@@ -493,8 +482,8 @@ extension AuthViewController: GIDSignInDelegate{
             self.makeUpdateNotifications()
             self.subscribeToNewsPushes()
             self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
         }
-        
     }
     func getGoogleAccName(user: GIDGoogleUser) {
         guard let givenName = user.profile.givenName else { return }

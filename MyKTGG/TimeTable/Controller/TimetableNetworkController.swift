@@ -21,13 +21,8 @@ class TimetableNetworkController {
         
         guard let data = group.data(using: .windowsCP1251) else { return }
         let encodedGroup = data.map { String(format: "%%%02hhX", $0) }.joined()
-        guard let url = URL(string: "http://217.76.201.218/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=\(mode)&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)") else { return }
-        var request = URLRequest(url: url, timeoutInterval: Double.infinity)
-        
-        let ip = getIPAddress()
-        if  ip.contains("192.168.5") {
-            request = URLRequest(url: url, timeoutInterval: Double.infinity)
-        }
+        guard let url = URL(string: "http://app.ktgg.kiev.ua/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=\(mode)&req_format=json&begin_date=\(stringPickedDate)&end_date=\(stringPickedDate)&bs=ok&OBJ_name=\(encodedGroup)") else { return }
+        var request = URLRequest(url: url)
         
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("key=AAAAgPiWVp0:APA91bGLjDDlC-4RnJ_6OwoEacDvLFo1Y1bcEJTfl0H4u16pBIMGZE047vLatzzzBhXf-WNemJC-ePH7nwrQ6x_3-Hku8-H7bEYZ4zkoOHgdNhfevze60zzhvOSClfiJ1MYushqzZgr8", forHTTPHeaderField: "Authorization")
@@ -70,6 +65,9 @@ class TimetableNetworkController {
         var result = str.replacingOccurrences(of: st, with: ",")
         result = result.replacingOccurrences(of: "\"item\": {", with: "\"item\": [{")
         result = result.replacingOccurrences(of: srt, with: "}]}")
+        result = result.replacingOccurrences(of: "(Сем)", with: "")
+        result = result.replacingOccurrences(of: "(Л)", with: "")
+        result = result.replacingOccurrences(of: "(ПрЛ)", with: "")
         return result
     }
     
@@ -141,7 +139,7 @@ class TimetableNetworkController {
     }
     
     func formatCellToChange(cell: TimeTableCell) {
-        cell.lessonView.backgroundColor = UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00)
+        cell.lessonView.backgroundColor = UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00)
     }
     func formatCellToLesson(cell: TimeTableCell) {
         cell.lessonView.backgroundColor = UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00)
@@ -149,6 +147,7 @@ class TimetableNetworkController {
     
     func configureCell(cell: TimeTableCell, for indexPath: IndexPath, date: Date, isStudent: Bool, subGroup: Int) {
         print("TT: config cell")
+        guard indexPath.row >= item.startIndex && indexPath.row < item.endIndex else { return }
         cell.roomImage.isHidden = false
         cell.lessonRoom.isHidden = false
         cell.teacher.isHidden = false
@@ -178,6 +177,9 @@ class TimetableNetworkController {
                             lesson = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "")
                             var newLesson = lesson.components(separatedBy: "замість:")[0]
                             let oldLesson = lesson.components(separatedBy: "замість:")[1]
+                            if (oldLesson.components(separatedBy: "<br>").count) == 3 {
+                                newLesson = "\(oldLesson.components(separatedBy: "<br>")[0])<br> \(newLesson)"
+                            }
                             print("NL: \(newLesson)")
                             print("OLDL: \(oldLesson)")
                             if isT3(lesson: newLesson) {
@@ -189,7 +191,7 @@ class TimetableNetworkController {
                                 newLesson = newLesson.replacingOccurrences(of: teacher, with: "")
                                 let subgroup = newLesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
                                 newLesson = newLesson.components(separatedBy: "<br>")[1]
-                                let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 print("subgroup:\(subgroup)")
                                 print("lesson:\(lesson)")
                                 cell.lessonName.text = lesson
@@ -210,7 +212,7 @@ class TimetableNetworkController {
                                 print("room:\(room)")
                                 cell.lessonRoom.text = room
                             } else {
-                                cell.lessonName.text = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                cell.lessonName.text = newLesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 cell.roomImage.isHidden = true
                                 cell.lessonRoom.isHidden = true
                                 cell.teacher.isHidden = true
@@ -220,8 +222,8 @@ class TimetableNetworkController {
                         } else {
                             formatCellToLesson(cell: cell)
                             if isT3(lesson: lesson) {
-                                let firstPart = lesson.components(separatedBy: "<br> <br>")[0]
-                                let secondPart = lesson.components(separatedBy: "<br> <br>")[1]
+                                let firstPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[0]
+                                let secondPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[1]
                                 print("firstPart of t3:\(firstPart)")
                                 print("secondPart of t3:\(secondPart)")
                                 var mainPart = String()
@@ -236,7 +238,7 @@ class TimetableNetworkController {
                                     mainPart = mainPart.replacingOccurrences(of: teacher, with: "")
                                     let subgroup = mainPart.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
                                     mainPart = mainPart.components(separatedBy: "<br>")[1]
-                                    let lesson = mainPart.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                    let lesson = mainPart.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     print("subgroup:\(subgroup)")
                                     print("lesson:\(lesson)")
                                     cell.lessonName.text = lesson
@@ -251,7 +253,7 @@ class TimetableNetworkController {
                                 lesson = lesson.replacingOccurrences(of: teacher, with: "")
                                 let subgroup = lesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
                                 lesson = lesson.components(separatedBy: "<br>")[1]
-                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 print("subgroup:\(subgroup)")
                                 print("lesson:\(lesson)")
                                 cell.lessonName.text = lesson
@@ -264,7 +266,7 @@ class TimetableNetworkController {
                                 lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
                                 lesson = lesson.replacingOccurrences(of: teacher, with: "")
-                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 print("lesson:\(lesson)")
                                 cell.lessonName.text = lesson
                                 print("teacher:\(teacher)")
@@ -272,7 +274,7 @@ class TimetableNetworkController {
                                 print("room:\(room)")
                                 cell.lessonRoom.text = room
                             } else {
-                                cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 cell.roomImage.isHidden = true
                                 cell.lessonRoom.isHidden = true
                                 cell.teacher.isHidden = true
@@ -303,7 +305,7 @@ class TimetableNetworkController {
                                     let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
                                     lesson = lesson.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     let group = lesson.components(separatedBy: "<br>")[0]
-                                    lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                    lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     cell.lessonName.text = lesson
                                     cell.teacher.text = group
                                 } else if isTZforOldTeacher(lesson: lesson) {
@@ -317,7 +319,7 @@ class TimetableNetworkController {
                                     cell.teacher.isHidden = true
                                     cell.teacherImage.isHidden = true
                                 } else {
-                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     cell.roomImage.isHidden = true
                                     cell.lessonRoom.isHidden = true
                                     cell.teacher.isHidden = true
@@ -340,12 +342,12 @@ class TimetableNetworkController {
                                         let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
                                         lesson = lesson.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                         let group = lesson.components(separatedBy: "<br>")[0]
-                                        lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                        lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                         cell.lessonName.text = lesson
                                         cell.lessonRoom.text = room
                                         cell.teacher.text = group
                                     } else {
-                                        cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                        cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                         cell.roomImage.isHidden = true
                                         cell.lessonRoom.isHidden = true
                                         cell.teacher.isHidden = true
@@ -362,7 +364,7 @@ class TimetableNetworkController {
                                     cell.teacher.isHidden = true
                                     cell.teacherImage.isHidden = true
                                 } else {
-                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
                                     cell.roomImage.isHidden = true
                                     cell.lessonRoom.isHidden = true
                                     cell.teacher.isHidden = true
@@ -406,35 +408,6 @@ class TimetableNetworkController {
                 }
             }
         }
-    }
-    
-    func getIPAddress() -> String {
-        var address: String?
-        var ifaddr: UnsafeMutablePointer<ifaddrs>? = nil
-        if getifaddrs(&ifaddr) == 0 {
-            var ptr = ifaddr
-            while ptr != nil {
-                defer { ptr = ptr?.pointee.ifa_next }
-                
-                guard let interface = ptr?.pointee else { return "" }
-                let addrFamily = interface.ifa_addr.pointee.sa_family
-                if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
-                    
-                    // wifi = ["en0"]
-                    // wired = ["en2", "en3", "en4"]
-                    // cellular = ["pdp_ip0","pdp_ip1","pdp_ip2","pdp_ip3"]
-                    
-                    let name: String = String(cString: (interface.ifa_name))
-                    if  name == "en0" || name == "en2" || name == "en3" || name == "en4" || name == "pdp_ip0" || name == "pdp_ip1" || name == "pdp_ip2" || name == "pdp_ip3" {
-                        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                        getnameinfo(interface.ifa_addr, socklen_t((interface.ifa_addr.pointee.sa_len)), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
-                        address = String(cString: hostname)
-                    }
-                }
-            }
-            freeifaddrs(ifaddr)
-        }
-        return address ?? ""
     }
     
     func isT1(lesson: String, isStudent: Bool) -> Bool {

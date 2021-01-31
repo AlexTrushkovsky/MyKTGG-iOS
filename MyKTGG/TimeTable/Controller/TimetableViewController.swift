@@ -22,6 +22,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     var lessonCount = 0
     var isRefreshing = false
     var isStudent = true
+    var pendingNotifications = [UNNotificationRequest]()
     
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
     private lazy var alertView: CustomAlert = {
@@ -63,8 +64,9 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        scrollToday()
+        selectDateFromUserDefaults()
         timeTableView.allowsSelection = true
+        getPendingNotifications()
     }
     
     override func viewDidLoad() {
@@ -81,6 +83,36 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         UserDefaults.standard.addObserver(self, forKeyPath: "group", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "subGroup", options: NSKeyValueObservingOptions.new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: "isStudent", options: NSKeyValueObservingOptions.new, context: nil)
+    }
+    
+    func getPendingNotifications() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests(completionHandler: { requests in
+            
+            let dq = DispatchQueue.global(qos: .userInteractive)
+            dq.async {
+                let group  = DispatchGroup()
+                group.enter()
+                self.pendingNotifications = requests
+                print("got noticiation requests")
+                group.leave()
+
+                group.notify(queue: DispatchQueue.main) { () in
+                    self.reloadRows()
+                }
+            }
+        })
+    }
+    
+    
+    func selectDateFromUserDefaults() {
+        if let date = UserDefaults.standard.object(forKey: "selectDate") as? Date {
+            UserDefaults.standard.setValue(nil, forKey: "selectDate")
+            datePicker.scrollToDate(date, animated: false)
+            datePicker.selectDate(date, animated: true)
+            dateScrollPicker(datePicker, didSelectDate: date)
+        } else {
+            scrollToday()
+        }
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -113,6 +145,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         DispatchQueue.main.sync {
             self.refControl.endRefreshing()
             self.setAlert(type: .alert)
+            
             self.alertView.setText(title: "Помилка", subTitle: "Немає зв'язку з мережею", body: "перевірте з'єднання, або cпробуйте будь ласка пізніше")
             self.animateIn()
         }
@@ -122,13 +155,43 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         print("Updating TableView")
         isRefreshing = true
         
+        for cell in self.timeTableView.visibleCells {
+            if let timetableCell = cell as? TimeTableCell {
+                UIView.animate(withDuration: 0.2, delay: 0, options: [.repeat, .autoreverse]) {
+                    timetableCell.lessonView.transform = .init(translationX: 0, y: 5)
+                } completion: { _ in
+                    UIView.animate(withDuration: 0.2) {
+                        timetableCell.lessonView.transform = .init(translationX: 0, y: 0)
+                    } completion: { _ in
+                        self.timeTableView.reloadSections([0], with: .automatic)
+                    }
+                }
+            } else if let timetableCell = cell as? WeekendCell{
+                UIView.animate(withDuration: 0.2, delay: 0, options: [.repeat, .autoreverse]) {
+                    timetableCell.transform = .init(translationX: 0, y: 5)
+                } completion: { _ in
+                    UIView.animate(withDuration: 0.2) {
+                        timetableCell.transform = .init(translationX: 0, y: 0)
+                    } completion: { _ in
+                        self.timeTableView.reloadSections([0], with: .automatic)
+                    }
+                }
+            }
+        }
+        
         DispatchQueue.global().async {
             self.network.fetchData(pickedDate: self.pickedDate, group: self.currentGroup, isStudent: self.isStudent)
             DispatchQueue.main.async {
                 self.refControl.endRefreshing()
                 self.deselectRows()
                 self.isRefreshing = false
-                self.timeTableView.reloadSections([0], with: .automatic)
+                for cell in self.timeTableView.visibleCells {
+                    if let timetableCell = cell as? TimeTableCell {
+                        timetableCell.lessonView.layer.removeAllAnimations()
+                    } else if let timetableCell = cell as? WeekendCell {
+                        timetableCell.layer.removeAllAnimations()
+                    }
+                }
             }
         }
     }
@@ -239,8 +302,8 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
                     selectedCell.turnAlarm.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
                     selectedCell.makeNote.backgroundColor = UIColor(red: 0.91, green: 0.96, blue: 0.94, alpha: 1.00)
                     selectedCell.makeNote.setTitleColor(UIColor(red: 0.30, green: 0.77, blue: 0.57, alpha: 1.00), for: .normal)
-                } else if self.cellInitColor == UIColor(red: 1.00, green: 0.76, blue: 0.47, alpha: 1.00) {
-                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.98, green: 0.46, blue: 0.28, alpha: 1.00)
+                } else if self.cellInitColor == UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00) {
+                    selectedCell.lessonView.backgroundColor = UIColor(red: 0.40, green: 0.09, blue: 0.09, alpha: 1.00)
                     selectedCell.turnAlarm.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
                     selectedCell.turnAlarm.setTitleColor(UIColor(red: 0.77, green: 0.30, blue: 0.30, alpha: 1.00), for: .normal)
                     selectedCell.makeNote.backgroundColor = UIColor(red: 0.96, green: 0.91, blue: 0.91, alpha: 1.00)
@@ -283,7 +346,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     func scrollToday(){
         deselectRows()
         datePicker.selectToday()
-        dateScrollPicker(datePicker, didSelectDate: Date())
+        dateScrollPicker(datePicker, didSelectDate: Date.today())
     }
     
     //MARK: Setup views
@@ -308,7 +371,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         format.dayBackgroundColor = UIColor.clear
         format.dayBackgroundSelectedColor = UIColor(red: 1.00, green: 0.46, blue: 0.28, alpha: 1.00)
         format.animatedSelection = true
-        format.separatorEnabled = true
+        format.separatorEnabled = false
         format.fadeEnabled = true
         format.animationScaleFactor = 1.1
         format.dayPadding = 5
@@ -330,7 +393,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     func setUpMainView() {
         background.layer.cornerRadius = 30
         todayButtonOutlet.layer.cornerRadius = 10
-        timeTableView.estimatedRowHeight = 123
+//        timeTableView.estimatedRowHeight = 200
         timeTableView.rowHeight = UITableView.automaticDimension
         timeTableView.allowsSelection = false
         refControl.tintColor = UIColor(red: 0.65, green: 0.74, blue: 0.82, alpha: 0.5)
@@ -367,10 +430,9 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     
     func animateIn() {
         print("animated in")
+        alertView.alpha = 0
         turnGestures(bool: false)
         alertView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
-        alertView.alpha = 0
-        
         UIView.animate(withDuration: 0.3) {
             self.visualEffectView.alpha = 1
             self.alertView.alpha = 1
@@ -392,6 +454,40 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
             self.alertView.removeFromSuperview()
         }
     }
+    
+    func okAction(type: AlertStatus) {
+        switch type {
+        case .note:
+            self.addNote()
+            self.animateOut()
+        case .lateAlarm, .alert:
+            self.animateOut()
+        case .alarmTurned:
+            self.getPendingNotifications()
+            self.animateOut()
+        case .alarmRequest:
+            self.addAlarm()
+        }
+    }
+    
+    func cancelAction(type: AlertStatus) {
+        switch type {
+        case .note:
+            self.noteCancel()
+            self.animateOut()
+        case .lateAlarm, .alert:
+            self.animateOut()
+        case .alarmTurned:
+            self.deleteAlarm()
+            self.animateOut()
+        case .alarmRequest:
+            self.deleteAlarm()
+            self.animateOut()
+        }
+    }
+    
+    
+    //MARK: Alarm methods
     
     func checkAlarmAvailability(cell: TimeTableCell) {
         let cellStartTime = cell.startTime.text
@@ -419,7 +515,6 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         }
     }
     
-    //MARK: Alarm methods
     func addAlarm() {
         //User reserve got from settings
         self.alertView.alpha = 0
@@ -478,7 +573,6 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         self.animateIn()
         addAlarmToPushArray(date: convertedDateWithReserve, lessonName: cell.lessonName.text ?? "")
         self.appDelegate?.scheduleNotification(title: "Будильник", notificationType: "\(convertedDateWithReserve)", body: body, date: convertedDateWithReserve)
-        
     }
     
     func addAlarmToPushArray(date: Date, lessonName: String) {
@@ -498,14 +592,15 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         }
     }
     
-    func deleteAlarmFromPushArray(date: Date) {
+    func deleteAlarmFromPushArray(date: Date, lessonName: String?) {
         let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
         let hoursOfUserDate = String(Calendar.current.component(.hour, from: date)).count == 1 ? "0\(Calendar.current.component(.hour, from: date))" : String(Calendar.current.component(.hour, from: date))
         let minutesOfUserDate = String(Calendar.current.component(.minute, from: date)).count == 1 ? "0\(Calendar.current.component(.minute, from: date))" : String(Calendar.current.component(.minute, from: date))
         let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM на \(hoursOfUserDate):\(minutesOfUserDate)"
+        formatter.locale = Locale(identifier: "uk_UA")
+        formatter.dateFormat = lessonName != nil ? "d MMM на \(hoursOfUserDate):\(minutesOfUserDate), \(lessonName!)" : "d MMM на \(hoursOfUserDate):\(minutesOfUserDate)"
         let body = formatter.string(from: date)
-        let push = ["Будильник", body, "alarm"]
+        let push = ["Будильник", body, "alarm", "\(date)"]
         if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{
             for (index, array) in arrayOfPushes.enumerated() {
                 if array == push {
@@ -578,9 +673,9 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
                         (cellTimeMin-120 == userTimeMin) {
                             identifiers.append(request.identifier)
                     }
-                    self.deleteAlarmFromPushArray(date: userInfoDate)
+                    self.deleteAlarmFromPushArray(date: userInfoDate, lessonName: cell.lessonName.text)
                     UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
-                    self.reloadRows(index: cellIndex)
+                    self.getPendingNotifications()
                 }
             }
         })
@@ -590,62 +685,27 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         print("checking alarms")
         cell.alarmImage.isHidden = true
         cell.alarmText.isHidden = true
-        let center = UNUserNotificationCenter.current()
-        center.getPendingNotificationRequests(completionHandler: { requests in
-            for request in requests {
-                guard let userInfo = request.content.userInfo as? [String:Date] else { return }
-                guard let userInfoDate = userInfo["date"] else { return }
-                let hoursOfUserDate = Calendar.current.component(.hour, from: userInfoDate)
-                let minutesOfUserDate = Calendar.current.component(.minute, from: userInfoDate)
-                DispatchQueue.main.sync {
-                    guard let timeOfCell = cell.startTime.text?.components(separatedBy: ":") else { return }
-                    guard let hoursOfCell = Int(timeOfCell[0]) else { return }
-                    guard let minutesOfCell = Int(timeOfCell[1]) else { return }
-                    guard userInfoDate.ignoringTime == date.ignoringTime else { return }
-                    let userTimeMin = hoursOfUserDate * 60 + minutesOfUserDate
-                    let cellTimeMin = hoursOfCell * 60 + minutesOfCell
-                    if  (cellTimeMin-60 == userTimeMin) ||
-                        (cellTimeMin-90 == userTimeMin) ||
-                        (cellTimeMin-120 == userTimeMin) {
-                        let hoursString = String(Calendar.current.component(.hour, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.hour, from: userInfoDate))" : String(Calendar.current.component(.hour, from: userInfoDate))
-                        let minutesString = String(Calendar.current.component(.minute, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.minute, from: userInfoDate))" : String(Calendar.current.component(.minute, from: userInfoDate))
-                        cell.alarmImage.isHidden = false
-                        cell.alarmText.isHidden = false
-                        cell.alarmText.text = "\(hoursString):\(minutesString)"
-                    }
-                }
+        for request in pendingNotifications {
+            guard let userInfo = request.content.userInfo as? [String:Date] else { return }
+            guard let userInfoDate = userInfo["date"] else { return }
+            let hoursOfUserDate = Calendar.current.component(.hour, from: userInfoDate)
+            let minutesOfUserDate = Calendar.current.component(.minute, from: userInfoDate)
+            guard let timeOfCell = cell.startTime.text?.components(separatedBy: ":") else { return }
+            guard let hoursOfCell = Int(timeOfCell[0]) else { return }
+            guard let minutesOfCell = Int(timeOfCell[1]) else { return }
+            guard userInfoDate.ignoringTime == date.ignoringTime else { return }
+            let userTimeMin = hoursOfUserDate * 60 + minutesOfUserDate
+            let cellTimeMin = hoursOfCell * 60 + minutesOfCell
+            if  (cellTimeMin-60 == userTimeMin) ||
+                    (cellTimeMin-90 == userTimeMin) ||
+                    (cellTimeMin-120 == userTimeMin) {
+                let hoursString = String(Calendar.current.component(.hour, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.hour, from: userInfoDate))" : String(Calendar.current.component(.hour, from: userInfoDate))
+                let minutesString = String(Calendar.current.component(.minute, from: userInfoDate)).count == 1 ? "0\(Calendar.current.component(.minute, from: userInfoDate))" : String(Calendar.current.component(.minute, from: userInfoDate))
+                cell.alarmImage.isHidden = false
+                cell.alarmText.isHidden = false
+                cell.alarmText.text = "\(hoursString):\(minutesString)"
+                print("added alarm on view")
             }
-        })
-    }
-    
-    func okAction(type: AlertStatus) {
-        switch type {
-        case .note:
-            self.addNote()
-            self.animateOut()
-        case .lateAlarm, .alert:
-            self.animateOut()
-        case .alarmTurned:
-            self.reloadRows()
-            self.animateOut()
-        case .alarmRequest:
-            self.addAlarm()
-        }
-    }
-    
-    func cancelAction(type: AlertStatus) {
-        switch type {
-        case .note:
-            self.noteCancel()
-            self.animateOut()
-        case .lateAlarm, .alert:
-            self.animateOut()
-        case .alarmTurned:
-            self.deleteAlarm()
-            self.animateOut()
-        case .alarmRequest:
-            self.deleteAlarm()
-            self.animateOut()
         }
     }
     
@@ -702,44 +762,32 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
     }
     
     func addNote() {
-        guard let text = alertView.textField.text else { return }
-        guard text != "" else { return }
+        guard let alertText = alertView.textField.text else { return }
+        guard alertText != "" else { return }
         guard let cellIndex = timeTableView.indexPathForSelectedRow else { return }
         guard let cell = timeTableView.cellForRow(at: cellIndex) as? TimeTableCell else { return }
         
         cell.noteImage.isHidden = false
         cell.noteText.isHidden = false
-        cell.noteText.text = text
         guard let pickedDate = self.pickedDate.ignoringTime else { return }
-        print("added note with: \(text)")
         
         if let dataOfArrayOfNotes = UserDefaults.standard.object(forKey: "arrayOfNotes") as? Data{
-            print("notes founded")
-            if let startTime = cell.startTime.text {
-                let noteDict = ["date": pickedDate,"cellStartTime":startTime,"text":text] as [String : Any]
-                print("set note on \(pickedDate) at \(startTime)")
-//MARK: if the same array is founded, just edit value
+            print("notes found")
+            if let cellStartTime = cell.startTime.text {
+                let noteDict = ["date": pickedDate,"cellStartTime":cellStartTime,"text":alertText] as [String : Any]
                 do {
-                    guard var arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(dataOfArrayOfNotes as Data) as? [[String : Any]] else { return }
-                    for var item in arrayOfNotes {
+                    guard let arrayOfNotes = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(dataOfArrayOfNotes) as? [[String : Any]] else { return }
+                    var newArrayOfNotes = arrayOfNotes
+                    for (index, item) in arrayOfNotes.enumerated() {
                         guard let arrDate = item["date"] as? Date else { return }
                         guard let startTime = item["cellStartTime"] as? String else { return }
-                        guard let text = item["text"] as? String else { return }
                         if cell.startTime.text == startTime && pickedDate == arrDate {
-                            print("deleted note at \(startTime)")
-                            item["text"] = text
-                            do {
-                                let noteData = try NSKeyedArchiver.archivedData(withRootObject: arrayOfNotes, requiringSecureCoding: false)
-                                UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                            return
+                            newArrayOfNotes.remove(at: index)
                         }
                     }
-                    arrayOfNotes.append(noteDict)
+                    newArrayOfNotes.append(noteDict)
                     do {
-                        let noteData = try NSKeyedArchiver.archivedData(withRootObject: arrayOfNotes, requiringSecureCoding: false)
+                        let noteData = try NSKeyedArchiver.archivedData(withRootObject: newArrayOfNotes, requiringSecureCoding: false)
                         UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
                     } catch {
                         print(error.localizedDescription)
@@ -751,7 +799,7 @@ class TimetableViewController: UIViewController, DateScrollPickerDelegate, DateS
         } else {
             print("notes not found, creating new defaults")
             if let startTime = cell.startTime.text {
-                let noteDict = [["date": pickedDate,"cellStartTime":startTime,"text":text]] as [[String : Any]]
+                let noteDict = [["date": pickedDate,"cellStartTime":startTime,"text":alertText]] as [[String : Any]]
                 do {
                     let noteData = try NSKeyedArchiver.archivedData(withRootObject: noteDict, requiringSecureCoding: false)
                     UserDefaults.standard.set(noteData, forKey: "arrayOfNotes")
@@ -812,10 +860,11 @@ extension TimetableViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TimeTableCell") as! TimeTableCell
             network.configureCell(cell: cell, for: indexPath, date: pickedDate, isStudent: isStudent, subGroup: currentSubGroup)
-            self.checkNotes(cell: cell, date: pickedDate)
-            self.checkAlarms(cell: cell, date: pickedDate)
+            checkAlarms(cell: cell, date: pickedDate)
+            checkNotes(cell: cell, date: pickedDate)
             timeTableView.allowsSelection = true
             timeTableSeparator.isHidden = false
+            print("cell returned")
             return cell
         }
     }

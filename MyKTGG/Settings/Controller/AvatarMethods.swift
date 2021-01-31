@@ -38,9 +38,9 @@ class AvatarMethods {
     }
     
     func setAccName(setName: String) {
-        let userID = Auth.auth().currentUser?.uid
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         let db = Database.database().reference().child("users")
-        db.child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             let name = value?["name"] as? String ?? ""
             
@@ -48,7 +48,7 @@ class AvatarMethods {
                 UserDefaults.standard.set(name, forKey: "name")
                 print("Updated name:",name)
             } else {
-                db.child(userID!).child("public").updateChildValues(["name":setName]) {
+                db.child(userID).child("public").updateChildValues(["name":setName]) {
                     (error: Error?, ref:DatabaseReference) in
                     if let error = error {
                         print("Data could not be saved: \(error).")
@@ -70,7 +70,7 @@ class AvatarMethods {
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
         let ref = Database.database().reference().child("users")
-        let user = Auth.auth().currentUser
+        guard let user = Auth.auth().currentUser else { return }
         let storageRef = Storage.storage().reference().child("avatars").child(userID)
         
         let db = Database.database().reference()
@@ -85,29 +85,26 @@ class AvatarMethods {
                     if error != nil {
                         print("Error",error!.localizedDescription)
                     } else {
-                        print(result!)
-                        let field = result! as? [String:Any]
-                        let facebookName = field!["name"] as! String
+                        guard let field = result as? [String:Any] else { return }
+                        let facebookName = field["name"] as! String
                         self.setAccName(setName: facebookName)
-                        if let imageURL = ((field!["picture"] as? [String: Any])?["data"] as? [String: Any])?["url"] as? String {
+                        if let imageURL = ((field["picture"] as? [String: Any])?["data"] as? [String: Any])?["url"] as? String {
                             print(imageURL)
-                            let url  = NSURL(string: imageURL)! as URL
-                            let data = NSData(contentsOf: url)
+                            guard let url  = NSURL(string: imageURL) as URL? else { return }
+                            guard let data = NSData(contentsOf: url) else { return }
                             
-                            storageRef.putData(data! as Data, metadata: metadata) { (metadata, error) in
+                            storageRef.putData(data as Data, metadata: metadata) { (metadata, error) in
                                 guard metadata != nil else {
                                     print("unable to upload Google avatar to firebase")
                                     return
                                 }
                                 print("image from Google Acc succesfully uploaded to firebase")
                                 storageRef.downloadURL { (url, error) in
-                                    guard url != nil else {
-                                        return
-                                    }
-                                    guard let photo = UIImage(data: data! as Data) else { return }
+                                    guard url != nil else { return }
+                                    guard let photo = UIImage(data: data as Data) else { return }
                                     self.saveAvatarToUserDefaults(image: photo, forKey: "avatar")
                                     
-                                    ref.child(user!.uid).child("public").updateChildValues(["avatarUrl":"\(url!)"]) {
+                                    ref.child(user.uid).child("public").updateChildValues(["avatarUrl":"\(url!)"]) {
                                         (error: Error?, ref:DatabaseReference) in
                                         if let error = error {
                                             print("Data could not be saved: \(error).")
@@ -131,21 +128,20 @@ class AvatarMethods {
             
             let imageUrl = GIDSignIn.sharedInstance().currentUser.profile.imageURL(withDimension: 400).absoluteString
             let url  = NSURL(string: imageUrl)! as URL
-            let data = NSData(contentsOf: url)
-            guard let userID = Auth.auth().currentUser?.uid else { return }
-            let storageRef = Storage.storage().reference().child("avatars").child(userID)
+            guard let data = NSData(contentsOf: url) else { return }
+            guard let user = Auth.auth().currentUser else { return }
+            let storageRef = Storage.storage().reference().child("avatars").child(user.uid)
             let metadata = StorageMetadata()
             metadata.contentType = "image/jpeg"
             let ref = Database.database().reference().child("users")
-            let user = Auth.auth().currentUser
             
             let db = Database.database().reference()
-            db.child("users").child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
+            db.child("users").child(user.uid).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
                 
                 let value = snapshot.value as? NSDictionary
                 let url = value?["avatarUrl"] as? String ?? ""
                 guard url != "" else {
-                    storageRef.putData(data! as Data, metadata: metadata) { (metadata, error) in
+                    storageRef.putData(data as Data, metadata: metadata) { (metadata, error) in
                         guard metadata != nil else {
                             print("unable to upload Google avatar to firebase")
                             return
@@ -155,10 +151,10 @@ class AvatarMethods {
                             guard url != nil else {
                                 return
                             }
-                            guard let photo = UIImage(data: data! as Data) else { return }
+                            guard let photo = UIImage(data: data as Data) else { return }
                             self.saveAvatarToUserDefaults(image: photo, forKey: "avatar")
                         }
-                        ref.child(user!.uid).updateChildValues(["avatarUrl":"\(url)"]) {
+                        ref.child(user.uid).updateChildValues(["avatarUrl":"\(url)"]) {
                             (error: Error?, ref:DatabaseReference) in
                             if let error = error {
                                 print("Data could not be saved: \(error).")
@@ -176,9 +172,9 @@ class AvatarMethods {
     
     func downloadAvatar(avatarView: UIImageView){
         print("downloading avatar...")
-        let userID = Auth.auth().currentUser?.uid
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         let db = Database.database().reference()
-        db.child("users").child(userID!).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
+        db.child("users").child(userID).child("public").observeSingleEvent(of: .value, with: { (snapshot) in
             let value = snapshot.value as? NSDictionary
             let url = value?["avatarUrl"] as? String ?? ""
             guard url != "" else { return }

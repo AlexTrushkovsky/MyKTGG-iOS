@@ -17,6 +17,8 @@ class MainViewController: UIViewController {
     var sheetVC = ListViewController()
     var dataSource: UBottomSheetCoordinatorDataSource?
     var alertStatus = AlertStatus.alert
+    @IBOutlet weak var weatherDeskHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var weatherDeskBottomConstraint: NSLayoutConstraint!
     
     @IBOutlet weak var whitePlaceholder: UIView!
     @IBOutlet weak var weatherIcon: UIImageView!
@@ -80,6 +82,27 @@ class MainViewController: UIViewController {
         alertView.setStyle(type: type)
     }
     
+    func showGettingStarted(){
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let gettingStarted = storyboard.instantiateViewController(withIdentifier: "gettingStarted") as! PagesViewController
+        gettingStarted.modalPresentationStyle = .overFullScreen
+        present(gettingStarted, animated: true, completion: nil)
+    }
+    
+    func enterCount() {
+        guard  let superDefaults = UserDefaults.init(suiteName: "super") else { return }
+        if let count = superDefaults.object(forKey: "EnterCount") as? Int {
+            print("count of enter: ", count)
+            if count%10==0 {
+                SKStoreReviewController.requestReview()
+            }
+            superDefaults.set(count+1, forKey: "EnterCount")
+        } else {
+            showGettingStarted()
+            superDefaults.set(1, forKey: "EnterCount")
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
@@ -87,7 +110,6 @@ class MainViewController: UIViewController {
         addWeatherUpdateObserver()
         makeElementsTransparent(bool: true)
         makeWeatherTransparent(bool: true)
-        EnterCount()
         websiteButton.layer.cornerRadius = 15
         chatButton.layer.cornerRadius = 15
         weatherBackgroundView.layer.cornerRadius = 15
@@ -95,8 +117,10 @@ class MainViewController: UIViewController {
         if height <= 568 {
             weatherDescription.isHidden = true
             weatherHeightConstraint.constant = 38
-            
+            weatherDeskHeightConstraint.constant = 8
+            weatherDeskBottomConstraint.constant = 0
         }
+        enterCount()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -194,18 +218,6 @@ class MainViewController: UIViewController {
                 self.weatherDescription.alpha = 1
                 self.weatherBackgroundView.alpha = 1
             }
-        }
-    }
-    // MARK: - Count of enters in app to display rate pop-up
-    func EnterCount() {
-        if let count = UserDefaults.standard.object(forKey: "EnterCount") as? Int {
-            print("count of enter: ", count)
-            if count%10==0 {
-                SKStoreReviewController.requestReview()
-            }
-            UserDefaults.standard.set(count+1, forKey: "EnterCount")
-        } else {
-            UserDefaults.standard.set(1, forKey: "EnterCount")
         }
     }
 }

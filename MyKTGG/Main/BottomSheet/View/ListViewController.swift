@@ -27,6 +27,29 @@ class ListViewController: UIViewController {
         addItemsFromDefaults()
     }
     
+    func deleteOutdatedAlarms() {
+        for index in 0..<tableView.numberOfRows(inSection: 0) {
+            let indexPath = IndexPath(row: index, section: 0)
+            if let cell = tableView.cellForRow(at: indexPath) as? MainItemCell {
+                let df = DateFormatter()
+                df.dateFormat = "yyyy-MM-dd HH:mm:ss zzz"
+                if let dateOfCell = df.date(from: cell.identifier) {
+                    if dateOfCell < Date() {
+                        sheetContentController.sheetModel.items!.remove(at: indexPath.row)
+                        var arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]
+                        arrayOfPushes!.remove(at: indexPath.row)
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                        sharedDefault!.set(arrayOfPushes, forKey: "pushes")
+                    }
+                }
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        deleteOutdatedAlarms()
+    }
+        
     func addItemsFromDefaults() {
         if let arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]{
             for push in arrayOfPushes {
@@ -35,7 +58,13 @@ class ListViewController: UIViewController {
                 let image = push[2]
                 if push.count > 3 {
                     let identifier = push[3]
-                    sheetContentController.addItem(title: title, subtitle: body, image: image, identifier: identifier)
+                    let df = DateFormatter()
+                    df.dateFormat = "yyyy-MM-dd HH:mm:ss zzz"
+                    if let dateOfCell = df.date(from: identifier) {
+                        if dateOfCell > Date() {
+                                sheetContentController.addItem(title: title, subtitle: body, image: image, identifier: identifier)
+                        }
+                    }
                 }else{
                     sheetContentController.addItem(title: title, subtitle: body, image: image)
                 }
@@ -123,7 +152,12 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource{
         guard let cell = tableView.cellForRow(at: indexPath) as? MainItemCell else { return }
         guard let tabBar = tabBarController else { return }
         if cell.nameLabel.text == "Будильник" || cell.nameLabel.text == "Заміна" {
-//            tabBar.selectedIndex = 2
+            let df = DateFormatter()
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss zzz"
+            if let dateOfCell = df.date(from: cell.identifier) {
+                UserDefaults.standard.setValue(dateOfCell, forKey: "selectDate")
+            }
+            tabBar.selectedIndex = 2
         } else {
             tabBar.selectedIndex = 1
         }

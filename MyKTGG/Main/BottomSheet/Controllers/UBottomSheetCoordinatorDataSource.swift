@@ -70,7 +70,6 @@ extension MainViewController: UBottomSheetCoordinatorDataSource{
         // 10 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
         var height = 10 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
         height = height - mainImage.frame.height * 0.1
-        print("available position: \(height)")
         return [UIApplication.shared.statusBarFrame.height, height]
     }
 
@@ -83,7 +82,6 @@ extension MainViewController: UBottomSheetCoordinatorDataSource{
         // 10 constraint + heightOfImage + 7.35% - 10,5%HeightOfImage
         var height = 10 + mainImage.frame.height + UIApplication.shared.statusBarFrame.height
         height = height - mainImage.frame.height * 0.1
-        print("available position: \(height)")
         return height
     }
 

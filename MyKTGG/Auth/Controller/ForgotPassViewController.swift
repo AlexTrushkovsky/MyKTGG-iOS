@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 class ForgotPassViewController: UIViewController {
+    @IBOutlet weak var shadowView: UIView!
     @IBOutlet weak var restoreLabel: UIView!
     @IBOutlet weak var emailFieldView: UIView!
     @IBOutlet weak var button: UIButton!
@@ -24,6 +25,19 @@ class ForgotPassViewController: UIViewController {
     
     override func viewWillLayoutSubviews() {
         setLabel(view: restoreLabel, text: "Відновлення паролю")
+    }
+    
+    @IBAction func cancelButton(_ sender: UIButton) {
+        dismiss(animated: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        shadowView.layer.cornerRadius = 36
+        shadowView.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        shadowView.layer.shadowColor = UIColor.black.cgColor
+        shadowView.layer.shadowOffset = .zero
+        shadowView.layer.shadowRadius = 20
+        shadowView.layer.shadowOpacity = 0.2
     }
     
     override func viewDidLoad() {

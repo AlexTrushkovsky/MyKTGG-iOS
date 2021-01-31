@@ -9,6 +9,7 @@
 import UIKit
 import Alamofire
 import AlamofireImage
+import SwiftSoup
 
 class NewsTableViewController: UITableViewController {
     
@@ -97,7 +98,7 @@ class NewsTableViewController: UITableViewController {
         isLoading = false
     }
     
-    private func clearTags() {
+    func clearTags() {
         guard let news = self.news.items else { return }
         for (index, _) in news.enumerated() {
             if let introtext = self.news.items?[index].introtext {
@@ -114,18 +115,15 @@ class NewsTableViewController: UITableViewController {
     
     private func configureCell(cell: NewsCell, for indexPath: IndexPath) {
         new = news.items![indexPath.section]
-        
         if let created = new.created{
             cell.date.text = created.toDate()?.toString(dateFormat: "dd'.'MM'.'YYYY")
         }
         if let rubric = new.category?.name?.withoutHtml {
             cell.rubric.text = rubric
         }
-        
         if let title = new.title{
             cell.heading.text = title
         }
-        
         if let introtext = new.introtext {
             if !introtext.isEmpty && introtext.count > 3 && cell.rubric.text != "Календар подій" {
                 cell.newsText.text = introtext
@@ -218,21 +216,17 @@ class NewsTableViewController: UITableViewController {
 }
     extension String {
         public var withoutHtml: String {
-            guard let data = self.data(using: .utf8) else {
-                return self
+            do{
+                let doc: Document = try SwiftSoup.parse(self)
+                return try doc.text()
+            }catch Exception.Error(let type, let message) {
+                print("without html error \(type): \(message)")
+            }catch{
+                print("without html error")
             }
-            
-            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-                .documentType: NSAttributedString.DocumentType.html,
-                .characterEncoding: String.Encoding.utf8.rawValue
-            ]
-            
-            guard let stringWoHTML = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
-                return self
-            }
-            
-            return stringWoHTML.string
+            return self
         }
+        
         public func toDate(withFormat format: String = "yyyy-MM-dd HH:mm:ss")-> Date?{
             
             let dateFormatter = DateFormatter()
