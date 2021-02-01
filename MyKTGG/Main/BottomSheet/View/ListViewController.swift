@@ -36,10 +36,17 @@ class ListViewController: UIViewController {
                 if let dateOfCell = df.date(from: cell.identifier) {
                     if dateOfCell < Date() {
                         sheetContentController.sheetModel.items!.remove(at: indexPath.row)
-                        var arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]]
-                        arrayOfPushes!.remove(at: indexPath.row)
+                        if var arrayOfPushes = sharedDefault!.object(forKey: "pushes") as? [[String]] {
+                            for (index, array) in arrayOfPushes.enumerated() {
+                                if array.count > 3 {
+                                    if array[4] != cell.identifier {
+                                        arrayOfPushes.remove(at: index)
+                                    }
+                                }
+                            }
+                            sharedDefault!.set(arrayOfPushes, forKey: "pushes")
+                        }
                         tableView.deleteRows(at: [indexPath], with: .automatic)
-                        sharedDefault!.set(arrayOfPushes, forKey: "pushes")
                     }
                 }
             }
@@ -56,13 +63,13 @@ class ListViewController: UIViewController {
                 let title = push[0]
                 let body = push[1]
                 let image = push[2]
-                if push.count > 3 {
+                if push.count > 3 && push[2] == "alarm" {
                     let identifier = push[3]
                     let df = DateFormatter()
                     df.dateFormat = "yyyy-MM-dd HH:mm:ss zzz"
                     if let dateOfCell = df.date(from: identifier) {
                         if dateOfCell > Date() {
-                                sheetContentController.addItem(title: title, subtitle: body, image: image, identifier: identifier)
+                            sheetContentController.addItem(title: title, subtitle: body, image: image, identifier: identifier)
                         }
                     }
                 }else{

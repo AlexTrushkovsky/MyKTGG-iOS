@@ -973,7 +973,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyKTGG/Мій КТГГDebug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = "$(SRCROOT)/MyKTGG/Helpers/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1000,7 +1000,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyKTGG/Мій КТГГ.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = "$(SRCROOT)/MyKTGG/Helpers/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1024,7 +1024,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1048,7 +1048,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;

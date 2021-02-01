@@ -230,6 +230,9 @@ class UserEditorTableViewController: UITableViewController {
         
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        if let groupDefaults = UserDefaults(suiteName: "group.myktgg") {
+            groupDefaults.removeObject(forKey: "pushes")
+        }
         UserDefaults.standard.synchronize()
         do{
             try Auth.auth().signOut()
