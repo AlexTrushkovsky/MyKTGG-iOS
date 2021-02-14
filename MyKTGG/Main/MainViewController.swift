@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import StoreKit
+import Firebase
 
 class MainViewController: UIViewController {
     
@@ -86,7 +87,7 @@ class MainViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let gettingStarted = storyboard.instantiateViewController(withIdentifier: "gettingStarted") as! PagesViewController
         gettingStarted.modalPresentationStyle = .overFullScreen
-        present(gettingStarted, animated: true, completion: nil)
+        present(gettingStarted, animated: true)
     }
     
     func enterCount() {

@@ -393,7 +393,7 @@ class AuthViewController: UIViewController, ASAuthorizationControllerPresentatio
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                         changeRequest?.displayName = name
                         changeRequest?.commitChanges { (error) in }
-                        ref.child(result.user.uid).child("public").updateChildValues(["name":name,"email":email,"perm":0])
+                        ref.child(result.user.uid).child("public").updateChildValues(["name":name,"email":email])
                         self.checkGroupInfoFromFirebase()
                         self.makeUpdateNotifications()
                         self.subscribeToNewsPushes()

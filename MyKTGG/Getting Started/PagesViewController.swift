@@ -17,9 +17,6 @@ class PagesViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var skipButton: UIButton!
     @IBAction func skipButton(_ sender: UIButton) {
         dismiss(animated: true)
-        if Auth.auth().currentUser == nil  {
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showAuthVC"), object: nil)
-        }
     }
     @IBOutlet weak var nextButton: UIButton!
     @IBAction func nextButton(_ sender: Any) {
@@ -48,6 +45,13 @@ class PagesViewController: UIViewController, UIScrollViewDelegate {
         scrollWidth = scrollView.frame.size.width
         scrollHeight = scrollView.frame.size.height
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if Auth.auth().currentUser == nil  {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showAuthVC"), object: nil)
+        }
+    }
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()

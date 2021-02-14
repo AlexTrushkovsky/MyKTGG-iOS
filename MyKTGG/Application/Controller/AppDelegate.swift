@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
         NotificationCenter.default.addObserver(self, selector: #selector(showModalGroupChoose), name:NSNotification.Name(rawValue: "groupChooseVC"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showModalAuth), name:NSNotification.Name(rawValue: "showAuthVC"), object: nil)
         Auth.auth().addStateDidChangeListener { (auth, user) in
-            if user == nil{
+            if user == nil {
                 self.showModalAuth()
             }
         }

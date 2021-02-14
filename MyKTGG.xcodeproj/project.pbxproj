@@ -49,8 +49,6 @@
 		6E8D588324605BAE00384ADC /* SourceSansPro-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587D24605BAE00384ADC /* SourceSansPro-ExtraLight.ttf */; };
 		6E8D588424605BAE00384ADC /* SourceSansPro-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E8D587E24605BAE00384ADC /* SourceSansPro-SemiBold.ttf */; };
 		6E8D58862460643A00384ADC /* TimeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D58852460643A00384ADC /* TimeTableCell.swift */; };
-		6E8D5888246074F100384ADC /* TimeTableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D5887246074F100384ADC /* TimeTableModel.swift */; };
-		6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8D58892460750200384ADC /* ChangeModel.swift */; };
 		6E9B60BE24EBEA0D000F81DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E9B60BD24EBEA0C000F81DB /* Assets.xcassets */; };
 		6E9E2C742468781700AFC756 /* DateInsertType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C682468781700AFC756 /* DateInsertType.swift */; };
 		6E9E2C752468781700AFC756 /* DateScrollManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9E2C692468781700AFC756 /* DateScrollManager.swift */; };
@@ -147,8 +145,6 @@
 		6E8D587D24605BAE00384ADC /* SourceSansPro-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-ExtraLight.ttf"; sourceTree = "<group>"; };
 		6E8D587E24605BAE00384ADC /* SourceSansPro-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-SemiBold.ttf"; sourceTree = "<group>"; };
 		6E8D58852460643A00384ADC /* TimeTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableCell.swift; sourceTree = "<group>"; };
-		6E8D5887246074F100384ADC /* TimeTableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableModel.swift; sourceTree = "<group>"; };
-		6E8D58892460750200384ADC /* ChangeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeModel.swift; sourceTree = "<group>"; };
 		6E9B60BD24EBEA0C000F81DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6E9E2C682468781700AFC756 /* DateInsertType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateInsertType.swift; sourceTree = "<group>"; };
 		6E9E2C692468781700AFC756 /* DateScrollManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateScrollManager.swift; sourceTree = "<group>"; };
@@ -534,8 +530,6 @@
 		6EABD2622464AC75009CE27F /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				6E8D5887246074F100384ADC /* TimeTableModel.swift */,
-				6E8D58892460750200384ADC /* ChangeModel.swift */,
 				6E5AB9872596063B0042F877 /* NewTimetableModel.swift */,
 			);
 			path = Model;
@@ -780,7 +774,6 @@
 				6E1600DF24ED3E2D001DE4B1 /* PassThroughView.swift in Sources */,
 				6E9E2C742468781700AFC756 /* DateInsertType.swift in Sources */,
 				6E76256E2403F6C100C68C7F /* AppDelegate.swift in Sources */,
-				6E8D588A2460750200384ADC /* ChangeModel.swift in Sources */,
 				6EF0F5DA25954A6200D6020E /* GroupNetworkController.swift in Sources */,
 				6E9E2C7E2468781700AFC756 /* UICollectionViewCell+Fade.swift in Sources */,
 				6E5AB98C25960A770042F877 /* TimetableNetworkController.swift in Sources */,
@@ -808,7 +801,6 @@
 				6E5AB9882596063B0042F877 /* NewTimetableModel.swift in Sources */,
 				6E1600D324ED3E2D001DE4B1 /* MainItemCell.swift in Sources */,
 				6E9E2C7A2468781700AFC756 /* DateScrollPickerFormat.swift in Sources */,
-				6E8D5888246074F100384ADC /* TimeTableModel.swift in Sources */,
 				6E1600DB24ED3E2D001DE4B1 /* ListViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -973,7 +965,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyKTGG/Мій КТГГDebug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = "$(SRCROOT)/MyKTGG/Helpers/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -981,7 +973,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1;
+				MARKETING_VERSION = 1.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg;
 				PRODUCT_NAME = "My KTGG";
@@ -1000,7 +992,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyKTGG/Мій КТГГ.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = "$(SRCROOT)/MyKTGG/Helpers/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1008,7 +1000,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1;
+				MARKETING_VERSION = 1.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg;
 				PRODUCT_NAME = "My KTGG";
@@ -1024,7 +1016,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1033,7 +1025,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1048,7 +1040,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DUHPBR64U;
 				INFOPLIST_FILE = NotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1057,7 +1049,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ua.pp.trushkovsky.myktgg.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
