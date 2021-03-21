@@ -153,360 +153,420 @@ class TimetableNetworkController {
         cell.teacher.isHidden = false
         cell.teacherImage.isHidden = false
         lessonCount = 0
-        if let stringDate = item[indexPath.row].date {
-            let newDate = stringDate.toDate(withFormat: "dd.MM.yyyy")
-            if date.ignoringTime == newDate?.ignoringTime {
-                if var lesson = item[indexPath.row].lessonDescription {
-                    if isStudent {
-                        if isTZ(lesson: lesson) {
-                            formatCellToChange(cell: cell)
-                            if isBigChangeForStudent(lesson: lesson) {
-                                let firstSubgroupLesson = lesson.components(separatedBy: "<br> <br>")[0]
-                                print(firstSubgroupLesson)
-                                let secondSubgroupLesson = lesson.components(separatedBy: "<br> <br>")[1]
-                                print(secondSubgroupLesson)
-                                if subGroup == 0 {
-                                    //работаем по первой сабгруппе
-                                } else if subGroup == 1 {
-                                    //работает по второй сабгруппе
-                                }
-                            } else {
-                                //если замена маленькая
-                            }
-                            
-                            lesson = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "")
-                            var newLesson = lesson.components(separatedBy: "замість:")[0]
-                            let oldLesson = lesson.components(separatedBy: "замість:")[1]
-                            if (oldLesson.components(separatedBy: "<br>").count) == 3 {
-                                newLesson = "\(oldLesson.components(separatedBy: "<br>")[0])<br> \(newLesson)"
-                            }
-                            print("NL: \(newLesson)")
-                            print("OLDL: \(oldLesson)")
-                            if isT3(lesson: newLesson) {
-                                
-                            } else if isT2(lesson: newLesson) {
-                                let room = newLesson.components(separatedBy: "<br>")[0]
-                                newLesson = newLesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                let teacher = "\(newLesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                newLesson = newLesson.replacingOccurrences(of: teacher, with: "")
-                                let subgroup = newLesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
-                                newLesson = newLesson.components(separatedBy: "<br>")[1]
-                                let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                print("subgroup:\(subgroup)")
-                                print("lesson:\(lesson)")
-                                cell.lessonName.text = lesson
-                                print("teacher:\(teacher)")
-                                cell.teacher.text = teacher
-                                print("room:\(room)")
-                                cell.lessonRoom.text = room
-                            } else if isT1(lesson: newLesson, isStudent: isStudent) {
-                                let room = newLesson.components(separatedBy: "<br>")[0]
-                                newLesson = newLesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                let teacher = "\(newLesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                newLesson = newLesson.replacingOccurrences(of: teacher, with: "")
-                                let lesson = newLesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                print("lesson:\(lesson)")
-                                cell.lessonName.text = lesson
-                                print("teacher:\(teacher)")
-                                cell.teacher.text = teacher
-                                print("room:\(room)")
-                                cell.lessonRoom.text = room
-                            } else {
-                                cell.lessonName.text = newLesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                cell.roomImage.isHidden = true
-                                cell.lessonRoom.isHidden = true
-                                cell.teacher.isHidden = true
-                                cell.teacherImage.isHidden = true
-                            }
-                            
-                        } else {
-                            formatCellToLesson(cell: cell)
-                            if isT3(lesson: lesson) {
-                                let firstPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[0]
-                                let secondPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[1]
-                                print("firstPart of t3:\(firstPart)")
-                                print("secondPart of t3:\(secondPart)")
-                                var mainPart = String()
-                                if firstPart.contains("(підгр. \(subGroup+1))") {
-                                    mainPart = firstPart
-                                } else if secondPart.contains("(підгр. \(subGroup+1))") {
-                                    mainPart = secondPart
-                                }
-                                    let room = mainPart.components(separatedBy: "<br>")[0]
-                                    mainPart = mainPart.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    let teacher = "\(mainPart.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                    mainPart = mainPart.replacingOccurrences(of: teacher, with: "")
-                                    let subgroup = mainPart.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
-                                    mainPart = mainPart.components(separatedBy: "<br>")[1]
-                                    let lesson = mainPart.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    print("subgroup:\(subgroup)")
-                                    print("lesson:\(lesson)")
-                                    cell.lessonName.text = lesson
-                                    print("teacher:\(teacher)")
-                                    cell.teacher.text = teacher
-                                    print("room:\(room)")
-                                    cell.lessonRoom.text = room
-                            } else if isT2(lesson: lesson) {
-                                let room = lesson.components(separatedBy: "<br>")[0]
-                                lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                lesson = lesson.replacingOccurrences(of: teacher, with: "")
-                                let subgroup = lesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
-                                lesson = lesson.components(separatedBy: "<br>")[1]
-                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                print("subgroup:\(subgroup)")
-                                print("lesson:\(lesson)")
-                                cell.lessonName.text = lesson
-                                print("teacher:\(teacher)")
-                                cell.teacher.text = teacher
-                                print("room:\(room)")
-                                cell.lessonRoom.text = room
-                            } else if isT1(lesson: lesson, isStudent: isStudent) {
-                                let room = lesson.components(separatedBy: "<br>")[0]
-                                lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                lesson = lesson.replacingOccurrences(of: teacher, with: "")
-                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                print("lesson:\(lesson)")
-                                cell.lessonName.text = lesson
-                                print("teacher:\(teacher)")
-                                cell.teacher.text = teacher
-                                print("room:\(room)")
-                                cell.lessonRoom.text = room
-                            } else {
-                                cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                cell.roomImage.isHidden = true
-                                cell.lessonRoom.isHidden = true
-                                cell.teacher.isHidden = true
-                                cell.teacherImage.isHidden = true
-                            }
-                        }
-                    } else {
-                        //For teacher
-                        if isTZ(lesson: lesson) {
-                            formatCellToChange(cell: cell)
-                            if isTZnewCab(lesson: lesson){
-                                print(lesson)
-                                lesson = lesson.replacingOccurrences(of: "Увага! Заняття перенесено у іншу аудиторію", with: "")
-                                let room = lesson.components(separatedBy: "!")[0]
-                                lesson = lesson.replacingOccurrences(of: "\(room)!", with: "")
-                                cell.lessonRoom.text = room
-                                
-                                if isTZcancel(lesson: lesson) {
-                                    print(lesson)
-                                    cell.lessonName.text = "Заняття відмінено"
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                } else if isTZforNewTeacher(lesson: lesson) {
-                                    print(lesson)
-                                    lesson = lesson.replacingOccurrences(of: "Увага! Цей викладач на заміні! Замість викладача ", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                    lesson = lesson.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    let group = lesson.components(separatedBy: "<br>")[0]
-                                    lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    cell.lessonName.text = lesson
-                                    cell.teacher.text = group
-                                } else if isTZforOldTeacher(lesson: lesson) {
-                                    print(lesson)
-                                    lesson = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "")
-                                    let newLesson = lesson.components(separatedBy: "замість:")[0]
-                                    let newTeacher = "\(lesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                    cell.lessonName.text = "Замість вас на заміні \(newTeacher)"
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                } else {
-                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                }
-                            } else {
-                                if isTZcancel(lesson: lesson) {
-                                    print(lesson)
-                                    cell.lessonName.text = "Заняття відмінено"
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                } else if isTZforNewTeacher(lesson: lesson) {
-                                    print(lesson)
-                                    if (lesson.components(separatedBy: "<br>").count-1) == 3 {
-                                        let room = lesson.components(separatedBy: "<br>")[0]
-                                        lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                        lesson = lesson.replacingOccurrences(of: "Увага! Цей викладач на заміні! Замість викладача ", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                        let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                        lesson = lesson.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                        let group = lesson.components(separatedBy: "<br>")[0]
-                                        lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "").replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                        cell.lessonName.text = lesson
-                                        cell.lessonRoom.text = room
-                                        cell.teacher.text = group
-                                    } else {
-                                        cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                        cell.roomImage.isHidden = true
-                                        cell.lessonRoom.isHidden = true
-                                        cell.teacher.isHidden = true
-                                        cell.teacherImage.isHidden = true
-                                    }
-                                } else if isTZforOldTeacher(lesson: lesson) {
-                                    print(lesson)
-                                    lesson = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "")
-                                    let newLesson = lesson.components(separatedBy: "замість:")[0]
-                                    let newTeacher = "\(lesson.components(separatedBy: ".")[0]).\(newLesson.components(separatedBy: ".")[1]).".trimmingCharacters(in: .whitespacesAndNewlines)
-                                    cell.lessonName.text = "Замість вас на заміні \(newTeacher)"
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                } else {
-                                    cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                    cell.roomImage.isHidden = true
-                                    cell.lessonRoom.isHidden = true
-                                    cell.teacher.isHidden = true
-                                    cell.teacherImage.isHidden = true
-                                }
-                                
-                            }
-                        } else {
-                            formatCellToLesson(cell: cell)
-                            if isT2(lesson: lesson) || isT1(lesson: lesson, isStudent: isStudent) {
-                                let room = lesson.components(separatedBy: "<br>")[0]
-                                lesson = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                let group = lesson.components(separatedBy: "<br>")[0]
-                                lesson = lesson.replacingOccurrences(of: "\(group)<br>", with: "")
-                                lesson = lesson.components(separatedBy: "<br>")[0]
-                                let lesson = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                print("lesson:\(lesson)")
-                                cell.lessonName.text = lesson
-                                print("group:\(group)")
-                                cell.teacher.text = group
-                                print("room:\(room)")
-                                cell.lessonRoom.text = room
-                            } else {
-                                cell.lessonName.text = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                                cell.roomImage.isHidden = true
-                                cell.lessonRoom.isHidden = true
-                                cell.teacher.isHidden = true
-                                cell.teacherImage.isHidden = true
-                            }
-                        }
-                    }
-                    
-                    if let lessontime = item[indexPath.row].lessonTime {
-                        if let index = lessontime.firstIndex(of: "-") {
-                            let firstPart = lessontime.prefix(upTo: index)
-                            let secondPart = lessontime.suffix(from: lessontime.index(index, offsetBy: 1))
-                            cell.startTime.text = String(firstPart)
-                            cell.endTime.text = String(secondPart)
-                        }
-                    }
-                }
+        configureTime(cell: cell, index: indexPath)
+        guard let stringDate = item[indexPath.row].date else { return }
+        let newDate = stringDate.toDate(withFormat: "dd.MM.yyyy")
+        guard date.ignoringTime == newDate?.ignoringTime else { return }
+        
+        configureLesson(cell: cell, index: indexPath, isStudent: isStudent, subGroup: subGroup)
+    }
+    
+    func configureTime(cell: TimeTableCell, index: IndexPath) {
+        if let lessontime = item[index.row].lessonTime {
+            if let index = lessontime.firstIndex(of: "-") {
+                let firstPart = lessontime.prefix(upTo: index)
+                let secondPart = lessontime.suffix(from: lessontime.index(index, offsetBy: 1))
+                cell.startTime.text = String(firstPart)
+                cell.endTime.text = String(secondPart)
             }
         }
     }
-    
-    func isT1(lesson: String, isStudent: Bool) -> Bool {
+ 
+    func configureLesson(cell: TimeTableCell, index: IndexPath, isStudent: Bool, subGroup: Int) {
+        formatCellToLesson(cell: cell)
+        guard let lesson = item[index.row].lessonDescription else { return }
         if isStudent {
-            if lesson.components(separatedBy: "<br>").count-1 == 2 && !lesson.contains("підгр.") {
-                print("t1 student")
-                return true
+            configAsStudent(cell: cell, lesson: lesson, isStudent: isStudent, subGroup: subGroup)
+        } else {
+            configAsTeacher(cell: cell, lesson: lesson, isStudent: isStudent)
+        }
+    }
+    
+    func configAsStudent(cell: TimeTableCell, lesson: String, isStudent: Bool, subGroup: Int) {
+        isStudentBig(lesson: lesson, cell: cell, subgroup: subGroup)
+    }
+    
+    func configAsTeacher(cell: TimeTableCell, lesson: String, isStudent: Bool) {
+        isTeacherRoomChange(lesson: lesson, cell: cell)
+    }
+    
+    
+//MARK: Student declaration
+    
+    func isStudentBig(lesson: String, cell: TimeTableCell, subgroup: Int) {
+        //getting subgroup if bigchange and giving new lessonDesk
+        if lesson.contains("(підгр. 1)") && lesson.contains("(підгр. 2)") && lesson.contains("<br> <div class='link'> </div> <br>") {
+            let firstPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[0]
+            let lastPart = lesson.components(separatedBy: "<br> <div class='link'> </div> <br>")[1]
+            var lessonForSubgroup: String? = nil
+            if firstPart.contains("(підгр. \(subgroup+1)") {
+                lessonForSubgroup = "\(firstPart)<br>"
             } else {
-                return false
+                lessonForSubgroup = lastPart
             }
-        } else {
-            if lesson.components(separatedBy: "<br>").count-1 == 3 && !lesson.contains("підгр.") {
-                print("t1 teacher")
-                return true
-            } else {
-                return false
+            if lessonForSubgroup != nil {
+                let lesson = lessonForSubgroup!.replacingOccurrences(of: "<div class='link'> </div>", with: "").replacingOccurrences(of: "<div class='link'></div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                print("\(cell.startTime.text ?? "") - got subgroup lesson")
+                isStudentRoomChange(lesson: lesson, cell: cell)
+                return
             }
         }
+        let formattedLesson = lesson.replacingOccurrences(of: "<div class='link'> </div>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+        isStudentRoomChange(lesson: formattedLesson, cell: cell)
     }
     
-    func isT2(lesson: String) -> Bool {
-        //identical for teacher
-        if lesson.components(separatedBy: "<br>").count-1 == 3 && lesson.components(separatedBy: "підгр.").count-1 == 1 {
-            print("t2")
-            return true
-        } else {
-            return false
+    var room: String? = nil
+    func isStudentRoomChange(lesson: String, cell: TimeTableCell) {
+        //if yes, remember new room
+        if lesson.contains("Увага! Заняття перенесено у іншу аудиторію") {
+            let lessonStr = lesson.replacingOccurrences(of: "Увага! Заняття перенесено у іншу аудиторію", with: "")
+            let room = lessonStr.components(separatedBy: "!")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            self.room = room
+            formatCellToChange(cell: cell)
+            print("\(cell.startTime.text ?? "") - room change found")
+            isStudentChangeWithLessonNameWithCab(lesson: lessonStr.replacingOccurrences(of: "\(room)!", with: "").trimmingCharacters(in: .whitespacesAndNewlines), cell: cell)
+            return
         }
+        isStudentChangeWithLessonNameWithCab(lesson: lesson, cell: cell)
     }
     
-    func isT3(lesson: String) -> Bool {
-        if (lesson.components(separatedBy: "<br>").count-1) == 7 && (lesson.components(separatedBy: "підгр.").count-1) == 2 {
-            print("t3")
-            return true
-        } else {
-            return false
+    func isStudentChangeWithLessonNameWithCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заміна!") && lesson.contains("замість:") && lesson.components(separatedBy: "<br>").count == 3{
+            var lessonStr = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "замість:")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            if lessonName != "" {
+                lessonStr = lessonStr.replacingOccurrences(of: lessonName, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                lessonStr = lessonStr.replacingOccurrences(of: "замість:", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                var room = lessonStr.components(separatedBy: "<br>")[0]
+                formatCellToChange(cell: cell)
+                cell.lessonName.text = lessonName
+                cell.teacher.text = teacher
+                if self.room != nil {
+                    room = self.room!
+                    self.room = nil
+                }
+                cell.lessonRoom.text = room
+                print("\(cell.startTime.text ?? "") - change with lesson name with cab found")
+                return
+            }
         }
+        isStudentChangeWithLessonNameWoCab(lesson: lesson, cell: cell)
     }
     
-    func isTZ(lesson: String) -> Bool {
-            if lesson.contains("Увага!") {
-                return true
+    func isStudentChangeWithLessonNameWoCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заміна!") && lesson.contains("замість:") && lesson.components(separatedBy: "<br>").count == 2{
+            var lessonStr = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "замість:")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            if lessonName != "" {
+                formatCellToChange(cell: cell)
+                cell.lessonName.text = lessonName
+                cell.teacher.text = teacher
+                if self.room != nil {
+                    cell.lessonRoom.text = self.room!
+                    self.room = nil
+                } else {
+                    cell.lessonRoom.isHidden = true
+                    cell.roomImage.isHidden = true
+                }
+                print("\(cell.startTime.text ?? "") - change with lesson name and without cab found")
+                return
+            }
+        }
+        isStudentChangeWithoutLessonNameWithCab(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentChangeWithoutLessonNameWithCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заміна!") && lesson.contains("замість:") && lesson.components(separatedBy: "<br>").count == 3 {
+            var lessonStr = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "замість:")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            if lessonName == "" {
+                formatCellToChange(cell: cell)
+                lessonStr = lessonStr.replacingOccurrences(of: "замість:", with: "")
+                let oldTeacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+                lessonStr = lessonStr.replacingOccurrences(of: oldTeacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let room = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                let lesson = lessonStr.components(separatedBy: "<br>")[1].replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                cell.lessonName.text = lesson
+                cell.teacher.text = teacher
+                cell.lessonRoom.text = room
+                if self.room != nil {
+                    cell.lessonRoom.text = room
+                    self.room = nil
+                }
+                print("\(cell.startTime.text ?? "") - change wo lesson name with cab found")
+                return
+            }
+        }
+        isStudentChangeWithoutLessonNameWoCab(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentChangeWithoutLessonNameWoCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заміна!") && lesson.contains("замість:") && lesson.components(separatedBy: "<br>").count == 2{
+            var lessonStr = lesson.replacingOccurrences(of: "Увага! Заміна!", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "замість:")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            if lessonName == "" {
+                formatCellToChange(cell: cell)
+                lessonStr = lessonStr.replacingOccurrences(of: "замість:", with: "")
+                let oldTeacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+                lessonStr = lessonStr.replacingOccurrences(of: oldTeacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let room = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                let lesson = lessonStr.components(separatedBy: "<br>")[1].replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+                cell.lessonName.text = lesson
+                cell.teacher.text = teacher
+                cell.lessonRoom.text = room
+                if self.room != nil {
+                    cell.lessonRoom.text = self.room!
+                    self.room = nil
+                } else {
+                    cell.lessonRoom.isHidden = true
+                    cell.roomImage.isHidden = true
+                }
+                print("\(cell.startTime.text ?? "") - change wo lesson name wo cab found")
+                return
+            }
+        }
+        isStudentChangeCanceled(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentChangeCanceled(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заняття відмінено!") {
+            formatCellToChange(cell: cell)
+            cell.lessonName.text = "Заняття відмінено"
+            cell.lessonRoom.isHidden = true
+            cell.teacher.isHidden = true
+            cell.roomImage.isHidden = true
+            cell.teacherImage.isHidden = true
+            print("\(cell.startTime.text ?? "") - change canceled found")
+            return
+        }
+        isStudentSubgroupLessonWithCab(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentSubgroupLessonWithCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("(підгр.") && lesson.components(separatedBy: "<br>").count == 4{
+            var room = lesson.components(separatedBy: "<br>")[0]
+            var lessonStr = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            var teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: "\(teacher)", with: "")
+            teacher = teacher.replacingOccurrences(of: "(підгр. 1)", with: "").replacingOccurrences(of: "(підгр. 2)", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "<br>")[1].trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "<br>", with: "")
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.lessonRoom.text = room
+            cell.teacher.text = teacher
+            print("\(cell.startTime.text ?? "") - subgroup lesson with cab found")
+            return
+        }
+        isStudentSubgroupLessonWoCab(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentSubgroupLessonWoCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("(підгр.") && lesson.components(separatedBy: "<br>").count == 3{
+            var teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1])."
+            let lessonStr = lesson.replacingOccurrences(of: "\(teacher)", with: "")
+            teacher = teacher.replacingOccurrences(of: "(підгр. 1)", with: "").replacingOccurrences(of: "(підгр. 2)", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "<br>")[1].trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "<br>", with: "")
+            if self.room != nil {
+                cell.lessonRoom.text = self.room!
+                self.room = nil
             } else {
-            return false
+                cell.lessonRoom.isHidden = true
+                cell.roomImage.isHidden = true
+            }
+            cell.lessonName.text = lessonName
+            cell.teacher.text = teacher
+            print("\(cell.startTime.text ?? "") - subgroup lesson without cab found")
+            return
         }
+        isStudentDefaultLessonWithCab(lesson: lesson, cell: cell)
     }
     
-    func isTZcancel(lesson: String) -> Bool {
-            if lesson.contains("Заняття відмінено!") {
-                print("tz cancel")
-                return true
+    func isStudentDefaultLessonWithCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.components(separatedBy: "<br>").count == 3 {
+            var room = lesson.components(separatedBy: "<br>")[0]
+            var lessonStr = lesson.replacingOccurrences(of: "\(room)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: "\(teacher)", with: "")
+            let lessonName = lessonStr.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.lessonRoom.text = room
+            cell.teacher.text = teacher
+            print("\(cell.startTime.text ?? "") - default lesson with cab found")
+            return
+        }
+        isStudentDefaultLessonWoCab(lesson: lesson, cell: cell)
+    }
+    
+    func isStudentDefaultLessonWoCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.components(separatedBy: "<br>").count == 2 {
+            let teacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1])."
+            let lessonStr = lesson.replacingOccurrences(of: "\(teacher)", with: "")
+            let lessonName = lessonStr.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            var room: String? = nil
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            if room != nil {
+                cell.lessonRoom.text = room
             } else {
-            return false
+                cell.roomImage.isHidden = true
+                cell.lessonRoom.isHidden = true
+            }
+            cell.teacher.text = teacher
+            print("\(cell.startTime.text ?? "") - default lesson wo cab found")
+            return
         }
+        putEverythingInline(lesson: lesson, cell: cell)
     }
     
-    func isTZnewCab(lesson: String) -> Bool {
-        if (lesson.components(separatedBy: "Заняття перенесено у іншу аудиторію").count-1) == 1 && (lesson.components(separatedBy: "!").count-1) >= 2 {
-                print("tz new cab")
-                return true
+    func putEverythingInline(lesson: String, cell: TimeTableCell) {
+        //put inline deleting occurances of tags
+        print("\(cell.startTime.text ?? "") - occurances not found")
+        let lessonName = lesson.replacingOccurrences(of: "<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+        cell.lessonName.text = lessonName
+        cell.lessonRoom.isHidden = true
+        cell.teacher.isHidden = true
+        cell.roomImage.isHidden = true
+        cell.teacherImage.isHidden = true
+    }
+    
+//MARK: Teacher declaration
+    
+    func isTeacherRoomChange(lesson: String, cell: TimeTableCell) {
+        //if yes, remember new room
+        if lesson.contains("Увага! Заняття перенесено у іншу аудиторію") {
+            let lessonStr = lesson.replacingOccurrences(of: "Увага! Заняття перенесено у іншу аудиторію", with: "")
+            let room = lessonStr.components(separatedBy: "!")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            self.room = room
+            formatCellToChange(cell: cell)
+            print("\(cell.startTime.text ?? "") - room change found")
+            isTeacherChanged(lesson: lessonStr.replacingOccurrences(of: "\(room)!", with: "").trimmingCharacters(in: .whitespacesAndNewlines), cell: cell)
+            return
+        }
+        isTeacherChanged(lesson: lesson, cell: cell)
+    }
+    
+    func isTeacherChanged(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Заміна! Заняття проведе інший викладач:") && lesson.components(separatedBy: "<br>").count == 3 {
+            var lessonStr = lesson.replacingOccurrences(of: "Увага! Заміна! Заняття проведе інший викладач:", with: "")
+            let teacher = "\(lessonStr.components(separatedBy: ".")[0]).\(lessonStr.components(separatedBy: ".")[1])."
+            lessonStr = lessonStr.replacingOccurrences(of: teacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let group = lessonStr.components(separatedBy: "<br>")[0]
+            lessonStr = lessonStr.replacingOccurrences(of: "\(group)<br>", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonName = lessonStr.components(separatedBy: "<br>")[0]
+            var room: String? = nil
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.teacher.text = group
+            if room != nil {
+                cell.lessonRoom.text = room
             } else {
-            return false
+                cell.roomImage.isHidden = true
+                cell.lessonRoom.isHidden = true
+            }
+            return
         }
+        isTeacherChanges(lesson: lesson, cell: cell)
     }
     
-    func isTZforNewTeacher(lesson: String) -> Bool {
-        if (lesson.components(separatedBy: "Цей викладач на заміні!").count-1) == 1 {
-                print("tz for new teacher")
-                return true
+    func isTeacherChanges(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.contains("Увага! Цей викладач на заміні! Замість викладача") && lesson.components(separatedBy: "<br>").count == 3 {
+            let oldTeacher = "\(lesson.components(separatedBy: ".")[0]).\(lesson.components(separatedBy: ".")[1])."
+            var lessonStr = lesson.replacingOccurrences(of: oldTeacher, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let group = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            lessonStr = lessonStr.replacingOccurrences(of: "\(group)<br>", with: "")
+            let lessonName = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            var room: String? = nil
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.teacher.text = group
+            if room != nil {
+                cell.lessonRoom.text = room
             } else {
-            return false
+                cell.roomImage.isHidden = true
+                cell.lessonRoom.isHidden = true
+            }
+            return
         }
+        isTeacherDefaultLessonWithCab(lesson: lesson, cell: cell)
     }
     
-    func isTZforOldTeacher(lesson: String) -> Bool {
-            if lesson.contains("Увага! Заміна!") {
-                print("tz for old teacher")
-                return true
+    func isTeacherDefaultLessonWithCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.components(separatedBy: "<br>").count == 4 {
+            var room = lesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            var lessonStr = lesson.replacingOccurrences(of: "\(room)<br>", with: "")
+            let group = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            lessonStr = lessonStr.replacingOccurrences(of: "\(group) <br>", with: "").replacingOccurrences(of: "\(group)<br>", with: "")
+            let lessonName = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.lessonRoom.text = room
+            cell.teacher.text = group
+            return
+        }
+        isTeacherDefaultLessonWoCab(lesson: lesson, cell: cell)
+    }
+    
+    func isTeacherDefaultLessonWoCab(lesson: String, cell: TimeTableCell) {
+        //if yes result, write and return
+        if lesson.components(separatedBy: "<br>").count == 3 {
+            let group = lesson.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            let lessonStr = lesson.replacingOccurrences(of: "\(group) <br>", with: "")
+            let lessonName = lessonStr.components(separatedBy: "<br>")[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            var room: String? = nil
+            if self.room != nil {
+                room = self.room!
+                self.room = nil
+            }
+            cell.lessonName.text = lessonName
+            cell.teacher.text = group
+            if room != nil {
+                cell.lessonRoom.text = room
             } else {
-            return false
+                cell.roomImage.isHidden = true
+                cell.lessonRoom.isHidden = true
+            }
+            return
         }
-    }
-    
-    func isTZforStudent(lesson: String) -> Bool {
-            if lesson.contains("Увага! Заміна!") {
-                print("tz for student")
-                return true
-            } else {
-            return false
-        }
-    }
-    
-    func isBigChangeForStudent(lesson: String) -> Bool{
-        if lesson.contains("<br> <br>") {
-            print("big change ofr student")
-            return true
-        } else {
-            return false
-        }
+        putEverythingInline(lesson: lesson, cell: cell)
     }
     
 }

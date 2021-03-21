@@ -32,40 +32,8 @@ class NotificationService: UNNotificationServiceExtension {
             
             var push = [String]()
             
-            let title = bestAttemptContent.title
-            if title.contains("<in>") && title.contains("</in>") {
-                if let superTitle = title.components(separatedBy: "<in>").first {
-                    push.append(superTitle)
-                }
-                push.append(bestAttemptContent.body)
-                
-                if let imageName = bestAttemptContent.title.components(separatedBy: "<in>").last?.components(separatedBy: "</in>").first {
-                    push.append(imageName)
-                } else {
-                    push.append("default")
-                }
-            } else {
-                push.append(bestAttemptContent.title)
-                push.append(bestAttemptContent.body)
-                push.append("default")
-            }
-            
-            
-            let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
-            if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{
-                arrayOfPushes.insert(push, at: 0)
-                sharedDefault.set(arrayOfPushes, forKey: "pushes")
-            } else {
-                sharedDefault.set([push], forKey: "pushes")
-            }
-            
-            if let title = title.components(separatedBy: "<in>").first {
-                bestAttemptContent.title = title
-                if let badgeNum = UserDefaults(suiteName: "group.myktgg")!.object(forKey: "badges") as? Int {
-                    bestAttemptContent.badge = NSNumber(value: badgeNum+1)
-                    UserDefaults(suiteName: "group.myktgg")!.set(badgeNum+1, forKey: "badges")
-                }
-            }
+            push.append(bestAttemptContent.title)
+            push.append(bestAttemptContent.body)
             
             let userInfo : [AnyHashable: Any] = request.content.userInfo
             if let attachmentURL = userInfo["image_url"] as? String {
@@ -75,6 +43,25 @@ class NotificationService: UNNotificationServiceExtension {
                     }
                 }
             }
+            if let icon = userInfo["icon"] as? String {
+                push.append(icon)
+            } else {
+                push.append("default")
+            }
+            
+            let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
+            if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{
+                arrayOfPushes.insert(push, at: 0)
+                sharedDefault.set(arrayOfPushes, forKey: "pushes")
+            } else {
+                sharedDefault.set([push], forKey: "pushes")
+            }
+            
+            if let badgeNum = UserDefaults(suiteName: "group.myktgg")!.object(forKey: "badges") as? Int {
+                bestAttemptContent.badge = NSNumber(value: badgeNum+1)
+                UserDefaults(suiteName: "group.myktgg")!.set(badgeNum+1, forKey: "badges")
+            }
+            
             contentHandler(bestAttemptContent)
         }
     }

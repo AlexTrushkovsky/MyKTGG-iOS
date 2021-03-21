@@ -74,6 +74,8 @@ class UserEditorTableViewController: UITableViewController {
             .applyingTransform(.stripDiacritics, reverse: false)?
             .lowercased()
             .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: ")", with: "")
+            .replacingOccurrences(of: "(", with: "")
             .replacingOccurrences(of: "`", with: "") ?? nonLatin
     }
     

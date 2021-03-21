@@ -36,6 +36,7 @@
                                     <constraint firstAttribute="height" constant="60" id="17E-5w-d39"/>
                                     <constraint firstAttribute="width" constant="60" id="kja-Cl-3Z7"/>
                                 </constraints>
+                                <color key="tintColor" red="0.015686274509803921" green="0.50978344679999998" blue="0.43526491519999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" image="ktgg_appIcon"/>
                                 <connections>
                                     <action selector="websiteButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="gfd-jV-0Xa"/>
@@ -84,7 +85,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1°" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lJT-79-G72">
                                         <rect key="frame" x="43" y="8" width="34" height="30"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="23"/>
-                                        <color key="textColor" red="0.59215686274509804" green="0.8784313725490196" blue="0.78823529411764703" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="textColor" red="0.63445276019999997" green="0.896276772" blue="0.82954686879999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pBO-RB-6JB">
@@ -1371,7 +1372,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <color key="backgroundColor" red="0.95686274510000002" green="0.91372549020000005" blue="0.91372549020000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="backgroundColor" red="0.96862745098039216" green="0.93187433480000004" blue="0.93091362710000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="trailingMargin" secondItem="Nyi-x2-09h" secondAttribute="trailing" id="Aww-yw-ggV"/>
                                                 <constraint firstItem="Nyi-x2-09h" firstAttribute="leading" secondItem="rJZ-I4-PsH" secondAttribute="leadingMargin" id="C34-Dy-JRG"/>

@@ -128,25 +128,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate{
         
         let sharedDefault = UserDefaults(suiteName: "group.myktgg")!
         
-            if title.contains("<in>") && title.contains("</in>") {
-                if let superTitle = title.components(separatedBy: "<in>").first {
-                    push.append(superTitle)
-                }
-                push.append(body)
-                if let imageName = title.components(separatedBy: "<in>").last?.components(separatedBy: "</in>").first {
-                    print(title)
-                    print(imageName)
-                    push.append(imageName)
-                } else {
-                    push.append("default")
-                }
-            } else {
-                push.append(title)
-                push.append(body)
-                push.append("default")
-            }
-            
-            push.append(dateOfchange)
+        push.append(title)
+        push.append(body)
+    
+        if let icon = userInfo["icon"] as? String {
+            push.append(icon)
+        } else {
+            push.append("default")
+        }
+        
+        push.append(dateOfchange)
             
         if var arrayOfPushes = sharedDefault.object(forKey: "pushes") as? [[String]]{
             for pushItem in arrayOfPushes {

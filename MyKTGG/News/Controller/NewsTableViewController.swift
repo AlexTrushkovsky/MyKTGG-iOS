@@ -61,11 +61,16 @@ class NewsTableViewController: UITableViewController {
     
     public func fetchData(limit: Int){
         let jsonUrlString = "https://ktgg.kiev.ua/uk/news.html?limit=\(limit)&format=json"
-        
         guard let url = URL(string: jsonUrlString) else { return }
+        
         print("Starting to fetch data from \(jsonUrlString)")
         //Alamofire request
-        let alamofireSession = AF.request(url, method: .get)
+        
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET"
+        req.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringCacheData
+        
+        let alamofireSession = AF.request(req)
         alamofireSession.validate()
         alamofireSession.responseJSON { response in
             switch response.result {
