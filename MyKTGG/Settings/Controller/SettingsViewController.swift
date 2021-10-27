@@ -375,7 +375,7 @@ class SettingsViewController: UITableViewController {
         }
         if indexPath.section == 5 {
             if indexPath.row == 0 {
-                if let url = URL(string: "https://t.me/esen1n25") {
+                if let url = URL(string: "https://send.monobank.ua/8vhG21ndYm") {
                     UIApplication.shared.open(url)
                 }
             }

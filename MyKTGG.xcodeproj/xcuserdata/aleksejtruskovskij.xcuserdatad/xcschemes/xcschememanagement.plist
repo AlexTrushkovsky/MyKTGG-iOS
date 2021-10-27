@@ -12,7 +12,7 @@
 		<key>NotificationService.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>26</integer>
+			<integer>25</integer>
 		</dict>
 		<key>pushService.xcscheme_^#shared#^_</key>
 		<dict>

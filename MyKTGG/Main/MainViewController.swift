@@ -37,9 +37,9 @@ class MainViewController: UIViewController {
         }
     }
     @IBAction func chatButton(_ sender: Any) {
-        self.setAlert(type: .alert)
-        self.alertView.setText(title: "Працюємо", subTitle: "Наразі чат в розробці", body: "очікуйте в наступних версіях")
-        self.animateIn()
+//        self.setAlert(type: .alert)
+//        self.alertView.setText(title: "Працюємо", subTitle: "Наразі чат в розробці", body: "очікуйте в наступних версіях")
+//        self.animateIn()
 //        let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "chat") as? ChatVC
 //        self.navigationController?.pushViewController(vc!, animated: true)
     }
